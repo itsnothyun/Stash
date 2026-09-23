@@ -1,0 +1,392 @@
+/* ══ Swap Component Styles (notboring.dev design spec) ═════════════ */
+
+.swp {
+  --swp-green: 52, 199, 89;
+  --font-ui: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --swp-card: hsl(var(--card));
+  --swp-ground: hsl(var(--surface));
+  --swp-ink: hsl(var(--foreground));
+  --swp-ink-2: hsl(var(--foreground) / 0.85);
+  --swp-ink-3: hsl(var(--muted-foreground));
+  --swp-ink-4: hsl(var(--muted-foreground) / 0.7);
+  --swp-ink-5: hsl(var(--muted-foreground) / 0.4);
+  --swp-on-ink: hsl(var(--primary-foreground));
+  --swp-pane-edge: hsl(var(--border));
+
+  box-sizing: border-box;
+  background: var(--swp-card);
+  color: var(--swp-ink);
+  font-family: var(--font-ui);
+  border: 1px solid var(--swp-pane-edge);
+  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.08);
+}
+
+.swp.swp-embedded {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+
+.swp-picker-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  background-color: #ffffff;
+  color: #18181b;
+  border-radius: 22px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  box-shadow: 0 20px 45px -8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.dark .swp-picker-overlay,
+[data-theme="dark"] .swp-picker-overlay {
+  background-color: #18181b;
+  color: #fafafa;
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 20px 45px -8px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+:root {
+  --ink-rgb: 24, 24, 27;
+}
+.dark {
+  --ink-rgb: 250, 250, 250;
+}
+
+.swp-head {
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px;
+  display: flex;
+}
+
+.swp-title {
+  letter-spacing: -0.01em;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.swp-slip {
+  color: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+}
+
+.swp-well {
+  box-sizing: border-box;
+  background: rgba(var(--ink-rgb), 0.05);
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 10px;
+  padding: 0 14px;
+  transition: box-shadow 0.15s, background-color 0.15s;
+  display: flex;
+  position: relative;
+}
+
+label.swp-well:focus-within {
+  box-shadow: inset 0 0 0 2px rgba(var(--ink-rgb), 0.18);
+  background: rgba(var(--ink-rgb), 0.07);
+}
+
+.swp-label {
+  color: var(--ink-4);
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+.swp-in,
+.swp-out {
+  width: 60%;
+  height: 32px;
+  font: inherit;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  background: 0 0;
+  border: 0;
+  outline: none;
+  margin: 0;
+  padding: 0;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 32px;
+  display: block;
+}
+
+.swp-in:disabled {
+  color: var(--ink);
+  opacity: 1;
+}
+
+.swp-out {
+  overflow: hidden;
+}
+
+.swp-roll {
+  height: 32px;
+  display: inline-grid;
+  position: relative;
+  overflow: hidden;
+}
+
+.swp-roll > span {
+  white-space: nowrap;
+  grid-area: 1/1;
+  display: block;
+}
+
+.swp-usd {
+  color: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+.swp-flip {
+  z-index: 2;
+  background: var(--swp-card);
+  box-shadow: inset 0 0 0 1px var(--swp-pane-edge), 0 2px 6px rgba(0, 0, 0, 0.06);
+  color: var(--swp-ink);
+  cursor: pointer;
+  border: 0;
+  border-radius: 999px;
+  place-items: center;
+  padding: 0;
+  transition: background 0.15s, scale 0.13s cubic-bezier(0.3, 0.9, 0.4, 1);
+  display: grid;
+  position: absolute;
+}
+
+.swp-flip:hover {
+  background: var(--swp-ground);
+}
+
+.swp-flip:active {
+  scale: 0.92;
+}
+
+.swp-flip:disabled {
+  cursor: default;
+  scale: 1;
+}
+
+.swp-flip:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--swp-pane-edge), 0 0 0 3px rgba(var(--ink-rgb), 0.28);
+  outline: none;
+}
+
+.swp-token {
+  z-index: 3;
+  background: var(--swp-card);
+  height: 32px;
+  color: var(--swp-ink);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08), inset 0 0 0 1px var(--swp-pane-edge);
+  font: inherit;
+  cursor: pointer;
+  border: 0;
+  border-radius: 999px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px 0 4px;
+  font-size: 12.5px;
+  font-weight: 600;
+  transition: scale 0.13s cubic-bezier(0.3, 0.9, 0.4, 1);
+  display: inline-flex;
+  position: absolute;
+  top: 0;
+}
+
+.swp-token:active {
+  scale: 0.96;
+}
+
+.swp-token:disabled {
+  cursor: default;
+  scale: 1;
+}
+
+.swp-token:focus-visible {
+  box-shadow: 0 0 0 3px rgba(var(--ink-rgb), 0.28);
+  outline: none;
+}
+
+.swp-coin {
+  color: #fff;
+  border-radius: 999px;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+  font-weight: 700;
+  display: grid;
+}
+
+.swp-token[data-tone="eth"] .swp-coin {
+  background: radial-gradient(90% 100% at 20% 10%, #7ab6ff, #0000 60%),
+    radial-gradient(80% 90% at 90% 25%, #8f5bff, #0000 60%), #4d6dff;
+}
+
+.swp-token[data-tone="usd"] .swp-coin {
+  background: #2775ca;
+}
+
+.swp-token[data-tone="btc"] .swp-coin {
+  background: #f7931a;
+}
+
+.swp-token[data-tone="eur"] .swp-coin {
+  background: #003399;
+}
+
+.swp-token[data-tone="gbp"] .swp-coin {
+  background: #7928ca;
+}
+
+.swp-token[data-tone="jpy"] .swp-coin {
+  background: #c93b2b;
+}
+
+.swp-token[data-tone="sol"] .swp-coin {
+  background: linear-gradient(135deg, #9945ff 0%, #14f195 100%);
+}
+
+.swp-token[data-tone="fiat"] .swp-coin {
+  background: #10b981;
+}
+
+.swp-token[data-tone="vnd"] .swp-coin {
+  background: #da251d;
+}
+
+.swp-token[data-tone="hkd"] .swp-coin {
+  background: #c8102e;
+}
+
+.swp-token[data-tone="crypto"] .swp-coin {
+  background: #6366f1;
+}
+
+.swp-rate {
+  color: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding: 0 4px;
+  font-size: 11.5px;
+  display: flex;
+}
+
+.swp-track {
+  background: rgba(var(--ink-rgb), 0.06);
+  -webkit-user-select: none;
+  user-select: none;
+  place-items: center;
+  margin-top: 12px;
+  transition: background 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s;
+  display: grid;
+  position: relative;
+  overflow: hidden;
+}
+
+.swp-track[data-off] {
+  opacity: 0.5;
+}
+
+.swp[data-done] .swp-track {
+  background: rgba(var(--swp-green), 0.16);
+}
+
+.swp-say,
+.swp-said {
+  color: var(--ink-3);
+  pointer-events: none;
+  grid-area: 1/1;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.swp-said {
+  z-index: 2;
+  color: rgb(var(--swp-green));
+  opacity: 0;
+  transition: opacity 0.24s 0.12s;
+  font-weight: 600;
+}
+
+.swp[data-done] .swp-said {
+  opacity: 1;
+}
+
+.swp-grip {
+  background: var(--ink);
+  color: var(--on-ink);
+  cursor: grab;
+  touch-action: none;
+  border: 0;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  z-index: 10;
+}
+
+.swp-track[data-held] .swp-grip {
+  cursor: grabbing;
+}
+
+.swp-grip:disabled {
+  cursor: default;
+}
+
+.swp-grip:focus-visible {
+  box-shadow: 0 0 0 3px rgba(var(--ink-rgb), 0.28);
+  outline: none;
+}
+
+.swp[data-done] .swp-grip {
+  background: rgb(var(--swp-green));
+  color: #fff;
+}
+
+.swp-cap {
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  position: relative;
+}
+
+.swp-glyph {
+  grid-area: 1/1;
+  place-items: center;
+  transition: opacity 0.18s, scale 0.26s cubic-bezier(0.3, 1.3, 0.5, 1);
+  display: grid;
+}
+
+.swp-glyph[data-off] {
+  opacity: 0;
+  scale: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swp-flip,
+  .swp-token,
+  .swp-track,
+  .swp-grip,
+  .swp-said,
+  .swp-well,
+  .swp-glyph {
+    transition-duration: 1ms;
+  }
+}

@@ -1,0 +1,679 @@
+@import "./swap.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   Stash design tokens
+   --------------------------------------------------------------------------
+   One neutral shell, one restrained accent, and a curated set of stash
+   colors. Nothing in a component should hardcode a colour or a radius.
+   ========================================================================== */
+
+@layer base {
+  :root {
+    /* --- Shell ----------------------------------------------------------- */
+    --background: 0 0% 100%;
+    --foreground: 240 8% 11%;
+
+    --surface: 30 9% 98%;
+    --surface-elevated: 0 0% 100%;
+    --surface-hover: 30 7% 95.5%;
+    --surface-sunken: 30 8% 96.5%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 8% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 8% 11%;
+
+    --primary: 240 8% 12%;
+    --primary-foreground: 0 0% 99%;
+
+    --secondary: 30 7% 95.5%;
+    --secondary-foreground: 240 8% 14%;
+
+    --muted: 30 7% 96%;
+    --muted-foreground: 240 4% 47%;
+    --subtle-foreground: 240 4% 62%;
+
+    --accent: 30 7% 95.5%;
+    --accent-foreground: 240 8% 12%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 99%;
+
+    --success: 152 58% 38%;
+    --warning: 35 92% 45%;
+
+    /* One restrained brand accent: a cool, sober indigo. */
+    --brand: 243 70% 58%;
+    --brand-foreground: 0 0% 100%;
+    --brand-muted: 243 72% 96%;
+
+    --border: 240 7% 91.5%;
+    --border-strong: 240 6% 84%;
+    --input: 240 7% 90%;
+    --ring: 243 70% 58%;
+    --selection: 243 70% 58%;
+
+    /* --- Sidebar --------------------------------------------------------- */
+    --sidebar: 30 9% 98.2%;
+    --sidebar-foreground: 240 5% 38%;
+    --sidebar-active: 30 7% 93.5%;
+    --sidebar-active-foreground: 240 8% 12%;
+    --sidebar-hover: 30 7% 95.8%;
+    --sidebar-border: 240 7% 91.5%;
+
+    /* --- Editor ---------------------------------------------------------- */
+    --editor: 0 0% 100%;
+    --editor-foreground: 240 8% 13%;
+    --editor-placeholder: 240 4% 68%;
+
+    /* --- Radii ----------------------------------------------------------- */
+    /* Soft, Apple-flavoured curvature: generous but never a pill. */
+    --radius-xs: 0.375rem; /* 6px  — dots, tiny chips */
+    --radius-sm: 0.5rem; /* 8px  — menu rows, tags */
+    --radius: 0.625rem; /* 10px — inputs, buttons */
+    --radius-md: 0.75rem; /* 12px — small cards, popovers */
+    --radius-lg: 0.875rem; /* 14px — note cards */
+    --radius-xl: 1.125rem; /* 18px — dialogs, panels */
+    --radius-2xl: 1.5rem; /* 24px — launch surfaces */
+
+    /* --- Elevation ------------------------------------------------------- */
+    /* Borders do most of the work; shadows only lift things off the page. */
+    --shadow-xs: 0 1px 2px -1px hsl(240 10% 12% / 0.06);
+    --shadow-sm: 0 1px 2px -1px hsl(240 10% 12% / 0.07),
+      0 2px 6px -2px hsl(240 10% 12% / 0.05);
+    --shadow-md: 0 2px 4px -2px hsl(240 10% 12% / 0.06),
+      0 8px 20px -6px hsl(240 10% 12% / 0.1);
+    --shadow-lg: 0 4px 8px -4px hsl(240 10% 12% / 0.08),
+      0 18px 44px -12px hsl(240 10% 12% / 0.16);
+
+    /* --- Stash colors (light) -------------------------------------------- */
+    --stash-paper-surface: #ffffff;
+    --stash-paper-hover: #fafafa;
+    --stash-paper-border: #e8e8eb;
+    --stash-paper-fg: #18181b;
+    --stash-paper-muted: #71717a;
+    --stash-paper-dot: #d4d4d8;
+
+    --stash-sand-surface: #fdfbf7;
+    --stash-sand-hover: #f7f2e9;
+    --stash-sand-border: #ece4d6;
+    --stash-sand-fg: #2b2622;
+    --stash-sand-muted: #8a7d6b;
+    --stash-sand-dot: #dcc9a6;
+
+    --stash-lemon-surface: #fffdf0;
+    --stash-lemon-hover: #fefae0;
+    --stash-lemon-border: #f4e9b5;
+    --stash-lemon-fg: #3a2c06;
+    --stash-lemon-muted: #8a6d12;
+    --stash-lemon-dot: #f2d349;
+
+    --stash-sage-surface: #f7faf7;
+    --stash-sage-hover: #eff5ef;
+    --stash-sage-border: #dde7dd;
+    --stash-sage-fg: #1e2d22;
+    --stash-sage-muted: #587a60;
+    --stash-sage-dot: #a9c6ae;
+
+    --stash-mint-surface: #f4fdf7;
+    --stash-mint-hover: #e6f9ed;
+    --stash-mint-border: #cdeeda;
+    --stash-mint-fg: #0b2e1b;
+    --stash-mint-muted: #1d7a48;
+    --stash-mint-dot: #7bdba4;
+
+    --stash-sky-surface: #f5fbff;
+    --stash-sky-hover: #e7f4fd;
+    --stash-sky-border: #cfe7f7;
+    --stash-sky-fg: #0c2c42;
+    --stash-sky-muted: #1c6c99;
+    --stash-sky-dot: #7cc7ee;
+
+    --stash-lavender-surface: #faf8ff;
+    --stash-lavender-hover: #f2edfe;
+    --stash-lavender-border: #e3daf8;
+    --stash-lavender-fg: #2b1b4d;
+    --stash-lavender-muted: #6a4bb0;
+    --stash-lavender-dot: #c3aef2;
+
+    --stash-rose-surface: #fff7f8;
+    --stash-rose-hover: #ffedf0;
+    --stash-rose-border: #f9dbe0;
+    --stash-rose-fg: #45141f;
+    --stash-rose-muted: #a63d55;
+    --stash-rose-dot: #f3aab7;
+
+    --stash-graphite-surface: #f6f6f7;
+    --stash-graphite-hover: #eeeef0;
+    --stash-graphite-border: #e0e0e4;
+    --stash-graphite-fg: #1b1b1f;
+    --stash-graphite-muted: #5b5b64;
+    --stash-graphite-dot: #a1a1aa;
+  }
+
+  .dark {
+    /* --- Shell ----------------------------------------------------------- */
+    --background: 240 9% 6.5%;
+    --foreground: 240 8% 95%;
+
+    --surface: 240 8% 8.5%;
+    --surface-elevated: 240 8% 11%;
+    --surface-hover: 240 7% 14%;
+    --surface-sunken: 240 9% 5.5%;
+
+    --card: 240 8% 9.5%;
+    --card-foreground: 240 8% 95%;
+
+    --popover: 240 8% 10.5%;
+    --popover-foreground: 240 8% 95%;
+
+    --primary: 240 8% 95%;
+    --primary-foreground: 240 9% 9%;
+
+    --secondary: 240 6% 16%;
+    --secondary-foreground: 240 8% 95%;
+
+    --muted: 240 6% 15%;
+    --muted-foreground: 240 5% 62%;
+    --subtle-foreground: 240 5% 48%;
+
+    --accent: 240 6% 16%;
+    --accent-foreground: 240 8% 95%;
+
+    --destructive: 0 66% 56%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 52% 50%;
+    --warning: 38 92% 58%;
+
+    --brand: 243 78% 70%;
+    --brand-foreground: 243 60% 12%;
+    --brand-muted: 243 40% 18%;
+
+    --border: 240 6% 17%;
+    --border-strong: 240 6% 26%;
+    --input: 240 6% 19%;
+    --ring: 243 78% 70%;
+    --selection: 243 78% 70%;
+
+    /* --- Sidebar --------------------------------------------------------- */
+    --sidebar: 240 9% 7.5%;
+    --sidebar-foreground: 240 5% 68%;
+    --sidebar-active: 240 6% 15.5%;
+    --sidebar-active-foreground: 240 8% 97%;
+    --sidebar-hover: 240 6% 12%;
+    --sidebar-border: 240 6% 15%;
+
+    /* --- Editor ---------------------------------------------------------- */
+    --editor: 240 8% 9.5%;
+    --editor-foreground: 240 8% 93%;
+    --editor-placeholder: 240 5% 42%;
+
+    /* --- Elevation ------------------------------------------------------- */
+    --shadow-xs: 0 1px 2px -1px hsl(240 20% 2% / 0.5);
+    --shadow-sm: 0 1px 2px -1px hsl(240 20% 2% / 0.6),
+      0 2px 6px -2px hsl(240 20% 2% / 0.45);
+    --shadow-md: 0 2px 4px -2px hsl(240 20% 2% / 0.5),
+      0 8px 20px -6px hsl(240 20% 2% / 0.55);
+    --shadow-lg: 0 4px 8px -4px hsl(240 20% 2% / 0.5),
+      0 18px 44px -12px hsl(240 20% 2% / 0.7);
+
+    /* --- Stash colors (dark) --------------------------------------------- */
+    /* Designed for dark, not inverted from the light values. */
+    --stash-paper-surface: #1a1a1e;
+    --stash-paper-hover: #212126;
+    --stash-paper-border: #2c2c33;
+    --stash-paper-fg: #f2f2f4;
+    --stash-paper-muted: #9c9ca6;
+    --stash-paper-dot: #52525b;
+
+    --stash-sand-surface: #1d1a16;
+    --stash-sand-hover: #26221c;
+    --stash-sand-border: #3a3329;
+    --stash-sand-fg: #f4efe6;
+    --stash-sand-muted: #b3a48c;
+    --stash-sand-dot: #b39b71;
+
+    --stash-lemon-surface: #1e1c11;
+    --stash-lemon-hover: #282417;
+    --stash-lemon-border: #3e3821;
+    --stash-lemon-fg: #f7eec2;
+    --stash-lemon-muted: #c7a53e;
+    --stash-lemon-dot: #d4b642;
+
+    --stash-sage-surface: #151c17;
+    --stash-sage-hover: #1d2620;
+    --stash-sage-border: #2a3a2e;
+    --stash-sage-fg: #e6efe7;
+    --stash-sage-muted: #8ba892;
+    --stash-sage-dot: #6f9478;
+
+    --stash-mint-surface: #101f17;
+    --stash-mint-hover: #162a1f;
+    --stash-mint-border: #1f3e2d;
+    --stash-mint-fg: #d6f5e2;
+    --stash-mint-muted: #56c288;
+    --stash-mint-dot: #3fa871;
+
+    --stash-sky-surface: #101c26;
+    --stash-sky-hover: #152633;
+    --stash-sky-border: #1f3b4f;
+    --stash-sky-fg: #d8eefb;
+    --stash-sky-muted: #57b4e0;
+    --stash-sky-dot: #3f97c9;
+
+    --stash-lavender-surface: #1a1628;
+    --stash-lavender-hover: #231e36;
+    --stash-lavender-border: #362c52;
+    --stash-lavender-fg: #ece3fb;
+    --stash-lavender-muted: #a88fe0;
+    --stash-lavender-dot: #8f74d4;
+
+    --stash-rose-surface: #211418;
+    --stash-rose-hover: #2c1a20;
+    --stash-rose-border: #45242e;
+    --stash-rose-fg: #fbdfe4;
+    --stash-rose-muted: #d9788c;
+    --stash-rose-dot: #c25f74;
+
+    --stash-graphite-surface: #202024;
+    --stash-graphite-hover: #28282e;
+    --stash-graphite-border: #35353c;
+    --stash-graphite-fg: #f0f0f2;
+    --stash-graphite-muted: #9a9aa4;
+    --stash-graphite-dot: #6e6e78;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: hsl(var(--selection) / 0.22);
+  }
+
+  /* One consistent focus treatment across the whole app. */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring) / 0.55);
+    outline-offset: 1px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Scrollbars — present but never loud
+   -------------------------------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.18);
+  border-radius: 9999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.32);
+  background-clip: content-box;
+  border: 3px solid transparent;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* --------------------------------------------------------------------------
+   Native window helpers
+   -------------------------------------------------------------------------- */
+.drag-region {
+  -webkit-app-region: drag;
+}
+.no-drag-region {
+  -webkit-app-region: no-drag;
+}
+
+/* --------------------------------------------------------------------------
+   Tiptap editor
+   -------------------------------------------------------------------------- */
+.tiptap {
+  outline: none;
+  min-height: 100%;
+  color: hsl(var(--editor-foreground));
+}
+.tiptap p.is-editor-empty:first-child::before {
+  color: hsl(var(--editor-placeholder));
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+.tiptap a {
+  text-underline-offset: 2px;
+}
+
+/* A checklist row is a single line of rich text, not a document: it grows
+   with its content and carries none of the block spacing a note needs. */
+.tiptap-todo-row {
+  min-height: 0;
+}
+.tiptap-todo-row p {
+  margin: 0;
+}
+.tiptap-todo-row p.is-editor-empty:first-child::before {
+  color: hsl(var(--editor-placeholder));
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+.tiptap code {
+  background: hsl(var(--muted));
+  border-radius: var(--radius-xs);
+  padding: 0.1em 0.35em;
+  font-size: 0.875em;
+}
+.tiptap pre {
+  background: hsl(var(--surface-sunken));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.875rem;
+}
+.tiptap blockquote {
+  border-left: 2px solid hsl(var(--border-strong));
+  padding-left: 0.875rem;
+  font-style: normal;
+  color: hsl(var(--muted-foreground));
+}
+.tiptap hr {
+  border: none;
+  border-top: 1px solid hsl(var(--border));
+  margin: 1rem 0;
+}
+.stash-checklist {
+  margin: 0.75rem 0 0.25rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-md);
+  background: hsl(var(--surface-elevated) / 0.55);
+  padding: 0.625rem 0.625rem 0.375rem;
+}
+.stash-checklist-chrome {
+  user-select: none;
+  margin-bottom: 0.375rem;
+}
+.stash-checklist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+.stash-checklist-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex: 1;
+  min-width: 0;
+}
+.stash-checklist-icon {
+  width: 13px;
+  height: 13px;
+  color: hsl(var(--muted-foreground) / 0.7);
+  flex-shrink: 0;
+}
+.stash-checklist-title-input {
+  background: transparent;
+  border: 0;
+  outline: none;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.stash-checklist-title-input::placeholder {
+  color: hsl(var(--muted-foreground) / 0.45);
+  font-weight: 500;
+  font-style: italic;
+}
+.stash-checklist-title-input:focus {
+  outline: none;
+}
+.stash-checklist-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.stash-checklist-track {
+  height: 3.5px;
+  flex: 1;
+  overflow: hidden;
+  border-radius: 999px;
+  background: hsl(var(--foreground) / 0.1);
+}
+.stash-checklist-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: hsl(var(--brand));
+  transition: width 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.stash-checklist-fill-done {
+  background: hsl(var(--success));
+}
+.stash-checklist-count {
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: hsl(var(--muted-foreground));
+  flex-shrink: 0;
+}
+.stash-checklist-percentage {
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: hsl(var(--muted-foreground));
+  min-width: 26px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.stash-checklist-add {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.125rem;
+  width: 100%;
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.35rem;
+  font-size: 12px;
+  color: hsl(var(--muted-foreground));
+}
+.stash-checklist-add:hover {
+  background: hsl(var(--foreground) / 0.05);
+  color: hsl(var(--foreground));
+}
+.tiptap ul[data-type="taskList"] {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.tiptap ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.2rem 0.15rem;
+  border-radius: var(--radius-sm);
+}
+.tiptap ul[data-type="taskList"] li:hover {
+  background: hsl(var(--foreground) / 0.04);
+}
+.tiptap ul[data-type="taskList"] li > label {
+  position: relative;
+  display: flex;
+  width: 0.95rem;
+  height: 0.95rem;
+  margin-top: 0.22rem;
+  flex: 0 0 auto;
+  user-select: none;
+}
+.tiptap ul[data-type="taskList"] li > label input[type="checkbox"] {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.tiptap ul[data-type="taskList"] li > label span {
+  display: flex;
+  width: 0.95rem;
+  height: 0.95rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  border: 1.5px solid hsl(var(--foreground) / 0.38);
+  background: transparent;
+  pointer-events: none;
+}
+.tiptap ul[data-type="taskList"] li[data-checked="true"] > label span {
+  background: hsl(var(--brand));
+  border-color: hsl(var(--brand));
+}
+.tiptap ul[data-type="taskList"] li[data-checked="true"] > label span::after {
+  content: "";
+  width: 0.28rem;
+  height: 0.48rem;
+  margin-top: -1px;
+  border: solid hsl(var(--brand-foreground, 0 0% 100%));
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+.tiptap ul[data-type="taskList"] li > div {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.tiptap ul[data-type="taskList"] li > div p {
+  margin: 0;
+}
+.tiptap ul[data-type="taskList"] li[data-checked="true"] > div {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+.tiptap mark {
+  border-radius: var(--radius-xs);
+  padding: 0.12em 0.3em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.tiptap u {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.tiptap sub {
+  font-size: 0.75em;
+  vertical-align: sub;
+  line-height: 0;
+}
+.tiptap sup {
+  font-size: 0.75em;
+  vertical-align: super;
+  line-height: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Checklist surface
+   -------------------------------------------------------------------------- */
+
+/* The tick is drawn on, rather than popped in. */
+@keyframes stash-check-draw {
+  from {
+    stroke-dashoffset: 22;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.stash-check-path {
+  stroke-dasharray: 22;
+  animation: stash-check-draw 220ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* A completed row settles rather than celebrates. */
+@keyframes stash-settle {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.stash-settle {
+  animation: stash-settle 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Table blocks
+   -------------------------------------------------------------------------- */
+.ProseMirror table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  margin: 0.75rem 0;
+  overflow: hidden;
+}
+
+.ProseMirror table td,
+.ProseMirror table th {
+  border: 1px solid hsl(var(--border));
+  padding: 0.375rem 0.625rem;
+  vertical-align: top;
+  min-width: 60px;
+  font-size: 0.8125rem;
+  position: relative;
+}
+
+.ProseMirror table th {
+  background: hsl(var(--muted) / 0.4);
+  font-weight: 600;
+  text-align: left;
+}
+
+.ProseMirror table .selectedCell {
+  background: hsl(var(--brand) / 0.08);
+}
