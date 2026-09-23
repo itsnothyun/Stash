@@ -1,24 +1,32 @@
-# Stash ✦ Desktop
+<p align="center">
+  <img src="src/assets/logo.png" alt="Stash Desktop Logo" width="108" height="108" />
+</p>
 
-> **Capture it. Stash it. Personalize it. Find it instantly.**  
-> *A high-performance, local-first floating workspace utility for macOS and Windows.*
+<h1 align="center">Stash</h1>
 
-[![Tauri 2](https://img.shields.io/badge/Tauri-2.0-blue.svg?logo=tauri&logoColor=white)](https://tauri.app/)
-[![React 18](https://img.shields.io/badge/React-18-61dafb.svg?logo=react&logoColor=black)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Rust](https://img.shields.io/badge/Rust-1.77+-orange.svg?logo=rust&logoColor=white)](https://www.rust-lang.org/)
-[![SQLite](https://img.shields.io/badge/SQLite-FTS5-003B57.svg?logo=sqlite&logoColor=white)](https://sqlite.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+<p align="center">
+  <strong>Capture it. Stash it. Personalize it. Find it instantly.</strong><br>
+  <em>A high-performance, local-first floating workspace utility for macOS and Windows.</em>
+</p>
+
+<p align="center">
+  <a href="https://tauri.app/"><img src="https://img.shields.io/badge/Tauri-2.0-blue.svg?logo=tauri&logoColor=white" alt="Tauri 2" /></a>
+  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18-61dafb.svg?logo=react&logoColor=black" alt="React 18" /></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.6-3178c6.svg?logo=typescript&logoColor=white" alt="TypeScript" /></a>
+  <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/Rust-1.77+-orange.svg?logo=rust&logoColor=white" alt="Rust" /></a>
+  <a href="https://sqlite.org/"><img src="https://img.shields.io/badge/SQLite-FTS5-003B57.svg?logo=sqlite&logoColor=white" alt="SQLite" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" /></a>
+</p>
 
 ---
 
-## ✦ Overview
+## Overview
 
 **Stash** is a production-quality, local-first desktop application combining the tactile immediacy of floating sticky notes with the organizational depth of a modern knowledge workspace. It is built natively on top of **Tauri 2 (Rust)** and **React 18 + TypeScript**, backed by an embedded SQLite database with WAL mode and SQLite FTS5 for sub-millisecond search.
 
 ---
 
-## ✦ Key Features
+## Key Features
 
 ### 1. Instant Capture & Detached Floating Windows
 - **Global Hotkey (`Cmd/Ctrl + Shift + N`)**: Launch a lightweight, focused floating stash note instantly from any app on your system.
@@ -74,7 +82,7 @@ Attach interactive, draggable utility widgets to any note surface:
 
 ---
 
-## ✦ System Architecture
+## System Architecture
 
 ```text
 Stash Architecture
@@ -107,7 +115,7 @@ Stash Architecture
 
 ---
 
-## ✦ Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -120,8 +128,8 @@ Stash Architecture
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/<your-username>/stash.git
-cd stash
+git clone https://github.com/itsnothyun/Stash.git
+cd Stash
 
 # 2. Install frontend dependencies
 pnpm install
@@ -151,7 +159,7 @@ cargo test
 
 ---
 
-## ✦ Keyboard Shortcuts
+## Keyboard Shortcuts
 
 | Shortcut | Action | Scope |
 | :--- | :--- | :--- |
@@ -171,7 +179,7 @@ cargo test
 
 ---
 
-## ✦ Data & Privacy
+## Data & Privacy
 
 - **Local Storage**: All notes and settings are stored locally on your machine:
   - Windows: `%APPDATA%\com.stash.desktop\stash.db`
@@ -181,6 +189,6 @@ cargo test
 
 ---
 
-## ✦ License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
