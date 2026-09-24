@@ -520,7 +520,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
           <button
             type="button"
             onClick={handleOpenTodayStash}
-            title={`Today's Stash (${new Date().toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}) · Ctrl+Shift+D`}
+            title={`Today's Stash (${new Date().toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })})`}
             aria-label="Open or create Today's Daily Stash"
             className={cn(
               "liquid-glass-shell group relative mb-3 flex items-center justify-center rounded-xl p-[1.5px] cursor-pointer transition-all duration-200 select-none",
@@ -535,7 +535,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 "liquid-glass-track liquid-glass-sheen flex w-full items-center rounded-xl transition-all",
                 sidebarCollapsed
                   ? "h-full justify-center p-0"
-                  : "justify-between gap-2 px-2.5 py-1.5"
+                  : "justify-start gap-2.5 px-2.5 py-1.5"
               )}
             >
               <div className="flex items-center gap-2 min-w-0">
@@ -570,14 +570,6 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                   </div>
                 )}
               </div>
-              {!sidebarCollapsed && (
-                <kbd className="rounded bg-black/5 dark:bg-white/10 px-1 py-0.2 font-mono text-[9px] font-medium text-muted-foreground/80 border border-black/5 dark:border-white/10 shrink-0">
-                  {typeof navigator !== "undefined" &&
-                  /Mac|iPod|iPhone|iPad/.test(navigator.platform)
-                    ? "⌘⇧D"
-                    : "Ctrl+Shift+D"}
-                </kbd>
-              )}
             </div>
           </button>
 

@@ -17,7 +17,7 @@ export const TodayStashGlassPill: React.FC<TodayStashGlassPillProps> = ({
   onClick,
   todayNote,
   size = "md",
-  showShortcut = true,
+  showShortcut = false,
   className,
 }) => {
   const now = new Date();
