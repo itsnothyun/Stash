@@ -28,7 +28,7 @@ export const DownloadMatrix: React.FC = () => {
   const linux = DOWNLOAD_PACKAGES.linux;
 
   return (
-    <section id="downloads" className="py-20 sm:py-28 border-t border-white/[0.06] bg-[#070709] relative">
+    <section id="downloads" className="py-20 sm:py-28 bg-transparent relative">
       <div className="mx-auto max-w-5xl px-6 sm:px-8">
         {/* Section Heading */}
         <div className="text-left mb-12">
@@ -49,7 +49,7 @@ export const DownloadMatrix: React.FC = () => {
           {/* ========================================================
              WINDOWS PLATFORM CARD
              ======================================================== */}
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0c0c0e] p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden group hover:border-cyan-500/30 transition-colors">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#161619] p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden group hover:border-cyan-500/30 transition-colors">
             {/* Top ambient highlight */}
             <div className="pointer-events-none absolute -top-16 -right-16 h-36 w-36 rounded-full bg-cyan-500/10 blur-3xl" />
 
@@ -90,7 +90,7 @@ export const DownloadMatrix: React.FC = () => {
                 <a
                   href={windows.primaryInstaller.url}
                   download
-                  className="flex w-full h-11 items-center justify-between rounded-full bg-white px-5 text-xs font-semibold text-black shadow-sm transition-all hover:bg-neutral-100 hover:shadow-[0_0_20px_rgba(255,255,255,0.25)] cursor-pointer group/btn"
+                  className="flex w-full h-11 items-center justify-between rounded-full bg-white px-5 text-xs font-semibold text-black shadow-[0_8px_24px_rgba(0,0,0,0.65),0_2px_6px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.8)] hover:bg-neutral-100 active:translate-y-0.5 transition-all cursor-pointer group/btn"
                 >
                   <div className="flex items-center gap-2.5">
                     {/* Small Windows logo */}
@@ -111,7 +111,7 @@ export const DownloadMatrix: React.FC = () => {
                   <a
                     href={windows.secondaryInstaller.url}
                     download
-                    className="flex w-full h-9 items-center justify-between rounded-full border border-white/[0.08] bg-white/[0.02] px-4 text-xs font-normal text-zinc-300 hover:bg-white/[0.06] hover:text-white transition-colors cursor-pointer"
+                    className="flex w-full h-9 items-center justify-between rounded-full border border-white/[0.08] bg-[#1a1a20] px-4 text-xs font-normal text-zinc-300 hover:bg-[#22222a] hover:text-white shadow-[0_4px_12px_rgba(0,0,0,0.55)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.7)] active:translate-y-0.5 transition-all cursor-pointer"
                   >
                     <div className="flex items-center gap-2">
                       <Package className="h-3.5 w-3.5 text-zinc-400" />
@@ -125,7 +125,7 @@ export const DownloadMatrix: React.FC = () => {
               </div>
 
               {/* Package Manager (Winget CLI) */}
-              <div className="rounded-xl bg-black/40 border border-white/[0.06] p-3.5">
+              <div className="rounded-xl bg-[#131316] border border-white/[0.06] p-3.5">
                 <div className="flex items-center justify-between text-[10px] text-zinc-500 mb-1.5 font-mono uppercase tracking-wider">
                   <span className="flex items-center gap-1.5">
                     <Terminal className="h-3 w-3 text-cyan-400" />
@@ -133,12 +133,12 @@ export const DownloadMatrix: React.FC = () => {
                   </span>
                   <span className="text-emerald-400 font-medium">Verified Package</span>
                 </div>
-                <div className="flex items-center justify-between font-mono text-xs text-zinc-300 bg-white/[0.02] rounded-lg px-2.5 py-1.5 border border-white/[0.04]">
+                <div className="flex items-center justify-between font-mono text-xs text-zinc-300 bg-[#1a1a20] rounded-lg px-2.5 py-1.5 border border-white/[0.04]">
                   <code className="text-cyan-300">{windows.cliCommand}</code>
                   <button
                     type="button"
                     onClick={() => handleCopy(windows.cliCommand, "winget")}
-                    className="p-1 rounded hover:bg-white/10 text-zinc-400 hover:text-white transition-colors cursor-pointer ml-2"
+                    className="p-1.5 rounded-md bg-[#25252e] border border-white/[0.06] text-zinc-400 hover:text-white shadow-[0_2px_6px_rgba(0,0,0,0.5)] active:translate-y-0.5 transition-all cursor-pointer ml-2"
                     title="Copy command"
                   >
                     {copiedKey === "winget" ? (
@@ -172,7 +172,7 @@ export const DownloadMatrix: React.FC = () => {
           {/* ========================================================
              MACOS PLATFORM CARD
              ======================================================== */}
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0c0c0e] p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden group hover:border-purple-500/30 transition-colors">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#161619] p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden group hover:border-purple-500/30 transition-colors">
             {/* Top ambient highlight */}
             <div className="pointer-events-none absolute -top-16 -right-16 h-36 w-36 rounded-full bg-purple-500/10 blur-3xl" />
 
@@ -213,7 +213,7 @@ export const DownloadMatrix: React.FC = () => {
                 <a
                   href={macos.primaryInstaller.url}
                   download
-                  className="flex w-full h-11 items-center justify-between rounded-full bg-white px-5 text-xs font-semibold text-black shadow-sm transition-all hover:bg-neutral-100 hover:shadow-[0_0_20px_rgba(255,255,255,0.25)] cursor-pointer group/btn"
+                  className="flex w-full h-11 items-center justify-between rounded-full bg-white px-5 text-xs font-semibold text-black shadow-[0_8px_24px_rgba(0,0,0,0.65),0_2px_6px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.8)] hover:bg-neutral-100 active:translate-y-0.5 transition-all cursor-pointer group/btn"
                 >
                   <div className="flex items-center gap-2.5">
                     {/* Small Apple logo */}
@@ -242,7 +242,7 @@ export const DownloadMatrix: React.FC = () => {
               </div>
 
               {/* Package Manager (Homebrew Cask) */}
-              <div className="rounded-xl bg-black/40 border border-white/[0.06] p-3.5">
+              <div className="rounded-xl bg-[#131316] border border-white/[0.06] p-3.5">
                 <div className="flex items-center justify-between text-[10px] text-zinc-500 mb-1.5 font-mono uppercase tracking-wider">
                   <span className="flex items-center gap-1.5">
                     {/* Beer / Brew Icon */}
@@ -257,12 +257,12 @@ export const DownloadMatrix: React.FC = () => {
                   </span>
                   <span className="text-emerald-400 font-medium">1-Command Install</span>
                 </div>
-                <div className="flex items-center justify-between font-mono text-xs text-zinc-300 bg-white/[0.02] rounded-lg px-2.5 py-1.5 border border-white/[0.04]">
+                <div className="flex items-center justify-between font-mono text-xs text-zinc-300 bg-[#1a1a20] rounded-lg px-2.5 py-1.5 border border-white/[0.04]">
                   <code className="text-purple-300">{macos.cliCommand}</code>
                   <button
                     type="button"
                     onClick={() => handleCopy(macos.cliCommand, "brew")}
-                    className="p-1 rounded hover:bg-white/10 text-zinc-400 hover:text-white transition-colors cursor-pointer ml-2"
+                    className="p-1.5 rounded-md bg-[#25252e] border border-white/[0.06] text-zinc-400 hover:text-white shadow-[0_2px_6px_rgba(0,0,0,0.5)] active:translate-y-0.5 transition-all cursor-pointer ml-2"
                     title="Copy command"
                   >
                     {copiedKey === "brew" ? (
@@ -295,7 +295,7 @@ export const DownloadMatrix: React.FC = () => {
         </div>
 
         {/* Linux & Open-Source Banner */}
-        <div className="mt-6 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="mt-6 rounded-xl border border-white/[0.08] bg-[#161619] p-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             {/* Linux Tux Icon */}
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400">
@@ -319,7 +319,7 @@ export const DownloadMatrix: React.FC = () => {
               href={`${GITHUB_REPO}/releases`}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-[#1e1e24] px-3 py-1.5 text-xs text-zinc-300 hover:text-white hover:bg-[#25252e] shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.65)] active:translate-y-0.5 transition-all cursor-pointer"
             >
               <span>View Linux Builds</span>
               <ExternalLink className="h-3 w-3" />
@@ -328,7 +328,7 @@ export const DownloadMatrix: React.FC = () => {
               href={GITHUB_REPO}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-[#1e1e24] px-3 py-1.5 text-xs text-zinc-300 hover:text-white hover:bg-[#25252e] shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.65)] active:translate-y-0.5 transition-all cursor-pointer"
             >
               <span>GitHub Source</span>
               <ExternalLink className="h-3 w-3" />

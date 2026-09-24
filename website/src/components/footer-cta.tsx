@@ -3,7 +3,11 @@ import { Download, Github, Monitor, Moon, Sun } from "lucide-react";
 import { detectUserOS, DOWNLOAD_PACKAGES, OperatingSystem, LATEST_VERSION, GITHUB_REPO } from "../lib/os-detect";
 import stashLogoSrc from "../assets/logo.png";
 
-export const FooterCta: React.FC = () => {
+interface FooterCtaProps {
+  onNavigateToDocs?: () => void;
+}
+
+export const FooterCta: React.FC<FooterCtaProps> = ({ onNavigateToDocs }) => {
   const [os, setOs] = useState<OperatingSystem>("windows");
 
   useEffect(() => {
@@ -13,7 +17,7 @@ export const FooterCta: React.FC = () => {
   const pkg = DOWNLOAD_PACKAGES[os] || DOWNLOAD_PACKAGES.windows;
 
   return (
-    <footer className="relative overflow-hidden pt-28 pb-16 border-t border-white/[0.06]">
+    <footer className="relative overflow-hidden pt-28 pb-16">
       <div className="mx-auto max-w-5xl px-6 sm:px-8">
         {/* Pre-Footer Headline & Dual CTA Buttons (Exact Foglamp Style) */}
         <div className="flex flex-col items-center text-center pb-28">
@@ -26,7 +30,7 @@ export const FooterCta: React.FC = () => {
             <a
               href={pkg.primaryInstaller.url}
               download
-              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-medium text-black transition-colors hover:bg-neutral-200 shadow-sm"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-xs font-semibold text-black shadow-[0_8px_24px_rgba(0,0,0,0.65),0_2px_6px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.8)] hover:bg-neutral-100 active:translate-y-0.5 transition-all cursor-pointer"
             >
               <Download className="h-3.5 w-3.5 text-black" />
               <span>
@@ -43,7 +47,7 @@ export const FooterCta: React.FC = () => {
               href={GITHUB_REPO}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center rounded-full border border-white/10 bg-zinc-900/80 px-4 py-2 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white"
+              className="inline-flex items-center rounded-full border border-white/[0.08] bg-[#1a1a20] px-5 py-2.5 text-xs font-medium text-zinc-300 shadow-[0_4px_14px_rgba(0,0,0,0.55),0_1px_3px_rgba(0,0,0,0.4)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.7)] hover:bg-[#22222a] hover:text-white active:translate-y-0.5 transition-all cursor-pointer"
             >
               Start free
             </a>
@@ -92,11 +96,11 @@ export const FooterCta: React.FC = () => {
           <div className="space-y-2.5">
             <h4 className="text-xs font-medium text-white">Resources</h4>
             <ul className="space-y-2 text-zinc-400 list-none p-0">
-              <li><a href={GITHUB_REPO} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Docs</a></li>
-              <li><a href={GITHUB_REPO} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Quickstart</a></li>
-              <li><a href="#security" className="hover:text-white transition-colors">Offline Architecture</a></li>
+              <li><a href="#docs" onClick={(e) => { e.preventDefault(); onNavigateToDocs?.(); }} className="hover:text-white transition-colors cursor-pointer">Docs</a></li>
+              <li><a href="#docs/quickstart" onClick={(e) => { e.preventDefault(); onNavigateToDocs?.(); }} className="hover:text-white transition-colors cursor-pointer">Quickstart</a></li>
+              <li><a href="#docs/sqlite-storage" onClick={(e) => { e.preventDefault(); onNavigateToDocs?.(); }} className="hover:text-white transition-colors cursor-pointer">Offline Architecture</a></li>
+              <li><a href="#shortcuts" className="hover:text-white transition-colors">Shortcuts</a></li>
               <li><a href={`${GITHUB_REPO}/releases`} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Changelog</a></li>
-              <li><a href={GITHUB_REPO} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">GitHub</a></li>
             </ul>
           </div>
 

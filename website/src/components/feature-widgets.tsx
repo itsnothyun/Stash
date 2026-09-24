@@ -36,7 +36,7 @@ export const FeatureWidgets: React.FC = () => {
   };
 
   return (
-    <section id="widgets" className="py-20 sm:py-28 border-t border-white/[0.06] relative">
+    <section id="widgets" className="py-20 sm:py-28 relative">
       <div className="mx-auto max-w-5xl px-6 sm:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
           {/* Left Column: Category Pills, Title, Description, Dark Pill Button */}
@@ -75,11 +75,11 @@ export const FeatureWidgets: React.FC = () => {
               Swap crypto and fiat currencies with live rates directly on your desk. Calculate totals, track liquidity, and insert one-click summaries without switching tabs.
             </p>
 
-            {/* Dark Pill Button */}
+            {/* Dark Pill Button with Deep Drop Shadow */}
             <div className="mt-6 flex items-center gap-3">
               <a
                 href="#downloads"
-                className="inline-flex items-center rounded-full border border-white/10 bg-zinc-900/80 px-4 py-2 text-xs font-medium text-white transition-all hover:bg-zinc-800 hover:border-white/20 active:scale-95 shadow-xs"
+                className="inline-flex items-center rounded-full border border-white/[0.08] bg-[#1c1c22] px-4 py-2 text-xs font-medium text-white transition-all hover:bg-[#24242c] hover:border-white/15 shadow-[0_4px_14px_rgba(0,0,0,0.55),0_1px_3px_rgba(0,0,0,0.4)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.7)] active:translate-y-0.5 cursor-pointer"
               >
                 Download Stash Free
               </a>
@@ -87,7 +87,7 @@ export const FeatureWidgets: React.FC = () => {
           </div>
 
           {/* Right Column: Chart Card + Interactive Currency Swap Playground + Overlaid Badges */}
-          <div className="relative rounded-2xl border border-white/[0.08] bg-[#0c0c0e] p-6 shadow-2xl overflow-hidden">
+          <div className="relative rounded-2xl border border-white/[0.08] bg-[#161619] p-6 shadow-2xl overflow-hidden">
             {/* Card Header */}
             <div className="flex items-center justify-between text-xs text-zinc-400 mb-5">
               <div className="flex items-center gap-2">
@@ -102,9 +102,9 @@ export const FeatureWidgets: React.FC = () => {
             </div>
 
             {/* Interactive Currency Converter Well */}
-            <div className="space-y-3 relative z-20 mb-6 rounded-xl bg-black/40 border border-white/[0.08] p-3.5 backdrop-blur-md">
+            <div className="space-y-3 relative z-20 mb-6 rounded-xl bg-[#1c1c21] border border-white/[0.08] p-3.5 backdrop-blur-md shadow-md shadow-black/30">
               {/* Pay Well */}
-              <div className="flex items-center justify-between rounded-lg bg-zinc-900/70 border border-white/[0.06] p-2.5">
+              <div className="flex items-center justify-between rounded-lg bg-[#151518] border border-white/[0.06] p-2.5">
                 <div>
                   <span className="text-[10px] font-mono uppercase text-zinc-500 block">You Pay</span>
                   <input
@@ -117,7 +117,7 @@ export const FeatureWidgets: React.FC = () => {
                 <select
                   value={fromToken}
                   onChange={(e) => setFromToken(e.target.value as any)}
-                  className="bg-black/60 border border-white/15 rounded-lg px-2.5 py-1 text-xs font-semibold text-white outline-none cursor-pointer hover:border-white/30 transition-colors"
+                  className="bg-[#1c1c22] border border-white/15 rounded-lg px-2.5 py-1 text-xs font-semibold text-white outline-none cursor-pointer hover:border-white/30 transition-colors"
                 >
                   <option value="ETH">ETH (Ethereum)</option>
                   <option value="BTC">BTC (Bitcoin)</option>
@@ -126,14 +126,14 @@ export const FeatureWidgets: React.FC = () => {
                 </select>
               </div>
 
-              {/* Flip Button with Spring Rotation */}
+              {/* Flip Button with Spring Rotation & Deep Drop Shadow */}
               <div className="flex justify-center -my-2 relative z-30">
                 <motion.button
                   type="button"
                   onClick={handleFlip}
                   animate={{ rotate: rotation }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className="rounded-full bg-neutral-800 p-1.5 border border-white/20 text-zinc-300 hover:text-white hover:bg-neutral-700 transition-colors cursor-pointer shadow-md"
+                  className="rounded-full bg-[#202026] p-1.5 border border-white/[0.08] text-zinc-300 hover:text-white hover:bg-[#282832] shadow-[0_4px_12px_rgba(0,0,0,0.65)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.8)] active:scale-95 transition-all cursor-pointer"
                   title="Swap currencies"
                 >
                   <ArrowUpDown className="h-3.5 w-3.5" />
@@ -141,7 +141,7 @@ export const FeatureWidgets: React.FC = () => {
               </div>
 
               {/* Receive Well */}
-              <div className="flex items-center justify-between rounded-lg bg-zinc-900/70 border border-white/[0.06] p-2.5">
+              <div className="flex items-center justify-between rounded-lg bg-[#151518] border border-white/[0.06] p-2.5">
                 <div>
                   <span className="text-[10px] font-mono uppercase text-zinc-500 block">You Receive (Calculated)</span>
                   <span className="font-mono text-base font-bold text-emerald-400">
@@ -151,7 +151,7 @@ export const FeatureWidgets: React.FC = () => {
                 <select
                   value={toToken}
                   onChange={(e) => setToToken(e.target.value as any)}
-                  className="bg-black/60 border border-white/15 rounded-lg px-2.5 py-1 text-xs font-semibold text-emerald-300 outline-none cursor-pointer hover:border-white/30 transition-colors"
+                  className="bg-[#1c1c22] border border-white/15 rounded-lg px-2.5 py-1 text-xs font-semibold text-emerald-300 outline-none cursor-pointer hover:border-white/30 transition-colors"
                 >
                   <option value="USDC">USDC (USD Coin)</option>
                   <option value="USD">USD ($)</option>
@@ -160,11 +160,11 @@ export const FeatureWidgets: React.FC = () => {
                 </select>
               </div>
 
-              {/* Insert Summary Button */}
+              {/* Insert Summary Button with Depth and Shadow */}
               <button
                 type="button"
                 onClick={handleInsert}
-                className="w-full flex items-center justify-center gap-2 rounded-lg bg-emerald-500/15 border border-emerald-500/30 py-2 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/25 active:scale-[0.99] transition-all cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 rounded-lg bg-emerald-500/15 border border-emerald-500/30 py-2 text-xs font-semibold text-emerald-300 shadow-[0_4px_14px_rgba(0,0,0,0.55)] hover:shadow-[0_6px_18px_rgba(0,0,0,0.7)] hover:bg-emerald-500/25 active:translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer"
               >
                 {inserted ? (
                   <>

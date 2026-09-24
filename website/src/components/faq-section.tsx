@@ -48,7 +48,7 @@ export const FaqSection: React.FC = () => {
   };
 
   return (
-    <section id="faq" className="py-20 sm:py-28 border-t border-white/[0.06]">
+    <section id="faq" className="py-20 sm:py-28 relative">
       <div className="mx-auto max-w-5xl px-6 sm:px-8">
         <div className="grid gap-12 lg:grid-cols-[1fr_1.8fr] lg:gap-16">
           {/* Left Column */}
@@ -132,7 +132,7 @@ export const FaqSection: React.FC = () => {
                   <motion.button
                     whileTap={{ scale: 0.95 }}
                     type="submit"
-                    className="text-xs text-zinc-400 hover:text-white font-medium cursor-pointer"
+                    className="rounded-full bg-[#1e1e23] border border-white/[0.08] px-3 py-1 text-xs text-zinc-300 hover:text-white shadow-[0_4px_10px_rgba(0,0,0,0.55)] hover:shadow-[0_6px_14px_rgba(0,0,0,0.7)] active:translate-y-0.5 font-medium cursor-pointer transition-all"
                   >
                     {submitted ? "Sent!" : "Submit"}
                   </motion.button>

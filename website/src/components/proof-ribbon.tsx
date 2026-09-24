@@ -114,7 +114,7 @@ export const ProofRibbon: React.FC = () => {
   const marqueeItems = [...TECH_ITEMS, ...TECH_ITEMS, ...TECH_ITEMS];
 
   return (
-    <div className="py-8 sm:py-10 border-t border-b border-white/[0.04] bg-[#08080a] relative overflow-hidden animate-marquee-hover-pause">
+    <div className="py-8 sm:py-10 bg-[#141417] relative overflow-hidden animate-marquee-hover-pause">
       {/* Section Eyebrow Header */}
       <div className="mx-auto max-w-5xl px-6 sm:px-8 mb-4">
         <div className="flex items-center justify-between text-[11px] text-zinc-500 font-mono">
@@ -131,17 +131,17 @@ export const ProofRibbon: React.FC = () => {
       {/* Infinite Looping Marquee Track with Edge Gradient Fade Masks */}
       <div className="relative w-full overflow-hidden">
         {/* Left Gradient Fade Mask */}
-        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-20 sm:w-36 bg-gradient-to-r from-[#08080a] to-transparent z-10" />
+        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-20 sm:w-36 bg-gradient-to-r from-[#141417] to-transparent z-10" />
 
         {/* Right Gradient Fade Mask */}
-        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-20 sm:w-36 bg-gradient-to-l from-[#08080a] to-transparent z-10" />
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-20 sm:w-36 bg-gradient-to-l from-[#141417] to-transparent z-10" />
 
         {/* Moving Marquee Strip */}
         <div className="flex w-max items-center gap-3.5 py-1 animate-marquee">
           {marqueeItems.map((tech, idx) => (
             <div
               key={idx}
-              className={`group flex items-center gap-2.5 rounded-xl border border-white/[0.06] bg-zinc-900/60 px-3.5 py-2 transition-all duration-200 hover:scale-[1.03] hover:bg-zinc-800/80 cursor-pointer select-none shadow-xs ${tech.accent}`}
+              className={`group flex items-center gap-2.5 rounded-xl border border-white/[0.08] bg-[#1b1b20] px-3.5 py-2 transition-all duration-200 hover:scale-[1.03] hover:bg-[#222228] cursor-pointer select-none shadow-sm ${tech.accent}`}
             >
               <div className="shrink-0 transition-transform group-hover:scale-110">
                 {tech.icon}

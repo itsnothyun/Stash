@@ -44,7 +44,7 @@ export const FeatureSecurity: React.FC = () => {
   };
 
   return (
-    <section id="security" className="py-20 sm:py-28 border-t border-white/[0.06] relative">
+    <section id="security" className="py-20 sm:py-28 relative">
       <div className="mx-auto max-w-5xl px-6 sm:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
           {/* Left Column */}
@@ -83,7 +83,7 @@ export const FeatureSecurity: React.FC = () => {
             <div className="mt-6 flex items-center gap-3">
               <a
                 href="#downloads"
-                className="inline-flex items-center rounded-full border border-white/10 bg-zinc-900/80 px-4 py-2 text-xs font-medium text-white transition-all hover:bg-zinc-800 hover:border-white/20 active:scale-95 shadow-xs"
+                className="inline-flex items-center rounded-full border border-white/[0.08] bg-[#1c1c22] px-4 py-2 text-xs font-medium text-white shadow-[0_4px_14px_rgba(0,0,0,0.55),0_1px_3px_rgba(0,0,0,0.4)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.7)] hover:bg-[#24242c] active:translate-y-0.5 transition-all cursor-pointer"
               >
                 Get Stash Free
               </a>
@@ -91,7 +91,7 @@ export const FeatureSecurity: React.FC = () => {
           </div>
 
           {/* Right Column: Interactive PIN Vault Simulator */}
-          <div className="relative rounded-2xl border border-white/[0.08] bg-[#0c0c0e] p-6 shadow-2xl overflow-hidden">
+          <div className="relative rounded-2xl border border-white/[0.08] bg-[#161619] p-6 shadow-2xl overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between text-xs text-zinc-400 pb-3 border-b border-white/[0.06] mb-5">
               <span className="font-medium text-zinc-200 flex items-center gap-1.5">
@@ -102,7 +102,7 @@ export const FeatureSecurity: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleLockAgain}
-                  className="flex items-center gap-1 rounded bg-rose-500/20 text-rose-300 px-2 py-0.5 text-[11px] font-medium hover:bg-rose-500/30 transition-colors cursor-pointer"
+                  className="flex items-center gap-1 rounded bg-rose-500/20 text-rose-300 px-2 py-0.5 text-[11px] font-medium border border-rose-500/30 shadow-[0_2px_8px_rgba(0,0,0,0.5)] hover:bg-rose-500/30 active:scale-95 transition-all cursor-pointer"
                 >
                   <RotateCcw className="h-3 w-3" />
                   <span>Lock Again</span>
@@ -165,7 +165,7 @@ export const FeatureSecurity: React.FC = () => {
                           else if (key === "←") setPin(pin.slice(0, -1));
                           else handleDigit(key);
                         }}
-                        className="flex h-9 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.02] text-xs font-mono font-medium text-white hover:bg-white/[0.08] active:scale-95 transition-all cursor-pointer"
+                        className="flex h-9 items-center justify-center rounded-lg border border-white/[0.08] bg-[#1e1e23] text-xs font-mono font-medium text-white shadow-[0_4px_10px_rgba(0,0,0,0.55)] hover:shadow-[0_6px_14px_rgba(0,0,0,0.7)] hover:bg-[#25252c] active:translate-y-0.5 active:shadow-[0_1px_3px_rgba(0,0,0,0.5)] transition-all cursor-pointer"
                       >
                         {key}
                       </button>
@@ -185,7 +185,7 @@ export const FeatureSecurity: React.FC = () => {
                     <span>Decrypted Local Stash Session</span>
                   </div>
 
-                  <div className="font-mono text-zinc-300 bg-black/60 p-3 rounded-lg border border-white/[0.08] space-y-1.5 text-[11px]">
+                  <div className="font-mono text-zinc-300 bg-[#131316] p-3 rounded-lg border border-white/[0.08] space-y-1.5 text-[11px]">
                     <div className="text-zinc-500">// AES-256 GCM hardware decrypted:</div>
                     <div><span className="text-purple-400">AWS_ACCESS_KEY</span> = <span className="text-emerald-300">"AKIA_STASH_LIVE_7729"</span></div>
                     <div><span className="text-purple-400">DATABASE_URL</span> = <span className="text-cyan-300">"postgres://root:vault@127.0.0.1:5432"</span></div>

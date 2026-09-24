@@ -183,10 +183,10 @@ export const Hero: React.FC = () => {
 
   return (
     <section className="relative pt-28 pb-16 sm:pt-36 sm:pb-24 overflow-hidden">
-      {/* Ambient Radial Glow */}
+      {/* Ambient Radial Glow (Monochrome Grey) */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-32 left-1/2 -z-10 h-[500px] w-[800px] -translate-x-1/2 opacity-30 blur-[130px] [background:radial-gradient(circle_at_center,#10b981_0%,#06b6d4_30%,#6366f1_60%,transparent_80%)]"
+        className="pointer-events-none absolute -top-32 left-1/2 -z-10 h-[520px] w-[860px] -translate-x-1/2 opacity-35 blur-[130px] [background:radial-gradient(circle_at_center,rgba(255,255,255,0.18)_0%,rgba(180,180,190,0.08)_35%,rgba(90,90,95,0.02)_65%,transparent_80%)]"
       />
 
       <div className="mx-auto max-w-5xl px-6 sm:px-8">
@@ -208,13 +208,13 @@ export const Hero: React.FC = () => {
           {/* CTA Row: Left Buttons + Right Brand Badge */}
           <div className="mt-7 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              {/* White Pill Button */}
+              {/* White Pill Button with Deep Drop Shadow & Tactile Depth */}
               <motion.a
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 href={pkg.primaryInstaller.url}
                 download
-                className="group relative inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-semibold text-black transition-all hover:bg-neutral-100 hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] shadow-sm"
+                className="group relative inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-semibold text-black transition-all hover:bg-neutral-100 shadow-[0_6px_20px_rgba(0,0,0,0.65),0_2px_4px_rgba(0,0,0,0.4)] hover:shadow-[0_10px_28px_rgba(0,0,0,0.8),0_3px_6px_rgba(0,0,0,0.5)] active:translate-y-0.5 active:shadow-[0_2px_6px_rgba(0,0,0,0.5)] cursor-pointer"
               >
                 <Download className="h-3.5 w-3.5 text-black transition-transform group-hover:-translate-y-0.5" />
                 <span>
@@ -226,12 +226,12 @@ export const Hero: React.FC = () => {
                 </span>
               </motion.a>
 
-              {/* Ghost Glass Pill Button */}
+              {/* Ghost Glass Pill Button with Deep Shadow & Subtle Highlights */}
               <motion.a
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 href="#floating"
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-zinc-900/60 px-4 py-2 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white"
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-[#1c1c22] px-4 py-2 text-xs font-medium text-zinc-300 transition-all hover:bg-[#24242c] hover:text-white shadow-[0_4px_14px_rgba(0,0,0,0.55),0_1px_3px_rgba(0,0,0,0.4)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.7)] active:translate-y-0.5 cursor-pointer"
               >
                 <span>Explore Features</span>
               </motion.a>
@@ -256,14 +256,14 @@ export const Hero: React.FC = () => {
         <motion.div
           layout
           transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-10 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0c0c0e] shadow-2xl"
+          className="mt-10 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#161619] shadow-2xl shadow-black/60"
         >
           <div className="grid grid-cols-1 md:grid-cols-[210px_1fr] items-stretch">
             {/* Left App Sidebar */}
-            <div className="hidden md:flex flex-col justify-between border-r border-white/[0.06] bg-[#0a0a0c] p-3 text-xs">
+            <div className="hidden md:flex flex-col justify-between border-r border-white/[0.06] bg-[#131316] p-3 text-xs">
               <div>
                 {/* Personal Vault Workspace Switcher */}
-                <div className="flex items-center justify-between rounded-lg border border-white/[0.08] bg-zinc-900/80 px-2.5 py-1.5 text-xs font-medium text-white mb-4 shadow-xs">
+                <div className="flex items-center justify-between rounded-lg border border-white/[0.08] bg-[#1c1c21] px-2.5 py-1.5 text-xs font-medium text-white mb-4 shadow-xs">
                   <div className="flex items-center gap-2">
                     <img
                       src={stashLogoSrc}
@@ -364,9 +364,9 @@ export const Hero: React.FC = () => {
             </div>
 
             {/* Main Workspace Viewport */}
-            <motion.div layout transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }} className="flex flex-col bg-[#0c0c0e] min-w-0">
+            <motion.div layout transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }} className="flex flex-col bg-[#161619] min-w-0">
               {/* Header Bar with View Switcher (DEFAULT: GALLERY MODE) */}
-              <div className="flex flex-wrap items-center justify-between border-b border-white/[0.06] px-4 py-3 gap-2">
+              <div className="flex flex-wrap items-center justify-between border-b border-white/[0.06] px-4 py-3 gap-2 bg-[#141417]">
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1.5 font-medium text-white text-xs">
                     <span className="text-amber-400">★</span>
@@ -380,7 +380,7 @@ export const Hero: React.FC = () => {
                       className={`flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] transition-colors cursor-pointer ${
                         activeTab === "dev"
                           ? "border-cyan-500/40 bg-cyan-500/10 text-cyan-300"
-                          : "border-white/[0.08] bg-white/[0.02] text-zinc-400 hover:text-white"
+                          : "border-white/[0.08] bg-white/[0.03] text-zinc-400 hover:text-white"
                       }`}
                     >
                       <span>{activeTab === "dev" ? "#dev" : "All tags"}</span>
@@ -392,7 +392,7 @@ export const Hero: React.FC = () => {
                       className={`flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] transition-colors cursor-pointer ${
                         pinnedFilter
                           ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
-                          : "border-white/[0.08] bg-white/[0.02] text-zinc-400 hover:text-white"
+                          : "border-white/[0.08] bg-white/[0.03] text-zinc-400 hover:text-white"
                       }`}
                     >
                       <Pin className="h-2.5 w-2.5 text-amber-400" />
@@ -402,7 +402,7 @@ export const Hero: React.FC = () => {
                 </div>
 
                 {/* Right: View Mode Segmented Control (DEFAULT: GALLERY MODE) */}
-                <div className="flex items-center rounded-lg border border-white/[0.08] bg-black/50 p-0.5 text-xs text-zinc-400 relative">
+                <div className="flex items-center rounded-lg border border-white/[0.08] bg-[#121215] p-0.5 text-xs text-zinc-400 relative">
                   <button
                     type="button"
                     onClick={() => setViewMode("gallery")}
@@ -415,7 +415,7 @@ export const Hero: React.FC = () => {
                     {viewMode === "gallery" && (
                       <motion.div
                         layoutId="hero-view-pill"
-                        className="absolute inset-0 rounded-md bg-white/[0.12] border border-white/[0.1] -z-10 shadow-xs"
+                        className="absolute inset-0 rounded-md bg-[#24242c] border border-white/[0.08] -z-10 shadow-[0_2px_8px_rgba(0,0,0,0.6)]"
                         transition={{ type: "spring", stiffness: 400, damping: 30 }}
                       />
                     )}
@@ -433,7 +433,7 @@ export const Hero: React.FC = () => {
                     {viewMode === "table" && (
                       <motion.div
                         layoutId="hero-view-pill"
-                        className="absolute inset-0 rounded-md bg-white/[0.12] border border-white/[0.1] -z-10 shadow-xs"
+                        className="absolute inset-0 rounded-md bg-[#24242c] border border-white/[0.08] -z-10 shadow-[0_2px_8px_rgba(0,0,0,0.6)]"
                         transition={{ type: "spring", stiffness: 400, damping: 30 }}
                       />
                     )}
@@ -464,7 +464,7 @@ export const Hero: React.FC = () => {
                     {/* GALLERY CARD 1: Currency Swap Widget */}
                     <motion.div
                       whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                      className="rounded-xl border border-amber-500/25 bg-[#121318] p-3.5 flex flex-col justify-between shadow-lg hover:border-amber-500/40 transition-colors"
+                      className="rounded-xl border border-white/[0.08] bg-[#1e1e23] p-3.5 flex flex-col justify-between shadow-md shadow-black/35 hover:border-amber-500/40 hover:bg-[#222228] transition-all"
                     >
                       <div>
                         {/* Titlebar */}
@@ -481,7 +481,7 @@ export const Hero: React.FC = () => {
 
                         {/* Swap Inputs */}
                         <div className="space-y-1.5 text-xs">
-                          <div className="flex items-center justify-between rounded-lg bg-black/40 border border-white/[0.06] px-2.5 py-1.5">
+                          <div className="flex items-center justify-between rounded-lg bg-[#151518] border border-white/[0.06] px-2.5 py-1.5">
                             <div>
                               <span className="text-[9px] font-mono uppercase text-zinc-500 block">Pay</span>
                               <input
@@ -500,13 +500,13 @@ export const Hero: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => setSwapFlipped(!swapFlipped)}
-                              className="rounded-full bg-zinc-800 p-1 border border-white/10 text-zinc-400 hover:text-white cursor-pointer"
+                              className="rounded-full bg-[#202026] p-1.5 border border-white/[0.08] text-zinc-300 hover:text-white hover:bg-[#282832] shadow-[0_4px_12px_rgba(0,0,0,0.65)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.8)] active:scale-95 transition-all cursor-pointer"
                             >
                               <ArrowUpDown className="h-2.5 w-2.5" />
                             </button>
                           </div>
 
-                          <div className="flex items-center justify-between rounded-lg bg-black/40 border border-white/[0.06] px-2.5 py-1.5">
+                          <div className="flex items-center justify-between rounded-lg bg-[#151518] border border-white/[0.06] px-2.5 py-1.5">
                             <div>
                               <span className="text-[9px] font-mono uppercase text-zinc-500 block">Receive</span>
                               <span className="font-mono text-xs font-bold text-emerald-400">
@@ -529,7 +529,7 @@ export const Hero: React.FC = () => {
                     {/* GALLERY CARD 2: Sprint Architecture & 36px Window Shade */}
                     <motion.div
                       whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                      className="rounded-xl border border-cyan-500/25 bg-[#121318] p-3.5 flex flex-col justify-between shadow-lg hover:border-cyan-500/40 transition-colors"
+                      className="rounded-xl border border-white/[0.08] bg-[#1e1e23] p-3.5 flex flex-col justify-between shadow-md shadow-black/35 hover:border-cyan-500/40 hover:bg-[#222228] transition-all"
                     >
                       <div>
                         {/* Titlebar */}
@@ -549,7 +549,7 @@ export const Hero: React.FC = () => {
                             <div
                               key={t.id}
                               onClick={() => toggleTask(t.id)}
-                              className="flex items-center gap-2 text-zinc-300 hover:text-white cursor-pointer select-none"
+                              className="flex items-center gap-2 text-zinc-300 hover:text-white cursor-pointer select-none bg-[#151518]/60 px-2 py-1 rounded-md border border-white/[0.04]"
                             >
                               <div
                                 className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border ${
@@ -577,7 +577,7 @@ export const Hero: React.FC = () => {
                     {/* GALLERY CARD 3: Countdown Timer Widget */}
                     <motion.div
                       whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                      className="rounded-xl border border-purple-500/25 bg-[#121318] p-3.5 flex flex-col justify-between shadow-lg hover:border-purple-500/40 transition-colors"
+                      className="rounded-xl border border-white/[0.08] bg-[#1e1e23] p-3.5 flex flex-col justify-between shadow-md shadow-black/35 hover:border-purple-500/40 hover:bg-[#222228] transition-all"
                     >
                       <div>
                         {/* Titlebar */}
@@ -589,14 +589,14 @@ export const Hero: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => setTimerRunning(!timerRunning)}
-                            className="p-1 rounded hover:bg-white/10 text-purple-300 cursor-pointer"
+                            className="p-1.5 rounded-lg bg-[#202026] border border-white/[0.08] text-purple-300 hover:text-white hover:bg-[#282832] shadow-[0_3px_8px_rgba(0,0,0,0.55)] active:scale-95 transition-all cursor-pointer"
                           >
                             {timerRunning ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
                           </button>
                         </div>
 
                         {/* Digital Timer Face */}
-                        <div className="text-center py-2">
+                        <div className="text-center py-2 bg-[#151518] rounded-lg border border-white/[0.06] my-1">
                           <div className="font-mono text-2xl font-bold tracking-tight text-white">
                             {formatTimer(timerSeconds)}
                           </div>
@@ -615,7 +615,7 @@ export const Hero: React.FC = () => {
                     {/* GALLERY CARD 4: 4-Digit Confidential PIN Vault */}
                     <motion.div
                       whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                      className="rounded-xl border border-rose-500/25 bg-[#121318] p-3.5 flex flex-col justify-between shadow-lg hover:border-rose-500/40 transition-colors"
+                      className="rounded-xl border border-white/[0.08] bg-[#1e1e23] p-3.5 flex flex-col justify-between shadow-md shadow-black/35 hover:border-rose-500/40 hover:bg-[#222228] transition-all"
                     >
                       <div>
                         {/* Titlebar */}
@@ -627,7 +627,7 @@ export const Hero: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => setVaultUnlocked(!vaultUnlocked)}
-                            className="flex items-center gap-1 rounded bg-rose-500/15 text-rose-300 px-1.5 py-0.5 text-[9px] font-mono border border-rose-500/20 cursor-pointer"
+                            className="flex items-center gap-1.5 rounded-md bg-[#202026] text-rose-300 px-2 py-1 text-[9px] font-mono border border-white/[0.08] shadow-[0_3px_8px_rgba(0,0,0,0.55)] hover:bg-[#282832] hover:text-white active:scale-95 transition-all cursor-pointer"
                           >
                             {vaultUnlocked ? <Unlock className="h-2.5 w-2.5" /> : <Lock className="h-2.5 w-2.5" />}
                             <span>{vaultUnlocked ? "Unlocked" : "Locked"}</span>
@@ -637,7 +637,7 @@ export const Hero: React.FC = () => {
                         {/* Vault Content */}
                         <div className="py-1 text-xs">
                           {!vaultUnlocked ? (
-                            <div className="flex flex-col items-center py-2 space-y-1.5">
+                            <div className="flex flex-col items-center py-2 space-y-1.5 bg-[#151518] rounded-lg border border-white/[0.06]">
                               <div className="flex gap-2">
                                 <span className="h-2 w-2 rounded-full bg-rose-400" />
                                 <span className="h-2 w-2 rounded-full bg-rose-400" />
@@ -649,7 +649,7 @@ export const Hero: React.FC = () => {
                               </span>
                             </div>
                           ) : (
-                            <div className="bg-black/50 p-2 rounded border border-white/10 font-mono text-[10px] text-emerald-300 space-y-0.5">
+                            <div className="bg-[#151518] p-2 rounded-lg border border-white/[0.06] font-mono text-[10px] text-emerald-300 space-y-0.5">
                               <div>AWS_SECRET="AKIA_LIVE"</div>
                               <div>DB_PASS="vault99"</div>
                             </div>
@@ -666,7 +666,7 @@ export const Hero: React.FC = () => {
                     {/* GALLERY CARD 5: Daily Deep Work Habit Streak */}
                     <motion.div
                       whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                      className="rounded-xl border border-blue-500/25 bg-[#121318] p-3.5 flex flex-col justify-between shadow-lg hover:border-blue-500/40 transition-colors"
+                      className="rounded-xl border border-white/[0.08] bg-[#1e1e23] p-3.5 flex flex-col justify-between shadow-md shadow-black/35 hover:border-blue-500/40 hover:bg-[#222228] transition-all"
                     >
                       <div>
                         {/* Titlebar */}
@@ -682,7 +682,7 @@ export const Hero: React.FC = () => {
                         </div>
 
                         {/* Interactive 7-Day Dot Grid */}
-                        <div className="py-2">
+                        <div className="py-2 bg-[#151518] px-2 rounded-lg border border-white/[0.06]">
                           <div className="flex justify-between items-center text-[10px] font-mono text-zinc-500 mb-1.5">
                             {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => (
                               <span key={i} className="w-5 text-center">{d}</span>
@@ -696,8 +696,8 @@ export const Hero: React.FC = () => {
                                 onClick={() => toggleHabitDay(idx)}
                                 className={`h-5 w-5 rounded-md flex items-center justify-center transition-all cursor-pointer ${
                                   val
-                                    ? "bg-blue-500 text-white shadow-xs shadow-blue-500/50"
-                                    : "bg-white/5 border border-white/10 hover:border-white/20"
+                                    ? "bg-blue-500 text-white shadow-[0_2px_8px_rgba(59,130,246,0.6)]"
+                                    : "bg-[#18181f] border border-white/[0.08] shadow-[0_2px_4px_rgba(0,0,0,0.5)] hover:border-white/20 hover:bg-[#202028]"
                                 }`}
                               >
                                 {val && <Check className="h-3 w-3 stroke-[3]" />}
@@ -716,7 +716,7 @@ export const Hero: React.FC = () => {
                     {/* GALLERY CARD 6: Markdown Note & Code Block */}
                     <motion.div
                       whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                      className="rounded-xl border border-white/[0.1] bg-[#121318] p-3.5 flex flex-col justify-between shadow-lg hover:border-white/20 transition-colors"
+                      className="rounded-xl border border-white/[0.08] bg-[#1e1e23] p-3.5 flex flex-col justify-between shadow-md shadow-black/35 hover:border-white/20 hover:bg-[#222228] transition-all"
                     >
                       <div>
                         {/* Titlebar */}
@@ -732,7 +732,7 @@ export const Hero: React.FC = () => {
                               setCopiedCode(true);
                               setTimeout(() => setCopiedCode(false), 2000);
                             }}
-                            className="p-1 rounded hover:bg-white/10 text-zinc-400 hover:text-white cursor-pointer"
+                            className="p-1.5 rounded-md bg-[#202026] border border-white/[0.08] text-zinc-300 hover:text-white hover:bg-[#282832] shadow-[0_2px_6px_rgba(0,0,0,0.5)] active:scale-95 transition-all cursor-pointer"
                             title="Copy snippet"
                           >
                             {copiedCode ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
@@ -740,7 +740,7 @@ export const Hero: React.FC = () => {
                         </div>
 
                         {/* Code snippet */}
-                        <div className="bg-black/50 p-2.5 rounded-lg border border-white/[0.06] text-[10px] font-mono text-cyan-300 leading-relaxed">
+                        <div className="bg-[#151518] p-2.5 rounded-lg border border-white/[0.06] text-[10px] font-mono text-cyan-300 leading-relaxed">
                           <div className="text-zinc-500">// Window configuration:</div>
                           <code>await window.setAlwaysOnTop(true);</code>
                         </div>
@@ -767,7 +767,7 @@ export const Hero: React.FC = () => {
                   >
                     <table className="w-full text-left text-xs min-w-[620px]">
                       <thead>
-                        <tr className="border-b border-white/[0.06] text-[11px] font-medium text-zinc-500 bg-white/[0.01]">
+                        <tr className="border-b border-white/[0.06] text-[11px] font-medium text-zinc-400 bg-[#131316]">
                           <th className="py-3 px-4 font-normal">Stash & Attached Widget</th>
                           <th className="py-3 px-3 font-normal text-right">Widgets</th>
                           <th className="py-3 px-3 font-normal text-right">Memory</th>
@@ -822,7 +822,7 @@ export const Hero: React.FC = () => {
             </motion.div>
 
               {/* Table / Gallery Footer */}
-              <div className="flex items-center justify-between border-t border-white/[0.06] px-4 py-2.5 text-[11px] text-zinc-500">
+              <div className="flex items-center justify-between border-t border-white/[0.06] bg-[#131316] px-4 py-2.5 text-[11px] text-zinc-400">
                 <span>6 active workspace stashes</span>
                 <div className="flex items-center gap-3 font-mono">
                   <span>SQLite DB: 32.4 KB</span>

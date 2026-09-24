@@ -35,7 +35,7 @@ export const FeatureFloating: React.FC = () => {
   const progressPercent = Math.round((doneCount / tasks.length) * 100);
 
   return (
-    <section id="floating" className="py-20 sm:py-28 border-t border-white/[0.06] relative">
+    <section id="floating" className="py-20 sm:py-28 relative">
       <div className="mx-auto max-w-5xl px-6 sm:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
           {/* Left Column */}
@@ -75,7 +75,7 @@ export const FeatureFloating: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsShaded(!isShaded)}
-                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-zinc-900/80 px-4 py-2 text-xs font-medium text-white transition-all hover:bg-zinc-800 hover:border-white/20 active:scale-95 shadow-xs cursor-pointer"
+                className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-[#1c1c22] px-4 py-2 text-xs font-medium text-white shadow-[0_4px_14px_rgba(0,0,0,0.55),0_1px_3px_rgba(0,0,0,0.4)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.7)] hover:bg-[#24242c] active:translate-y-0.5 transition-all cursor-pointer"
               >
                 <span>{isShaded ? "Expand Window" : "Click to Test 36px Shade"}</span>
                 {isShaded ? <Maximize2 className="h-3 w-3" /> : <Minimize2 className="h-3 w-3 text-cyan-400" />}
@@ -89,16 +89,16 @@ export const FeatureFloating: React.FC = () => {
             <motion.div
               layout
               transition={{ type: "spring", stiffness: 350, damping: 28 }}
-              className={`rounded-2xl border transition-colors shadow-2xl bg-[#0e0f13] overflow-hidden ${
+              className={`rounded-2xl border transition-colors shadow-2xl bg-[#161619] overflow-hidden ${
                 isShaded
                   ? "border-cyan-500/40 shadow-cyan-500/10"
-                  : "border-white/[0.1] shadow-black/80"
+                  : "border-white/[0.08] shadow-black/80"
               }`}
             >
               {/* Window Titlebar (36px high when shaded) */}
               <div
                 onDoubleClick={() => setIsShaded(!isShaded)}
-                className="flex h-10 items-center justify-between border-b border-white/[0.08] px-3.5 text-xs bg-black/40 select-none cursor-pointer"
+                className="flex h-10 items-center justify-between border-b border-white/[0.08] px-3.5 text-xs bg-[#131316] select-none cursor-pointer"
                 title="Double-click to toggle Window Shade"
               >
                 {/* Traffic lights & Title */}
@@ -126,10 +126,10 @@ export const FeatureFloating: React.FC = () => {
                       e.stopPropagation();
                       setIsPinned(!isPinned);
                     }}
-                    className={`p-1 rounded transition-colors cursor-pointer ${
+                    className={`p-1.5 rounded-md border transition-all cursor-pointer shadow-[0_2px_6px_rgba(0,0,0,0.5)] active:scale-95 ${
                       isPinned
-                        ? "text-amber-400 bg-amber-400/10"
-                        : "text-zinc-500 hover:text-white"
+                        ? "text-amber-400 bg-amber-400/15 border-amber-400/30"
+                        : "text-zinc-400 bg-[#1a1a20] border-white/[0.08] hover:text-white hover:bg-[#22222a]"
                     }`}
                     title={isPinned ? "Unpin window" : "Pin Always-On-Top"}
                   >
@@ -142,7 +142,7 @@ export const FeatureFloating: React.FC = () => {
                       e.stopPropagation();
                       setIsShaded(!isShaded);
                     }}
-                    className="p-1 rounded text-zinc-500 hover:text-white transition-colors cursor-pointer"
+                    className="p-1.5 rounded-md border border-white/[0.08] bg-[#1a1a20] text-zinc-400 hover:text-white hover:bg-[#22222a] shadow-[0_2px_6px_rgba(0,0,0,0.5)] active:scale-95 transition-all cursor-pointer"
                     title={isShaded ? "Expand" : "Collapse to shade"}
                   >
                     {isShaded ? (
@@ -205,7 +205,7 @@ export const FeatureFloating: React.FC = () => {
                     </div>
 
                     {/* Code Block Snippet */}
-                    <div className="rounded-lg bg-black/50 border border-white/[0.08] p-3 text-[11px] font-mono text-cyan-300">
+                    <div className="rounded-lg bg-[#131316] border border-white/[0.08] p-3 text-[11px] font-mono text-cyan-300">
                       <div className="text-zinc-500 text-[10px] pb-1 border-b border-white/[0.06] mb-1.5 flex items-center justify-between">
                         <span>tauri::window::set_always_on_top</span>
                         <span className="text-emerald-400 font-bold">TRUE</span>
@@ -228,7 +228,7 @@ export const FeatureFloating: React.FC = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3 }}
-              className="hidden sm:block absolute -top-8 -right-4 z-20 w-52 rounded-xl border border-white/[0.12] bg-[#14151a]/95 p-1.5 shadow-2xl backdrop-blur-xl text-xs"
+              className="hidden sm:block absolute -top-8 -right-4 z-20 w-52 rounded-xl border border-white/[0.12] bg-[#1e1e24]/95 p-1.5 shadow-2xl backdrop-blur-xl text-xs"
             >
               <div className="px-2 py-1 text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
                 Right-Click Card
