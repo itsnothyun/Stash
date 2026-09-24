@@ -53,7 +53,15 @@ import {
   Palette,
   Calendar,
   Smile,
+  Camera,
+  ListTodo,
+  ArrowRight,
 } from "lucide-react";
+import {
+  isTodayTitle,
+  findPreviousDailyNote,
+  extractUnfinishedTasks,
+} from "@/features/stash/daily-stash";
 import { LogicalSize } from "@tauri-apps/api/dpi";
 import {
   getDueDateStatus,
@@ -80,6 +88,7 @@ import {
   FONT_PERSONAS,
 } from "@/features/stash/note-meta";
 import { NotePersonaModal } from "@/features/stash/components/note-persona-modal";
+import { NoteExportImageModal } from "@/features/stash/components/note-export-image-modal";
 import { NoteWidgetsCanvas } from "@/features/widgets/components/note-widgets-canvas";
 import { NoteWidgetData, WidgetType } from "@/features/widgets/types";
 import {
@@ -208,6 +217,9 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
     getNoteFrame(noteId)
   );
   const [personaModalOpen, setPersonaModalOpen] = useState(false);
+  const [exportImageOpen, setExportImageOpen] = useState(false);
+  const [carryoverTasks, setCarryoverTasks] = useState<string[]>([]);
+  const [carryoverDismissed, setCarryoverDismissed] = useState(false);
 
   useEffect(() => {
     const handleMetaUpdate = (e: Event) => {
@@ -405,6 +417,33 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
     []
   );
 
+  // Check for unfinished tasks to carry over if this is today's daily scratchpad
+  useEffect(() => {
+    if (!note || carryoverDismissed) return;
+    if (!isTodayTitle(note.title)) {
+      setCarryoverTasks([]);
+      return;
+    }
+
+    void stashIpc.listNotes().then((allNotes) => {
+      const prevNote = findPreviousDailyNote(allNotes);
+      if (!prevNote) {
+        setCarryoverTasks([]);
+        return;
+      }
+      const prevTasks = extractUnfinishedTasks(prevNote.plainText);
+      if (prevTasks.length === 0) {
+        setCarryoverTasks([]);
+        return;
+      }
+
+      // Filter out tasks already present in today's note plain text
+      const currentText = note.plainText || "";
+      const remaining = prevTasks.filter((t) => !currentText.includes(t));
+      setCarryoverTasks(remaining);
+    });
+  }, [note?.id, note?.title, note?.plainText, carryoverDismissed]);
+
   /* -------------------------- window geometry --------------------------- */
 
   useEffect(() => {
@@ -536,6 +575,24 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
     void persist(appendPlainTextToContent(note.contentJson, widgets, text));
     setContentToken((t) => t + 1);
   };
+
+  const handleAcceptCarryover = useCallback(() => {
+    if (carryoverTasks.length === 0) return;
+    const carryoverBlock =
+      `\n\n### ↩ Carried Over Tasks\n` +
+      carryoverTasks.map((t) => `- [ ] ${t}`).join("\n");
+    handleInsertTextToNote(carryoverBlock);
+    toast.show({
+      message: `Carried over ${carryoverTasks.length} task${carryoverTasks.length > 1 ? "s" : ""}`,
+    });
+    setCarryoverTasks([]);
+    setCarryoverDismissed(true);
+  }, [carryoverTasks, handleInsertTextToNote]);
+
+  const handleDismissCarryover = useCallback(() => {
+    setCarryoverTasks([]);
+    setCarryoverDismissed(true);
+  }, []);
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
@@ -902,6 +959,16 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
             )}
           </button>
 
+          {/* Share as Image Button */}
+          <button
+            onClick={() => setExportImageOpen(true)}
+            title="Share note as beautiful image / PNG"
+            aria-label="Share as Image"
+            className={iconButton}
+          >
+            <Camera className="h-3.5 w-3.5" />
+          </button>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className={iconButton} aria-label="More actions">
@@ -909,6 +976,10 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem onClick={() => setExportImageOpen(true)}>
+                <Camera className="mr-2 h-3.5 w-3.5 text-primary" />
+                Share as Beautiful Image
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setPersonaModalOpen(true)}>
                 <Sparkles className="mr-2 h-3.5 w-3.5 text-primary" />
                 Personalize note persona
@@ -1259,6 +1330,11 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
         <span>Personalize Note Persona</span>
       </ContextMenuItem>
 
+      <ContextMenuItem onClick={() => setExportImageOpen(true)}>
+        <Camera className="mr-2 h-3.5 w-3.5 text-primary" />
+        <span>Share as Beautiful Image</span>
+      </ContextMenuItem>
+
       <ContextMenuItem onClick={() => setDueDateDialogOpen(true)}>
         <CalendarClock className="mr-2 h-3.5 w-3.5 text-amber-500" />
         <span>Due Date & Reminder</span>
@@ -1302,6 +1378,38 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       {/* Surface (only rendered if not shaded) */}
       {!isShaded && (
         <>
+          {/* Task Carryover Banner for Today's Note */}
+          {carryoverTasks.length > 0 && (!hasPin || isSessionUnlocked) && (
+            <div className="relative z-20 flex items-center justify-between gap-2 border-b border-border/40 bg-primary/10 px-3 py-1.5 text-xs text-foreground backdrop-blur-xs select-none shrink-0">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
+                  <ListTodo className="h-3 w-3" />
+                </div>
+                <span className="truncate text-[11px] font-medium">
+                  <strong>{carryoverTasks.length}</strong> unfinished task{carryoverTasks.length > 1 ? "s" : ""} from last daily note
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleAcceptCarryover}
+                  className="flex items-center gap-1 rounded bg-primary px-2 py-0.5 text-[10px] font-medium text-primary-foreground shadow-2xs hover:bg-primary/90 transition-colors"
+                >
+                  <span>Carry Over</span>
+                  <ArrowRight className="h-2.5 w-2.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDismissCarryover}
+                  aria-label="Dismiss task carryover"
+                  className="flex h-5 w-5 items-center justify-center rounded text-muted-foreground hover:bg-current/10 hover:text-foreground transition-colors"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            </div>
+          )}
+
           {hasPin && !isSessionUnlocked ? (
             <div className="flex flex-1 flex-col items-center justify-center p-6 text-center select-none">
               <div className="p-3 bg-primary/10 text-primary rounded-full mb-3 shadow-inner">
@@ -1619,6 +1727,16 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
         onChangeFont={handleSetFont}
         currentFrame={noteFrame}
         onChangeFrame={handleSetFrame}
+      />
+      {/* Export Note as Image Modal */}
+      <NoteExportImageModal
+        isOpen={exportImageOpen}
+        onClose={() => setExportImageOpen(false)}
+        note={note}
+        noteEmoji={noteEmoji}
+        notePaper={notePaper}
+        noteFont={noteFont}
+        noteFrame={noteFrame}
       />
     </div>
   );

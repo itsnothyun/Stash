@@ -58,7 +58,12 @@ import {
   Star,
   Trash2,
   X,
+  Calendar,
 } from "lucide-react";
+import {
+  openOrCreateTodayStash,
+  findTodayNote,
+} from "@/features/stash/daily-stash";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -387,6 +392,19 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
     [notes, selectedNoteId, setSelectedNoteId]
   );
 
+  const todayNote = useMemo(() => findTodayNote(notes), [notes]);
+
+  const handleOpenTodayStash = useCallback(async () => {
+    try {
+      const stash = await openOrCreateTodayStash(notes, openFloating);
+      loadNotes();
+      toast.show({ message: `Opened Today's Stash (${stash.title})` });
+    } catch (err) {
+      console.error(err);
+      toast.show({ message: "Failed to open Today's Stash" });
+    }
+  }, [notes, openFloating, loadNotes]);
+
   useShortcuts([
     { keys: "arrowdown", run: () => moveSelection(1) },
     { keys: "arrowup", run: () => moveSelection(-1) },
@@ -404,6 +422,14 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
       keys: "enter",
       enabled: selectedNote !== null,
       run: () => selectedNote && openFloating(selectedNote.id),
+    },
+    {
+      keys: "ctrl+shift+d",
+      run: handleOpenTodayStash,
+    },
+    {
+      keys: "cmd+shift+d",
+      run: handleOpenTodayStash,
     },
     {
       keys: SHORTCUTS.duplicate,
@@ -488,6 +514,34 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
         </div>
 
         <nav className="flex-1 overflow-y-auto px-2.5 pb-2">
+          {/* Today's Stash Quick Action in Sidebar */}
+          <button
+            type="button"
+            onClick={handleOpenTodayStash}
+            className={cn(
+              "mb-3 flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-semibold transition-all cursor-pointer shadow-xs",
+              todayNote && selectedNoteId === todayNote.id
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "bg-primary/10 text-primary hover:bg-primary/15 border border-primary/20"
+            )}
+            title="Open or create Today's Daily Stash (Ctrl+Shift+D)"
+          >
+            <div className="relative flex h-5 w-5 items-center justify-center shrink-0">
+              <Calendar className="h-4 w-4" />
+              <span className="absolute -bottom-0.5 -right-0.5 text-[8px] font-mono leading-none bg-primary text-primary-foreground rounded-full px-0.5">
+                {new Date().getDate()}
+              </span>
+            </div>
+            {!sidebarCollapsed && (
+              <div className="flex flex-1 items-center justify-between min-w-0">
+                <span className="truncate">Today's Stash</span>
+                <span className="text-[10px] font-mono opacity-70">
+                  {new Date().toLocaleDateString(undefined, { weekday: "short" })}
+                </span>
+              </div>
+            )}
+          </button>
+
           {NAV_GROUPS.map((group) => (
             <div key={group.heading} className="mb-4">
               {!sidebarCollapsed && (
@@ -812,6 +866,17 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 </button>
               ))}
             </div>
+
+            {/* Today's Stash quick button */}
+            <button
+              type="button"
+              onClick={handleOpenTodayStash}
+              title={`Open Today's Stash (${new Date().toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}) · Ctrl+Shift+D`}
+              className="flex h-8 items-center gap-1.5 rounded border border-border bg-surface px-2.5 text-xs font-semibold text-foreground hover:bg-surface-hover transition-colors shadow-xs cursor-pointer"
+            >
+              <Calendar className="h-3.5 w-3.5 text-primary" />
+              <span>Today</span>
+            </button>
 
             <NewStashMenu onCreate={() => void onCapture()} />
           </div>

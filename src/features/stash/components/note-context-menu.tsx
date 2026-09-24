@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Note, Tag } from "../types/note";
 import { NOTE_COLORS, NoteColor, getColorDot } from "../types/color";
 import { deriveNoteTitle } from "@/lib/utils/text";
@@ -45,6 +45,7 @@ import {
   Smile,
   Type,
   Square,
+  Camera,
 } from "lucide-react";
 import {
   getNoteOpacity,
@@ -61,6 +62,7 @@ import {
   getNoteFrame,
   setNoteFrame,
 } from "@/features/stash/note-meta";
+import { NoteExportImageModal } from "./note-export-image-modal";
 
 export interface NoteActionProps {
   note: Note;
@@ -122,6 +124,7 @@ export const NoteMenuItems: React.FC<
   const notePaper = getNotePaper(note.id);
   const noteFont = getNoteFont(note.id);
   const noteFrame = getNoteFrame(note.id);
+  const [exportImageOpen, setExportImageOpen] = useState(false);
 
   const handleCopyText = () => {
     const text = note.plainText || note.title || "";
@@ -458,6 +461,10 @@ export const NoteMenuItems: React.FC<
           <span>Copy & Share</span>
         </SubTrigger>
         <SubContent className="w-48">
+          <Item onClick={() => setExportImageOpen(true)}>
+            <Camera className="mr-2 h-3.5 w-3.5 text-primary" />
+            <span>Share as Beautiful Image</span>
+          </Item>
           <Item onClick={handleCopyText}>
             <FileText className="mr-2 h-3.5 w-3.5" />
             <span>Copy Plain Text</span>
@@ -487,6 +494,10 @@ export const NoteMenuItems: React.FC<
           <span>Export Stash</span>
         </SubTrigger>
         <SubContent className="w-48">
+          <Item onClick={() => setExportImageOpen(true)}>
+            <Camera className="mr-2 h-3.5 w-3.5 text-primary" />
+            <span>Image Card (.png)</span>
+          </Item>
           <Item onClick={handleExportMarkdown}>
             <FileDown className="mr-2 h-3.5 w-3.5" />
             <span>Markdown (.md)</span>
@@ -538,6 +549,17 @@ export const NoteMenuItems: React.FC<
           </Item>
         </>
       )}
+
+      {/* Export Note as Image Modal */}
+      <NoteExportImageModal
+        isOpen={exportImageOpen}
+        onClose={() => setExportImageOpen(false)}
+        note={note}
+        noteEmoji={noteEmoji}
+        notePaper={notePaper}
+        noteFont={noteFont}
+        noteFrame={noteFrame}
+      />
     </>
   );
 };
