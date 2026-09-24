@@ -34,10 +34,10 @@ import {
   Trash2,
   ZoomIn,
   ZoomOut,
-  FileText,
   Globe,
 } from "lucide-react";
 import { NOTE_TEMPLATES } from "@/features/stash/templates";
+import { cn } from "@/lib/utils/cn";
 import { stashIpc } from "@/lib/ipc/stash-ipc";
 
 interface CommandPaletteProps {
@@ -156,27 +156,39 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         <CommandSeparator />
 
         <CommandGroup heading="Templates">
-          {NOTE_TEMPLATES.map((tmpl) => (
-            <CommandItem
-              key={tmpl.id}
-              onSelect={() =>
-                run(() => {
-                  void createAndOpenStash({
-                    color: tmpl.color,
-                    title: tmpl.title,
-                    plainText: tmpl.plainText,
-                    tagNames: tmpl.tagNames,
-                  });
-                })
-              }
-            >
-              <FileText className="mr-2 h-4 w-4 text-primary" strokeWidth={1.75} />
-              <div className="flex items-center gap-2">
-                <span>{tmpl.name}</span>
-                <span className="text-2xs text-muted-foreground">— {tmpl.description}</span>
-              </div>
-            </CommandItem>
-          ))}
+          {NOTE_TEMPLATES.map((tmpl) => {
+            const Icon = tmpl.icon;
+            return (
+              <CommandItem
+                key={tmpl.id}
+                onSelect={() =>
+                  run(() => {
+                    void createAndOpenStash({
+                      color: tmpl.color,
+                      title: tmpl.title,
+                      plainText: tmpl.plainText,
+                      tagNames: tmpl.tagNames,
+                      emoji: tmpl.emoji,
+                      paper: tmpl.paper,
+                    });
+                  })
+                }
+              >
+                <div
+                  className={cn(
+                    "mr-2 flex h-5 w-5 shrink-0 items-center justify-center rounded",
+                    tmpl.iconBg
+                  )}
+                >
+                  <Icon className={cn("h-3.5 w-3.5", tmpl.iconColor)} strokeWidth={2} />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">{tmpl.name}</span>
+                  <span className="text-2xs text-muted-foreground">— {tmpl.description}</span>
+                </div>
+              </CommandItem>
+            );
+          })}
         </CommandGroup>
 
         <CommandSeparator />

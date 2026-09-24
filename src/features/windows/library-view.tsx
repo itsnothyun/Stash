@@ -965,23 +965,36 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                   Templates
                 </div>
-                {NOTE_TEMPLATES.map((tmpl) => (
-                  <ContextMenuItem
-                    key={tmpl.id}
-                    onClick={() => {
-                      void createAndOpenStash({
-                        title: tmpl.title,
-                        color: tmpl.color,
-                        plainText: tmpl.plainText,
-                        tagNames: tmpl.tagNames,
-                      });
-                      toast.show({ message: `Created ${tmpl.name}` });
-                    }}
-                  >
-                    <FileText className="mr-2 h-3.5 w-3.5 text-primary" />
-                    <span>{tmpl.name}</span>
-                  </ContextMenuItem>
-                ))}
+                {NOTE_TEMPLATES.map((tmpl) => {
+                  const Icon = tmpl.icon;
+                  return (
+                    <ContextMenuItem
+                      key={tmpl.id}
+                      onClick={() => {
+                        void createAndOpenStash({
+                          title: tmpl.title,
+                          color: tmpl.color,
+                          plainText: tmpl.plainText,
+                          tagNames: tmpl.tagNames,
+                          emoji: tmpl.emoji,
+                          paper: tmpl.paper,
+                        });
+                        toast.show({ message: `Created ${tmpl.name}` });
+                      }}
+                      className="flex items-center gap-2 cursor-pointer py-1.5"
+                    >
+                      <div
+                        className={cn(
+                          "flex h-5 w-5 shrink-0 items-center justify-center rounded",
+                          tmpl.iconBg
+                        )}
+                      >
+                        <Icon className={cn("h-3.5 w-3.5", tmpl.iconColor)} />
+                      </div>
+                      <span>{tmpl.name}</span>
+                    </ContextMenuItem>
+                  );
+                })}
               </ContextMenuSubContent>
             </ContextMenuSub>
 

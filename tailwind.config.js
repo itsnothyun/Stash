@@ -12,7 +12,7 @@ const stashColor = (name) => ({
 
 export default {
   darkMode: ["class"],
-  content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
+  content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}", "./website/**/*.{html,ts,tsx}"],
   theme: {
     extend: {
       colors: {

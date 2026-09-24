@@ -2,6 +2,7 @@ import { stashIpc } from "@/lib/ipc/stash-ipc";
 import { Note } from "@/features/stash/types/note";
 import { NoteColor } from "@/features/stash/types/color";
 import { stashContentFromPlainText } from "@/features/editor/stash-content";
+import { setNoteEmoji, setNotePaper, PaperPattern } from "@/features/stash/note-meta";
 
 export interface CaptureRequest {
   /** Falls back to the user's default colour. */
@@ -11,6 +12,8 @@ export interface CaptureRequest {
   tagNames?: string[];
   isPinned?: boolean;
   isFavorite?: boolean;
+  emoji?: string | null;
+  paper?: PaperPattern;
 }
 
 /**
@@ -42,6 +45,13 @@ export async function createAndOpenStash(
     isPinned: request.isPinned,
     isFavorite: request.isFavorite,
   });
+
+  if (request.emoji !== undefined) {
+    setNoteEmoji(note.id, request.emoji);
+  }
+  if (request.paper !== undefined) {
+    setNotePaper(note.id, request.paper);
+  }
 
   await stashIpc.openFloatingStash(note.id);
   return note;

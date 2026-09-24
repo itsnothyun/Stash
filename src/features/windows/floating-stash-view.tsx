@@ -8,6 +8,7 @@ import {
   extractDoc,
   extractWidgets,
   serializeStashContent,
+  stashContentFromPlainText,
 } from "@/features/editor/stash-content";
 import { ColorPicker } from "@/components/shared/color-picker";
 import {
@@ -56,7 +57,11 @@ import {
   Camera,
   ListTodo,
   ArrowRight,
+  ListChecks,
 } from "lucide-react";
+import { NoteStatsHud } from "@/features/stash/components/note-stats-hud";
+import { VoiceDictationButton } from "@/features/stash/components/voice-dictation-button";
+import { organizeChecklist } from "@/features/stash/task-organizer";
 import {
   isTodayTitle,
   findPreviousDailyNote,
@@ -594,6 +599,29 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
     setCarryoverDismissed(true);
   }, []);
 
+  const handleOrganizeChecklist = useCallback(() => {
+    if (!note?.plainText) return;
+    const result = organizeChecklist(note.plainText);
+    if (!result.hasTasks) {
+      toast.show({ message: "No checklist tasks found in this note" });
+      return;
+    }
+    if (result.completedCount === 0) {
+      toast.show({ message: "All tasks are already active" });
+      return;
+    }
+    flushRef.current?.();
+    const nextContentJson = stashContentFromPlainText(result.updatedText, widgets);
+    void persist({
+      plainText: result.updatedText,
+      contentJson: nextContentJson,
+    });
+    setContentToken((t) => t + 1);
+    toast.show({
+      message: `Organized tasks: moved ${result.completedCount} completed task${result.completedCount > 1 ? "s" : ""} to bottom`,
+    });
+  }, [note, widgets, persist]);
+
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
     if (isTauri()) {
@@ -969,6 +997,12 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
             <Camera className="h-3.5 w-3.5" />
           </button>
 
+          {/* Voice to Stash Dictation */}
+          <VoiceDictationButton
+            onInsertText={handleInsertTextToNote}
+            iconButtonClass={iconButton}
+          />
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className={iconButton} aria-label="More actions">
@@ -983,6 +1017,10 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
               <DropdownMenuItem onClick={() => setPersonaModalOpen(true)}>
                 <Sparkles className="mr-2 h-3.5 w-3.5 text-primary" />
                 Personalize note persona
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleOrganizeChecklist}>
+                <ListChecks className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+                Organize checklist (done to bottom)
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -1335,6 +1373,11 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
         <span>Share as Beautiful Image</span>
       </ContextMenuItem>
 
+      <ContextMenuItem onClick={handleOrganizeChecklist}>
+        <ListChecks className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+        <span>Organize Checklist (Done to bottom)</span>
+      </ContextMenuItem>
+
       <ContextMenuItem onClick={() => setDueDateDialogOpen(true)}>
         <CalendarClock className="mr-2 h-3.5 w-3.5 text-amber-500" />
         <span>Due Date & Reminder</span>
@@ -1488,6 +1531,11 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                   onToggleDock={handleToggleDock}
                   className={currentFontPersona?.fontClass}
                 />
+              </div>
+
+              {/* Interactive Note Statistics HUD */}
+              <div className="fixed bottom-2.5 right-3 z-30 pointer-events-auto">
+                <NoteStatsHud plainText={note.plainText || ""} />
               </div>
             </div>
           )}

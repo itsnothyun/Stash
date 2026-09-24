@@ -1,5 +1,4 @@
-import React from "react";
-import { ChevronDown, Clipboard, Plus, FileText } from "lucide-react";
+import { ChevronDown, Clipboard, Plus } from "lucide-react";
 import { formatShortcut, SHORTCUTS } from "@/lib/keyboard/shortcuts";
 import {
   DropdownMenu,
@@ -42,6 +41,8 @@ export const NewStashMenu: React.FC<NewStashMenuProps> = ({
       color: tmpl.color,
       plainText: tmpl.plainText,
       tagNames: tmpl.tagNames,
+      emoji: tmpl.emoji,
+      paper: tmpl.paper,
     });
     toast.show({ message: `Created ${tmpl.name}` });
   };
@@ -68,13 +69,13 @@ export const NewStashMenu: React.FC<NewStashMenuProps> = ({
             <ChevronDown className="h-3 w-3 opacity-80" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56 text-xs">
+        <DropdownMenuContent align="end" className="w-64 text-xs">
           <DropdownMenuItem onClick={onCreate}>
-            <Plus className="mr-2 h-3.5 w-3.5" />
+            <Plus className="mr-2 h-3.5 w-3.5 text-primary" />
             <span>Blank Stash</span>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => void handleClipboard()}>
-            <Clipboard className="mr-2 h-3.5 w-3.5" />
+            <Clipboard className="mr-2 h-3.5 w-3.5 text-sky-500" />
             <span>Capture clipboard</span>
           </DropdownMenuItem>
 
@@ -82,21 +83,33 @@ export const NewStashMenu: React.FC<NewStashMenuProps> = ({
           <div className="px-2 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
             Templates
           </div>
-          {NOTE_TEMPLATES.map((tmpl) => (
-            <DropdownMenuItem
-              key={tmpl.id}
-              onClick={() => void handleCreateFromTemplate(tmpl)}
-              className="flex flex-col items-start gap-0.5 cursor-pointer py-1.5"
-            >
-              <div className="flex items-center gap-1.5 font-medium text-foreground">
-                <FileText className="h-3 w-3 text-primary shrink-0" />
-                <span>{tmpl.name}</span>
-              </div>
-              <span className="text-[10px] text-muted-foreground line-clamp-1 pl-4.5">
-                {tmpl.description}
-              </span>
-            </DropdownMenuItem>
-          ))}
+          {NOTE_TEMPLATES.map((tmpl) => {
+            const Icon = tmpl.icon;
+            return (
+              <DropdownMenuItem
+                key={tmpl.id}
+                onClick={() => void handleCreateFromTemplate(tmpl)}
+                className="flex items-start gap-2.5 cursor-pointer py-1.5"
+              >
+                <div
+                  className={cn(
+                    "flex h-6 w-6 shrink-0 items-center justify-center rounded-md mt-0.5",
+                    tmpl.iconBg
+                  )}
+                >
+                  <Icon className={cn("h-3.5 w-3.5", tmpl.iconColor)} />
+                </div>
+                <div className="flex flex-col min-w-0 flex-1">
+                  <div className="flex items-center gap-1 font-medium text-foreground">
+                    <span>{tmpl.name}</span>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground line-clamp-1">
+                    {tmpl.description}
+                  </span>
+                </div>
+              </DropdownMenuItem>
+            );
+          })}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
