@@ -204,6 +204,7 @@ pub fn run() {
             commands::toggle_maximize_current_window,
             commands::toggle_fullscreen_current_window,
             commands::close_current_window_cmd,
+            commands::get_system_username,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Stash application");

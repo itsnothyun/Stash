@@ -63,13 +63,8 @@ import {
   openOrCreateTodayStash,
   findTodayNote,
 } from "@/features/stash/daily-stash";
-import { TodayStashGlassPill } from "@/components/desktop/today-stash-glass-pill";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { FilterSortControl } from "./components/filter-sort-control";
+import { getSystemUsername, getQuirkyGreeting } from "@/lib/utils/greetings";
 import { cn } from "@/lib/utils/cn";
 
 interface LibraryViewProps {
@@ -148,6 +143,13 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
   const [pendingDelete, setPendingDelete] = useState<Note | null>(null);
   const [confirmEmptyTrash, setConfirmEmptyTrash] = useState(false);
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
+  const [username, setUsername] = useState<string>("Friend");
+
+  useEffect(() => {
+    getSystemUsername().then(setUsername);
+  }, []);
+
+  const quirkyGreeting = useMemo(() => getQuirkyGreeting(username), [username]);
 
   const isSearching = searchQuery.trim().length > 0;
 
@@ -736,25 +738,44 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
         {/* Page header */}
         <div className="flex shrink-0 flex-wrap items-end justify-between gap-3 border-b border-border px-6 py-4">
           <div className="min-w-0">
-            <h1 className="text-[1.375rem] font-semibold tracking-tight">
-              {sectionTitle}
-            </h1>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              {isLoading
-                ? "Loading…"
-                : `${notes.length} ${notes.length === 1 ? "note" : "notes"}`}
-              {activeSection === "trash" && notes.length > 0 && (
-                <>
-                  {" · "}
-                  <button
-                    onClick={() => setConfirmEmptyTrash(true)}
-                    className="text-destructive underline-offset-2 hover:underline"
-                  >
-                    Empty Trash
-                  </button>
-                </>
-              )}
-            </p>
+            {activeSection === "all" && !isSearching && !selectedTagId && !selectedColorFilter ? (
+              <>
+                <h1 className="text-[1.375rem] font-semibold tracking-tight text-foreground">
+                  {quirkyGreeting.title}
+                </h1>
+                <p className="mt-0.5 text-xs text-muted-foreground flex items-center gap-1.5">
+                  <span>{quirkyGreeting.subtitle}</span>
+                  <span className="opacity-40">•</span>
+                  <span className="font-medium text-foreground/80">
+                    {isLoading
+                      ? "Loading…"
+                      : `${notes.length} ${notes.length === 1 ? "stash" : "stashes"}`}
+                  </span>
+                </p>
+              </>
+            ) : (
+              <>
+                <h1 className="text-[1.375rem] font-semibold tracking-tight">
+                  {sectionTitle}
+                </h1>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {isLoading
+                    ? "Loading…"
+                    : `${notes.length} ${notes.length === 1 ? "note" : "notes"}`}
+                  {activeSection === "trash" && notes.length > 0 && (
+                    <>
+                      {" · "}
+                      <button
+                        onClick={() => setConfirmEmptyTrash(true)}
+                        className="text-destructive underline-offset-2 hover:underline"
+                      >
+                        Empty Trash
+                      </button>
+                    </>
+                  )}
+                </p>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -769,145 +790,24 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
               onSelectColor={setSelectedColorFilter}
               includeArchived={includeArchived}
               onToggleIncludeArchived={setIncludeArchived}
+              showFilterButton={false}
             />
 
-            {/* Sort dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  title="Sort"
-                  className="flex h-8 items-center gap-1 rounded border border-border bg-surface px-2 text-xs text-muted-foreground hover:bg-surface-hover hover:text-foreground"
-                >
-                  {sortDir === "asc" ? (
-                    <SortAsc className="h-3.5 w-3.5" />
-                  ) : (
-                    <SortDesc className="h-3.5 w-3.5" />
-                  )}
-                  <span className="hidden sm:inline">
-                    {sortField === "updatedAt"
-                      ? "Modified"
-                      : sortField === "createdAt"
-                      ? "Created"
-                      : sortField === "title"
-                      ? "Name"
-                      : "Color"}
-                  </span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-44">
-                {(
-                  [
-                    ["updatedAt", "Last modified"],
-                    ["createdAt", "Date created"],
-                    ["title", "Name (A–Z)"],
-                    ["color", "Color"],
-                  ] as [SortField, string][]
-                ).map(([field, label]) => (
-                  <DropdownMenuItem
-                    key={field}
-                    onClick={() =>
-                      setSort(
-                        field,
-                        field === sortField
-                          ? sortDir === "asc"
-                            ? "desc"
-                            : "asc"
-                          : "desc"
-                      )
-                    }
-                    className={cn(
-                      "flex items-center justify-between",
-                      sortField === field && "font-medium"
-                    )}
-                  >
-                    {label}
-                    {sortField === field &&
-                      (sortDir === "asc" ? (
-                        <SortAsc className="h-3 w-3" />
-                      ) : (
-                        <SortDesc className="h-3 w-3" />
-                      ))}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Group-by dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  title="Group by"
-                  className={cn(
-                    "flex h-8 items-center gap-1 rounded border border-border bg-surface px-2 text-xs hover:bg-surface-hover",
-                    groupBy !== "none"
-                      ? "font-medium text-foreground"
-                      : "text-muted-foreground"
-                  )}
-                >
-                  <Layers2 className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">
-                    {groupBy === "color"
-                      ? "By Color"
-                      : groupBy === "month"
-                      ? "By Month"
-                      : "Group"}
-                  </span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40">
-                {(["none", "color", "month"] as GroupBy[]).map((g) => (
-                  <DropdownMenuItem
-                    key={g}
-                    onClick={() => setGroupBy(g)}
-                    className={cn(
-                      "flex items-center justify-between",
-                      groupBy === g && "font-medium"
-                    )}
-                  >
-                    {g === "none"
-                      ? "No grouping"
-                      : g === "color"
-                      ? "By Color"
-                      : "By Month"}
-                    {groupBy === g && <Check className="h-3 w-3" />}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* View switcher */}
-            <div
-              role="group"
-              aria-label="View"
-              className="flex items-center gap-0.5 rounded-sm border border-border bg-surface p-0.5"
-            >
-              {(
-                [
-                  { mode: "grid" as const, icon: LayoutGrid, label: "Grid view" },
-                  { mode: "list" as const, icon: ListIcon, label: "List view" },
-                ]
-              ).map(({ mode, icon: Icon, label }) => (
-                <button
-                  key={mode}
-                  onClick={() => setViewMode(mode)}
-                  aria-label={label}
-                  aria-pressed={viewMode === mode}
-                  className={cn(
-                    "flex h-6 w-6 items-center justify-center rounded-xs transition-colors",
-                    viewMode === mode
-                      ? "bg-surface-elevated text-foreground shadow-xs"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  <Icon className="h-3.5 w-3.5" />
-                </button>
-              ))}
-            </div>
-
-            {/* Today's Stash liquid glass floating pill */}
-            <TodayStashGlassPill
-              onClick={handleOpenTodayStash}
-              todayNote={todayNote}
+            <FilterSortControl
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              sortField={sortField}
+              sortDir={sortDir}
+              onSortChange={setSort}
+              groupBy={groupBy}
+              onGroupByChange={setGroupBy}
+              selectedColor={selectedColorFilter}
+              onSelectColor={setSelectedColorFilter}
+              tags={tags}
+              selectedTagId={selectedTagId}
+              onSelectTag={setSelectedTagId}
+              includeArchived={includeArchived}
+              onToggleIncludeArchived={setIncludeArchived}
             />
 
             <NewStashMenu onCreate={() => void onCapture()} />

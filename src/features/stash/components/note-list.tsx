@@ -4,6 +4,7 @@ import { getColorDot, NoteColor } from "../types/color";
 import { deriveNoteTitle, getNotePreview } from "@/lib/utils/text";
 import { formatNoteDate } from "@/lib/utils/dates";
 import { taskSummary } from "@/features/stash/task-summary";
+import { isTodayTitle } from "@/features/stash/daily-stash";
 import { NoteContextMenu } from "./note-context-menu";
 import { ExternalLink, Pin, Star } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
@@ -49,6 +50,7 @@ export const NoteList: React.FC<NoteListProps> = ({
         const preview = getNotePreview(note.title, note.plainText);
         const isSelected = selectedNoteId === note.id;
         const isBulkSelected = selectedIds?.has(note.id) ?? false;
+        const isToday = isTodayTitle(note.title);
 
         return (
           <NoteContextMenu
@@ -93,6 +95,17 @@ export const NoteList: React.FC<NoteListProps> = ({
                 <span className="max-w-[220px] truncate font-medium text-foreground">
                   {title}
                 </span>
+                {isToday && (
+                  <span
+                    className="liquid-glass-shell rounded-full p-[1px] shrink-0 select-none self-center"
+                    title="Today's Daily Scratchpad"
+                  >
+                    <span className="liquid-glass-track rounded-full px-1.5 py-0.2 flex items-center gap-1 text-[9px] font-semibold text-foreground">
+                      <span className="glass-active-beacon h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
+                      <span>Today</span>
+                    </span>
+                  </span>
+                )}
                 <span className="flex-1 truncate text-2xs text-muted-foreground">
                   {preview || "No additional text"}
                 </span>

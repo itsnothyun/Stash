@@ -592,5 +592,13 @@ pub async fn close_current_window_cmd(window: tauri::Window) -> AppResult<()> {
     Ok(())
 }
 
+/// Returns the current PC username for personalized greetings.
+#[tauri::command]
+pub fn get_system_username() -> String {
+    std::env::var("USERNAME")
+        .or_else(|_| std::env::var("USER"))
+        .unwrap_or_else(|_| "Friend".to_string())
+}
+
 
 
