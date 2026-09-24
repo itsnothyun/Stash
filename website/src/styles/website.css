@@ -1,0 +1,191 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 4.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 4.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 0 0% 98%;
+  --primary-foreground: 240 5.9% 10%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 240 4.9% 83.9%;
+}
+
+/* ========================================================
+   FOGLAMP SIGNATURE LUMINOUS PRISMATIC BEAMS
+   ======================================================== */
+
+@property --beam-opacity {
+  syntax: "<number>";
+  initial-value: 0;
+  inherits: true;
+}
+
+@property --beam-hue {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: true;
+}
+
+@keyframes beam-rotate {
+  0% {
+    --beam-hue: 0deg;
+  }
+  100% {
+    --beam-hue: 360deg;
+  }
+}
+
+.foglamp-beam-container {
+  position: relative;
+  border-radius: 9999px;
+  isolation: isolate;
+  display: inline-flex;
+}
+
+.foglamp-beam-container::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 9999px;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--beam-hue, 0deg),
+    #ff3366,
+    #ff9933,
+    #33cc66,
+    #3399ff,
+    #cc33ff,
+    #ff3366
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.85;
+  transition: opacity 0.3s ease;
+  animation: beam-rotate 6s linear infinite;
+  z-index: 2;
+}
+
+.foglamp-beam-container:hover::after {
+  opacity: 1;
+}
+
+.foglamp-beam-bloom {
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  background: conic-gradient(
+    from var(--beam-hue, 0deg),
+    #ff3366,
+    #ff9933,
+    #33cc66,
+    #3399ff,
+    #cc33ff,
+    #ff3366
+  );
+  filter: blur(10px);
+  opacity: 0.35;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  animation: beam-rotate 6s linear infinite;
+  z-index: 0;
+}
+
+.foglamp-beam-container:hover .foglamp-beam-bloom {
+  opacity: 0.65;
+}
+
+/* ========================================================
+   FOGLAMP SQUIRCLE & CHROME STYLING
+   ======================================================== */
+
+.squircle-badge {
+  border-radius: 8px;
+  padding: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.glass-panel {
+  background: rgba(18, 20, 24, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-elevated {
+  background: rgba(24, 27, 34, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6);
+}
+
+/* ========================================================
+   3D PERSPECTIVE DESKTOP CANVAS
+   ======================================================== */
+
+.perspective-desktop {
+  perspective: 2400px;
+  transform-style: preserve-3d;
+}
+
+.perspective-window-tilt {
+  transform: rotateX(8deg) rotateZ(-5deg) translateY(10px);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 30px 80px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.perspective-window-tilt:hover {
+  transform: rotateX(4deg) rotateZ(-2deg) translateY(0px) scale(1.02);
+}
+
+/* Texture Pattern Helpers */
+.paper-pattern-blueprint {
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 0.5px, transparent 0.5px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 0.5px, transparent 0.5px);
+  background-size: 32px 32px, 32px 32px, 8px 8px, 8px 8px;
+}
+
+.paper-pattern-dots {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.paper-pattern-lines {
+  background-image: linear-gradient(to bottom, transparent 27px, rgba(255, 255, 255, 0.12) 28px);
+  background-size: 100% 28px;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
