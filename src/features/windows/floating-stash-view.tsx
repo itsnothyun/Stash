@@ -16,6 +16,7 @@ import {
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuSeparator,
+  ContextMenuShortcut,
   ContextMenuSub,
   ContextMenuSubContent,
   ContextMenuSubTrigger,
@@ -31,6 +32,7 @@ import {
   MoreHorizontal,
   Pin,
   PinOff,
+  RefreshCw,
   RotateCcw,
   Trash2,
   X,
@@ -216,7 +218,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
 
   // Window Shade mode
   const [isShaded, setIsShaded] = useState(false);
-  const preShadeHeightRef = useRef<number>(360);
+  const preShadeHeightRef = useRef<number>(580);
 
   // PIN lock & session unlock
   const [hasPin, setHasPin] = useState<boolean>(() => hasNotePin(noteId));
@@ -329,7 +331,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                 await win.setSize(new LogicalSize(curWidth, 38));
               }, 130);
             } else {
-              const targetH = Math.max(preShadeHeightRef.current || 360, 220);
+              const targetH = Math.max(preShadeHeightRef.current || 580, 220);
               await win.setSize(new LogicalSize(curWidth, targetH));
             }
           } catch {
@@ -446,6 +448,23 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       setAlwaysOnTopState(ws.alwaysOnTop);
       setAlwaysOnTop(ws.alwaysOnTop);
     });
+  }, [noteId]);
+
+  const handleRefreshNote = useCallback(async () => {
+    try {
+      const n = await stashIpc.getNote(noteId);
+      if (!n) return;
+      setNote(n);
+      setTitle(n.title);
+      const stored = extractWidgets<NoteWidgetData>(n.contentJson);
+      if (stored.length > 0) {
+        setWidgets(stored);
+      }
+      setContentToken((t) => t + 1);
+      toast.show({ message: "Note refreshed" });
+    } catch {
+      toast.show({ message: "Refreshed" });
+    }
   }, [noteId]);
 
   useEffect(
@@ -711,6 +730,8 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
   };
 
   useShortcuts([
+    { keys: "f5", allowInInput: true, run: () => void handleRefreshNote() },
+    { keys: "mod+r", allowInInput: true, run: () => void handleRefreshNote() },
     { keys: SHORTCUTS.alwaysOnTop, allowInInput: true, run: handleTogglePin },
     {
       keys: SHORTCUTS.duplicate,
@@ -1331,6 +1352,12 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
         />
         <span className="truncate">{title || "Untitled Stash"}</span>
       </div>
+
+      <ContextMenuItem onClick={() => void handleRefreshNote()}>
+        <RefreshCw className="mr-2 h-3.5 w-3.5 text-primary" />
+        <span>Refresh Note</span>
+        <ContextMenuShortcut>F5</ContextMenuShortcut>
+      </ContextMenuItem>
 
       <ContextMenuItem onClick={handleTogglePin}>
         {alwaysOnTopState ? (

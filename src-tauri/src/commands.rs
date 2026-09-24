@@ -281,8 +281,26 @@ pub async fn open_floating_stash(
         WindowRepository::get(&conn, &note_id)?
     };
 
-    let width = window_state.as_ref().map(|s| s.width as f64).unwrap_or(360.0).clamp(280.0, 800.0);
-    let height = window_state.as_ref().map(|s| s.height as f64).unwrap_or(360.0).clamp(220.0, 900.0);
+    let (default_width, default_height) = (500.0, 580.0);
+    let (mut width, mut height) = match window_state.as_ref() {
+        Some(s) => {
+            // Upgrade legacy tiny 360x360 default to spacious modern standard
+            let w = if (s.width as f64 - 360.0).abs() < 1.0 && (s.height as f64 - 360.0).abs() < 1.0 {
+                default_width
+            } else {
+                s.width as f64
+            };
+            let h = if (s.width as f64 - 360.0).abs() < 1.0 && (s.height as f64 - 360.0).abs() < 1.0 {
+                default_height
+            } else {
+                s.height as f64
+            };
+            (w, h)
+        }
+        None => (default_width, default_height),
+    };
+    width = width.clamp(300.0, 1600.0);
+    height = height.clamp(240.0, 1400.0);
     let always_on_top = window_state.as_ref().map(|s| s.always_on_top).unwrap_or(false);
 
     let url_str = format!("/?window=stash&noteId={}", note_id);

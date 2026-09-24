@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Minus, Square, Copy, Maximize2, Minimize2, X } from "lucide-react";
+import { Minus, Square, Copy, X } from "lucide-react";
 import {
   closeCurrentWindow,
   minimizeCurrentWindow,
   toggleMaximizeCurrentWindow,
-  toggleFullscreenCurrentWindow,
   isWindowMaximized,
-  isWindowFullscreen,
 } from "@/lib/tauri/window-manager";
 import { QuirkyExitModal } from "@/components/desktop/quirky-exit-modal";
 import { cn } from "@/lib/utils/cn";
 
 interface WindowControlsProps {
   allowMaximize?: boolean;
-  allowFullscreen?: boolean;
   confirmExit?: boolean;
   className?: string;
   onClose?: () => void;
@@ -21,18 +18,16 @@ interface WindowControlsProps {
 
 /**
  * Windows/Linux-style controls for our undecorated windows: full-height hit
- * targets flush to the top-right corner, with maximize, full screen, minimize,
+ * targets flush to the top-right corner, with minimize, maximize/restore,
  * and quirky exit confirmation.
  */
 export const WindowControls: React.FC<WindowControlsProps> = ({
   allowMaximize = true,
-  allowFullscreen = true,
   confirmExit = true,
   className,
   onClose,
 }) => {
   const [maximized, setMaximized] = useState(false);
-  const [fullscreen, setFullscreen] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
 
   // Poll/Check initial window states
@@ -40,13 +35,9 @@ export const WindowControls: React.FC<WindowControlsProps> = ({
     let mounted = true;
     const checkState = async () => {
       try {
-        const [isMax, isFull] = await Promise.all([
-          isWindowMaximized(),
-          isWindowFullscreen(),
-        ]);
+        const isMax = await isWindowMaximized();
         if (mounted) {
           setMaximized(isMax);
-          setFullscreen(isFull);
         }
       } catch {
         // Ignore fallback
@@ -68,11 +59,6 @@ export const WindowControls: React.FC<WindowControlsProps> = ({
   const handleToggleMaximize = async () => {
     const nextState = await toggleMaximizeCurrentWindow();
     setMaximized(nextState);
-  };
-
-  const handleToggleFullscreen = async () => {
-    const nextState = await toggleFullscreenCurrentWindow();
-    setFullscreen(nextState);
   };
 
   const handleCloseClick = () => {
@@ -128,23 +114,6 @@ export const WindowControls: React.FC<WindowControlsProps> = ({
               <Copy className="h-3 w-3 -scale-y-100 rotate-90" />
             ) : (
               <Square className="h-2.5 w-2.5" />
-            )}
-          </button>
-        )}
-
-        {/* Fullscreen Button */}
-        {allowFullscreen && (
-          <button
-            type="button"
-            onClick={handleToggleFullscreen}
-            title={fullscreen ? "Exit Full Screen (F11)" : "Full Screen (F11)"}
-            aria-label={fullscreen ? "Exit Full Screen" : "Full Screen"}
-            className={buttonClass}
-          >
-            {fullscreen ? (
-              <Minimize2 className="h-3 w-3" />
-            ) : (
-              <Maximize2 className="h-3 w-3" />
             )}
           </button>
         )}

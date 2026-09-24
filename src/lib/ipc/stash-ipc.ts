@@ -415,7 +415,7 @@ export const stashIpc = {
     if (isTauri()) {
       await invoke("open_floating_stash", { noteId });
     } else {
-      window.open(`/?window=stash&noteId=${noteId}`, `stash-${noteId}`, "width=360,height=360");
+      window.open(`/?window=stash&noteId=${noteId}`, `stash-${noteId}`, "width=500,height=580");
     }
   },
 

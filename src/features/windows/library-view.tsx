@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/context-menu";
 import {
   Archive,
+  Calendar,
   Check,
   Clipboard,
   FileText,
@@ -51,7 +52,7 @@ import {
   PanelLeft,
   Pin,
   Plus,
-  RotateCcw,
+  RefreshCw,
   Settings as SettingsIcon,
   SortAsc,
   SortDesc,
@@ -407,7 +408,21 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
     }
   }, [notes, openFloating, loadNotes]);
 
+  const handleRefreshLibrary = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      await Promise.all([loadNotes(), loadTags()]);
+      toast.show({ message: "Library refreshed" });
+    } catch {
+      toast.show({ message: "Refreshed" });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [loadNotes, loadTags]);
+
   useShortcuts([
+    { keys: "f5", run: () => void handleRefreshLibrary() },
+    { keys: "mod+r", run: () => void handleRefreshLibrary() },
     { keys: "arrowdown", run: () => moveSelection(1) },
     { keys: "arrowup", run: () => moveSelection(-1) },
     {
@@ -502,12 +517,14 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
   return (
     <div className="flex h-screen w-screen select-none overflow-hidden bg-background text-foreground">
       {/* ---------------------------- Sidebar ---------------------------- */}
-      <aside
-        className={cn(
-          "flex shrink-0 flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-200 ease-soft",
-          sidebarCollapsed ? "w-[60px]" : "w-[232px]"
-        )}
-      >
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          <aside
+            className={cn(
+              "flex shrink-0 flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-200 ease-soft",
+              sidebarCollapsed ? "w-[60px]" : "w-[232px]"
+            )}
+          >
         <div
           data-tauri-drag-region
           className="drag-region flex h-11 items-center px-3.5"
@@ -619,6 +636,11 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                           <Icon className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                           <span>Open {item.label}</span>
                         </ContextMenuItem>
+                        <ContextMenuItem onClick={() => void handleRefreshLibrary()}>
+                          <RefreshCw className="mr-2 h-3.5 w-3.5 text-primary" />
+                          <span>Refresh Library</span>
+                          <ContextMenuShortcut>F5</ContextMenuShortcut>
+                        </ContextMenuItem>
                         {item.id === "trash" ? (
                           <>
                             <ContextMenuSeparator />
@@ -701,6 +723,123 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
           </button>
         </div>
       </aside>
+    </ContextMenuTrigger>
+
+    <ContextMenuContent className="w-56">
+      <div className="flex items-center gap-1.5 px-2.5 py-1.5 border-b border-border/50 text-[11px] font-semibold text-foreground truncate select-none">
+        <StashLogo size={14} showText={false} />
+        <span>Stash Library</span>
+      </div>
+
+      <ContextMenuItem onClick={() => void handleRefreshLibrary()}>
+        <RefreshCw className="mr-2 h-3.5 w-3.5 text-primary" />
+        <span>Refresh Library</span>
+        <ContextMenuShortcut>F5</ContextMenuShortcut>
+      </ContextMenuItem>
+
+      <ContextMenuSeparator />
+
+      <ContextMenuItem onClick={() => void onCapture()}>
+        <Plus className="mr-2 h-3.5 w-3.5 text-primary" />
+        <span>New Stash Note</span>
+        <ContextMenuShortcut>Ctrl+N</ContextMenuShortcut>
+      </ContextMenuItem>
+
+      <ContextMenuItem onClick={handleOpenTodayStash}>
+        <Calendar className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+        <span>Today's Daily Stash</span>
+      </ContextMenuItem>
+
+      {/* Templates */}
+      <ContextMenuSub>
+        <ContextMenuSubTrigger>
+          <FileText className="mr-2 h-3.5 w-3.5 text-purple-500" />
+          <span>New from Template</span>
+        </ContextMenuSubTrigger>
+        <ContextMenuSubContent className="w-52">
+          <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Templates
+          </div>
+          {NOTE_TEMPLATES.map((tmpl) => {
+            const Icon = tmpl.icon;
+            return (
+              <ContextMenuItem
+                key={tmpl.id}
+                onClick={() => {
+                  void createAndOpenStash({
+                    title: tmpl.title,
+                    color: tmpl.color,
+                    plainText: tmpl.plainText,
+                    tagNames: tmpl.tagNames,
+                    emoji: tmpl.emoji,
+                    paper: tmpl.paper,
+                    widgets: tmpl.widgets,
+                  });
+                  toast.show({ message: `Created ${tmpl.name}` });
+                }}
+                className="flex items-center gap-2 cursor-pointer py-1.5"
+              >
+                <div
+                  className={cn(
+                    "flex h-5 w-5 shrink-0 items-center justify-center rounded",
+                    tmpl.iconBg
+                  )}
+                >
+                  <Icon className={cn("h-3.5 w-3.5", tmpl.iconColor)} />
+                </div>
+                <span>{tmpl.name}</span>
+              </ContextMenuItem>
+            );
+          })}
+        </ContextMenuSubContent>
+      </ContextMenuSub>
+
+      <ContextMenuSeparator />
+
+      {/* Quick Navigation Submenu */}
+      <ContextMenuSub>
+        <ContextMenuSubTrigger>
+          <Layers className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+          <span>Go to View</span>
+        </ContextMenuSubTrigger>
+        <ContextMenuSubContent className="w-48">
+          {NAV_GROUPS.flatMap((g) => g.items).map((item) => {
+            const ItemIcon = item.icon;
+            const isActive =
+              activeSection === item.id && !selectedTagId && !isSearching;
+            return (
+              <ContextMenuItem
+                key={item.id}
+                onClick={() => goToSection(item.id)}
+                className="flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <ItemIcon className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span>{item.label}</span>
+                </div>
+                {isActive && (
+                  <Check className="h-3 w-3 stroke-[2.5] text-primary" />
+                )}
+              </ContextMenuItem>
+            );
+          })}
+        </ContextMenuSubContent>
+      </ContextMenuSub>
+
+      <ContextMenuItem onClick={toggleSidebar}>
+        <PanelLeft className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+        <span>{sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}</span>
+      </ContextMenuItem>
+
+      <ContextMenuSeparator />
+
+      <ContextMenuItem onClick={() => setSettingsOpen(true)}>
+        <SettingsIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+        <span>Settings</span>
+        <ContextMenuShortcut>Ctrl+,</ContextMenuShortcut>
+      </ContextMenuItem>
+    </ContextMenuContent>
+  </ContextMenu>
 
       {/* ---------------------------- Content ---------------------------- */}
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
@@ -842,6 +981,14 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
           </ContextMenuTrigger>
 
           <ContextMenuContent className="w-56">
+            <ContextMenuItem onClick={() => void handleRefreshLibrary()}>
+              <RefreshCw className="mr-2 h-3.5 w-3.5 text-primary" />
+              <span>Refresh Library</span>
+              <ContextMenuShortcut>F5</ContextMenuShortcut>
+            </ContextMenuItem>
+
+            <ContextMenuSeparator />
+
             <ContextMenuItem onClick={() => void onCapture()}>
               <Plus className="mr-2 h-3.5 w-3.5 text-primary" />
               <span>New Stash Note</span>
@@ -1061,9 +1208,10 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
 
             <ContextMenuSeparator />
 
-            <ContextMenuItem onClick={() => void loadNotes()}>
-              <RotateCcw className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
-              <span>Refresh Notes</span>
+            <ContextMenuItem onClick={() => void handleRefreshLibrary()}>
+              <RefreshCw className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+              <span>Refresh Library</span>
+              <ContextMenuShortcut>F5</ContextMenuShortcut>
             </ContextMenuItem>
 
             <ContextMenuItem onClick={() => setSettingsOpen(true)}>
