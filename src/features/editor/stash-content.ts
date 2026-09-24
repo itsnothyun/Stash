@@ -30,18 +30,118 @@ export function emptyDoc(): TiptapDoc {
   return { type: "doc", content: [] };
 }
 
-/** One paragraph per line. Blank lines stay as empty paragraphs. */
+/**
+ * Maps plain text lines into a structured Tiptap doc.
+ * Accurately parses markdown headings (#, ##, ###), task lists (- [ ] / - [x]),
+ * and bullet lists into native Tiptap nodes instead of raw text strings.
+ */
 export function plainTextToDoc(plainText?: string | null): TiptapDoc {
   if (!plainText || plainText.length === 0) return emptyDoc();
 
+  const content: TiptapNode[] = [];
+  const lines = plainText.split("\n");
+  let currentTaskList: TiptapNode | null = null;
+  let currentBulletList: TiptapNode | null = null;
+
+  for (let i = 0; i < lines.length; i++) {
+    const rawLine = lines[i];
+    const trimmed = rawLine.trim();
+
+    // Check for task item: - [ ] or - [x]
+    if (trimmed.startsWith("- [ ]") || trimmed.startsWith("- [x]")) {
+      currentBulletList = null;
+      const checked = trimmed.startsWith("- [x]");
+      const text = trimmed.slice(5).replace(/^\s+/, "");
+      const taskItem: TiptapNode = {
+        type: "taskItem",
+        attrs: { checked },
+        content: [
+          {
+            type: "paragraph",
+            ...(text.length > 0 ? { content: [{ type: "text", text }] } : {}),
+          },
+        ],
+      };
+      if (!currentTaskList) {
+        currentTaskList = {
+          type: "taskList",
+          content: [taskItem],
+        };
+        content.push(currentTaskList);
+      } else {
+        currentTaskList.content?.push(taskItem);
+      }
+      continue;
+    }
+
+    // Check for bullet item: - or *
+    if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+      currentTaskList = null;
+      const text = trimmed.slice(2);
+      const listItem: TiptapNode = {
+        type: "listItem",
+        content: [
+          {
+            type: "paragraph",
+            ...(text.length > 0 ? { content: [{ type: "text", text }] } : {}),
+          },
+        ],
+      };
+      if (!currentBulletList) {
+        currentBulletList = {
+          type: "bulletList",
+          content: [listItem],
+        };
+        content.push(currentBulletList);
+      } else {
+        currentBulletList.content?.push(listItem);
+      }
+      continue;
+    }
+
+    // Reset list grouping on non-list line
+    currentTaskList = null;
+    currentBulletList = null;
+
+    // Check for heading: #, ##, ###
+    if (trimmed.startsWith("### ")) {
+      const text = trimmed.slice(4);
+      content.push({
+        type: "heading",
+        attrs: { level: 3 },
+        ...(text.length > 0 ? { content: [{ type: "text", text }] } : {}),
+      });
+      continue;
+    }
+    if (trimmed.startsWith("## ")) {
+      const text = trimmed.slice(3);
+      content.push({
+        type: "heading",
+        attrs: { level: 2 },
+        ...(text.length > 0 ? { content: [{ type: "text", text }] } : {}),
+      });
+      continue;
+    }
+    if (trimmed.startsWith("# ")) {
+      const text = trimmed.slice(2);
+      content.push({
+        type: "heading",
+        attrs: { level: 1 },
+        ...(text.length > 0 ? { content: [{ type: "text", text }] } : {}),
+      });
+      continue;
+    }
+
+    // Standard paragraph
+    content.push({
+      type: "paragraph",
+      ...(rawLine.length > 0 ? { content: [{ type: "text", text: rawLine }] } : {}),
+    });
+  }
+
   return {
     type: "doc",
-    content: plainText.split("\n").map((line) => ({
-      type: "paragraph",
-      ...(line.length > 0
-        ? { content: [{ type: "text", text: line }] }
-        : {}),
-    })),
+    content,
   };
 }
 

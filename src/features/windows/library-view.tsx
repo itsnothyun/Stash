@@ -58,12 +58,12 @@ import {
   Star,
   Trash2,
   X,
-  Calendar,
 } from "lucide-react";
 import {
   openOrCreateTodayStash,
   findTodayNote,
 } from "@/features/stash/daily-stash";
+import { TodayStashGlassPill } from "@/components/desktop/today-stash-glass-pill";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -518,28 +518,65 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
           <button
             type="button"
             onClick={handleOpenTodayStash}
+            title={`Today's Stash (${new Date().toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}) · Ctrl+Shift+D`}
+            aria-label="Open or create Today's Daily Stash"
             className={cn(
-              "mb-3 flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-semibold transition-all cursor-pointer shadow-xs",
+              "liquid-glass-shell group relative mb-3 flex items-center justify-center rounded-xl p-[1.5px] cursor-pointer transition-all duration-200 select-none",
+              sidebarCollapsed ? "mx-auto h-9 w-9" : "w-full",
               todayNote && selectedNoteId === todayNote.id
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "bg-primary/10 text-primary hover:bg-primary/15 border border-primary/20"
+                ? "ring-2 ring-primary/50 shadow-md"
+                : ""
             )}
-            title="Open or create Today's Daily Stash (Ctrl+Shift+D)"
           >
-            <div className="relative flex h-5 w-5 items-center justify-center shrink-0">
-              <Calendar className="h-4 w-4" />
-              <span className="absolute -bottom-0.5 -right-0.5 text-[8px] font-mono leading-none bg-primary text-primary-foreground rounded-full px-0.5">
-                {new Date().getDate()}
-              </span>
-            </div>
-            {!sidebarCollapsed && (
-              <div className="flex flex-1 items-center justify-between min-w-0">
-                <span className="truncate">Today's Stash</span>
-                <span className="text-[10px] font-mono opacity-70">
-                  {new Date().toLocaleDateString(undefined, { weekday: "short" })}
-                </span>
+            <div
+              className={cn(
+                "liquid-glass-track liquid-glass-sheen flex w-full items-center rounded-xl transition-all",
+                sidebarCollapsed
+                  ? "h-full justify-center p-0"
+                  : "justify-between gap-2 px-2.5 py-1.5"
+              )}
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="relative flex h-5 w-5 items-center justify-center shrink-0">
+                  <div className="flex h-5 w-5 flex-col items-center justify-center rounded-md border border-border/70 bg-surface/80 shadow-2xs overflow-hidden">
+                    <div className="h-1.5 w-full bg-primary/70 shrink-0" />
+                    <span className="text-[9px] font-bold font-mono leading-none text-foreground">
+                      {new Date().getDate()}
+                    </span>
+                  </div>
+                  <span
+                    className={cn(
+                      "absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full",
+                      todayNote
+                        ? "glass-active-beacon bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.8)]"
+                        : "bg-primary/30 group-hover:bg-primary transition-colors"
+                    )}
+                  />
+                </div>
+                {!sidebarCollapsed && (
+                  <div className="flex flex-col text-left min-w-0 leading-tight">
+                    <span className="text-xs font-semibold tracking-tight text-foreground truncate">
+                      Today's Stash
+                    </span>
+                    <span className="text-[10px] text-muted-foreground truncate">
+                      {new Date().toLocaleDateString(undefined, {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </span>
+                  </div>
+                )}
               </div>
-            )}
+              {!sidebarCollapsed && (
+                <kbd className="rounded bg-black/5 dark:bg-white/10 px-1 py-0.2 font-mono text-[9px] font-medium text-muted-foreground/80 border border-black/5 dark:border-white/10 shrink-0">
+                  {typeof navigator !== "undefined" &&
+                  /Mac|iPod|iPhone|iPad/.test(navigator.platform)
+                    ? "⌘⇧D"
+                    : "Ctrl+Shift+D"}
+                </kbd>
+              )}
+            </div>
           </button>
 
           {NAV_GROUPS.map((group) => (
@@ -867,16 +904,11 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
               ))}
             </div>
 
-            {/* Today's Stash quick button */}
-            <button
-              type="button"
+            {/* Today's Stash liquid glass floating pill */}
+            <TodayStashGlassPill
               onClick={handleOpenTodayStash}
-              title={`Open Today's Stash (${new Date().toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}) · Ctrl+Shift+D`}
-              className="flex h-8 items-center gap-1.5 rounded border border-border bg-surface px-2.5 text-xs font-semibold text-foreground hover:bg-surface-hover transition-colors shadow-xs cursor-pointer"
-            >
-              <Calendar className="h-3.5 w-3.5 text-primary" />
-              <span>Today</span>
-            </button>
+              todayNote={todayNote}
+            />
 
             <NewStashMenu onCreate={() => void onCapture()} />
           </div>

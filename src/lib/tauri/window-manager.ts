@@ -220,3 +220,35 @@ export async function setAlwaysOnTop(alwaysOnTop: boolean) {
     }
   }
 }
+
+export type ResizeDirection =
+  | "East"
+  | "North"
+  | "NorthEast"
+  | "NorthWest"
+  | "South"
+  | "SouthEast"
+  | "SouthWest"
+  | "West";
+
+/**
+ * Initiates native OS window resizing in the given direction.
+ * This delegates resizing directly to Windows OS DWM loop for 60-144fps responsiveness.
+ */
+export async function startWindowResize(direction: ResizeDirection) {
+  if (isTauri()) {
+    try {
+      const win = getCurrentWindow();
+      await win.startResizeDragging(direction);
+      return;
+    } catch {
+      try {
+        const win = getCurrentWebviewWindow();
+        await win.startResizeDragging(direction);
+      } catch (e) {
+        console.error("Failed to start native resize dragging", e);
+      }
+    }
+  }
+}
+

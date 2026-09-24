@@ -10,7 +10,13 @@ export type WidgetType =
   | "kanban"
   | "habits"
   | "palette"
-  | "browser";
+  | "browser"
+  | "scratchpad"
+  | "meeting"
+  | "bug"
+  | "idea"
+  | "api"
+  | "reading";
 
 export interface NoteWidgetData {
   id: string;

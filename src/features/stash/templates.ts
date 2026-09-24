@@ -34,7 +34,7 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
   {
     id: "scratchpad",
     name: "Daily Scratchpad",
-    description: "Priorities, fleeting thoughts, and daily log with focus timer",
+    description: "Focus timer, streak badge, priorities checklist & fleeting thoughts",
     color: "Lemon",
     icon: Sun,
     iconColor: "text-amber-500",
@@ -42,32 +42,23 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
     emoji: "☀️",
     paper: "lines",
     title: `Scratchpad — ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}`,
-    plainText: `## 🎯 Top Priorities
-- [ ] 
-- [ ] 
-- [ ] 
-
-## 💭 Fleeting Thoughts
-- 
-
-## 📝 Daily Log
-- `,
+    plainText: "",
     tagNames: ["daily", "scratchpad"],
     widgets: [
       {
-        id: "widget-timer-focus",
-        type: "timer",
-        title: "Focus Pomodoro",
+        id: "widget-scratchpad-main",
+        type: "scratchpad",
+        title: "Daily Scratchpad",
         x: 0,
         y: 0,
-        config: { focusDuration: 25 },
+        width: "100%",
       },
     ],
   },
   {
     id: "meeting",
     name: "Meeting Minutes",
-    description: "Attendees, discussion agenda, and action items with 30m countdown",
+    description: "Agenda countdown, attendee presence tags & action items",
     color: "Mint",
     icon: Users,
     iconColor: "text-emerald-500",
@@ -75,30 +66,23 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
     emoji: "🤝",
     paper: "dots",
     title: "Meeting Notes",
-    plainText: `**Date:** ${new Date().toISOString().slice(0, 10)}
-**Attendees:** 
-
-### 📌 Agenda & Discussion
-- 
-
-### ⚡ Action Items
-- [ ] `,
+    plainText: "",
     tagNames: ["meeting", "work"],
     widgets: [
       {
-        id: "widget-meeting-countdown",
-        type: "countdown",
-        title: "Meeting Timer (30m)",
+        id: "widget-meeting-main",
+        type: "meeting",
+        title: "Meeting Minutes",
         x: 0,
         y: 0,
-        config: { minutes: 30 },
+        width: "100%",
       },
     ],
   },
   {
     id: "bug_report",
     name: "Bug & Issue Report",
-    description: "Repro steps, expected vs actual, and repro run counter",
+    description: "P0/P1/P2 severity buttons, status toggle, repro steps & counter",
     color: "Rose",
     icon: Bug,
     iconColor: "text-rose-500",
@@ -106,51 +90,30 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
     emoji: "🐛",
     paper: "grid",
     title: "Bug: ",
-    plainText: `### 🐛 Issue Description
-
-
-### 🔁 Steps to Reproduce
-1. 
-2. 
-3. 
-
-### 💡 Expected vs Actual
-- **Expected:** 
-- **Actual:** 
-
-### 🔧 Fix Notes
-- `,
+    plainText: "",
     tagNames: ["bug", "dev"],
     widgets: [
       {
-        id: "widget-repro-counter",
-        type: "counter",
-        title: "Repro Test Runs",
+        id: "widget-bug-main",
+        type: "bug",
+        title: "Bug Blitz & Triage",
         x: 0,
         y: 0,
-        config: { initialCount: 0 },
+        width: "100%",
       },
     ],
   },
   {
     id: "weekly_review",
     name: "Weekly Review & Goals",
-    description: "Highlights, blockers, and weekly habit consistency",
+    description: "7-day habit consistency tracker, weekly highlights & goals",
     color: "Lavender",
     icon: Target,
     iconColor: "text-purple-500",
     iconBg: "bg-purple-500/15",
     emoji: "🎯",
     title: "Weekly Review",
-    plainText: `### 🌟 Highlights & Wins
-- 
-
-### 🚧 Challenges & Blockers
-- 
-
-### 🎯 Focus for Next Week
-- [ ] 
-- [ ] `,
+    plainText: "",
     tagNames: ["review", "planning"],
     widgets: [
       {
@@ -159,48 +122,37 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
         title: "Weekly Habit Consistency",
         x: 0,
         y: 0,
+        width: "100%",
       },
     ],
   },
   {
     id: "brainstorm",
     name: "Brainstorm & Idea Dump",
-    description: "Problem angles, bold ideas, pros/cons, and next moves",
+    description: "Hypothesis confidence slider, validation tally & theme swatches",
     color: "Lemon",
     icon: Lightbulb,
     iconColor: "text-yellow-500",
     iconBg: "bg-yellow-500/15",
     emoji: "💡",
     title: "Idea: ",
-    plainText: `### 💡 Core Concept & Problem
-- 
-
-### 🚀 Creative Angles
-1. 
-2. 
-3. 
-
-### ⚖️ Trade-offs & Risks
-- **Pros:** 
-- **Cons:** 
-
-### 🏁 Immediate Next Action
-- [ ] `,
+    plainText: "",
     tagNames: ["ideas", "brainstorm"],
     widgets: [
       {
-        id: "widget-palette-ideas",
-        type: "palette",
-        title: "Idea Color Theme",
+        id: "widget-idea-main",
+        type: "idea",
+        title: "Idea Incubator",
         x: 0,
         y: 0,
+        width: "100%",
       },
     ],
   },
   {
     id: "sprint_kanban",
     name: "Project Sprint Kanban",
-    description: "Interactive visual board with To Do, In Flight, and Done columns",
+    description: "Visual 3-column Kanban board with cards & stage progression",
     color: "Sky",
     icon: Kanban,
     iconColor: "text-blue-500",
@@ -208,12 +160,7 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
     emoji: "📋",
     paper: "grid",
     title: "Sprint Board",
-    plainText: `## 🚀 Sprint Goal
-Deliver component-driven templates and interactive widgets for v0.4 release.
-
-### 📌 Milestone Notes
-- Focus on zero context switching
-- Real-time updates across floating windows`,
+    plainText: "",
     tagNames: ["sprint", "kanban", "dev"],
     widgets: [
       {
@@ -222,13 +169,14 @@ Deliver component-driven templates and interactive widgets for v0.4 release.
         title: "Sprint Tasks",
         x: 0,
         y: 0,
+        width: "100%",
       },
     ],
   },
   {
     id: "code_snippet",
     name: "Code & Tech Scratchpad",
-    description: "Syntax snippet, implementation context, and bitwise calculator",
+    description: "API method pill, copyable endpoint, payload schema & converter",
     color: "Sky",
     icon: Code2,
     iconColor: "text-blue-500",
@@ -236,46 +184,30 @@ Deliver component-driven templates and interactive widgets for v0.4 release.
     emoji: "💻",
     paper: "dots",
     title: "Snippet: ",
-    plainText: `### 💻 Implementation Context
-- **Language / Framework:** TypeScript
-- **Goal:** 
-
-\`\`\`typescript
-// Code snippet here
-\`\`\`
-
-### 🧪 Test Edge Cases
-- [ ] Empty / Null input
-- [ ] Boundary condition
-- [ ] Error handling`,
+    plainText: "",
     tagNames: ["code", "dev"],
     widgets: [
       {
-        id: "widget-code-calc",
-        type: "calculator",
-        title: "Math & Bitwise Calc",
+        id: "widget-api-main",
+        type: "api",
+        title: "API & Code Blueprint",
         x: 0,
         y: 0,
+        width: "100%",
       },
     ],
   },
   {
     id: "crypto_watchlist",
     name: "Crypto & Market Watchlist",
-    description: "Live conversion rates, price levels, and trade plan",
+    description: "Live token exchange rates, price levels, and trade plan",
     color: "Sky",
     icon: TrendingUp,
     iconColor: "text-cyan-500",
     iconBg: "bg-cyan-500/15",
     emoji: "📈",
     title: "Crypto Watchlist",
-    plainText: `### 📊 Watchlist & Key Levels
-- **BTC:** Support $____ | Target $____
-- **ETH:** Support $____ | Target $____
-- **SOL:** Support $____ | Target $____
-
-### ⚡ Trade Notes
-- `,
+    plainText: "",
     tagNames: ["crypto", "trading"],
     widgets: [
       {
@@ -284,13 +216,14 @@ Deliver component-driven templates and interactive widgets for v0.4 release.
         title: "Live Currency Converter",
         x: 0,
         y: 0,
+        width: "100%",
       },
     ],
   },
   {
     id: "summary",
     name: "Book & Article Summary",
-    description: "Core premise, standout quotes, and countdown focus session",
+    description: "5-star rating, reading progress slider, quote callout & takeaways",
     color: "Sand",
     icon: BookOpen,
     iconColor: "text-indigo-500",
@@ -298,27 +231,16 @@ Deliver component-driven templates and interactive widgets for v0.4 release.
     emoji: "📖",
     paper: "lines",
     title: "Summary: ",
-    plainText: `### 📚 Title & Author
-- **Source:** 
-- **Topic:** 
-
-### 🔑 Big Ideas & Core Premise
-- 
-
-### 💬 Standout Quotes
-> " "
-
-### 🛠️ Actionable Takeaways
-- [ ] `,
+    plainText: "",
     tagNames: ["reading", "notes"],
     widgets: [
       {
-        id: "widget-reading-timer",
-        type: "timer",
-        title: "Reading Deep Session",
+        id: "widget-reading-main",
+        type: "reading",
+        title: "Book & Article Digest",
         x: 0,
         y: 0,
-        config: { focusDuration: 30 },
+        width: "100%",
       },
     ],
   },

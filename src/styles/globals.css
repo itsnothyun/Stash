@@ -354,6 +354,25 @@
 }
 
 /* --------------------------------------------------------------------------
+   Resize animation stopper — prevents layout thrashing & stutter during window resize
+   -------------------------------------------------------------------------- */
+.resize-animation-stopper *,
+.resize-animation-stopper *::before,
+.resize-animation-stopper *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+.window-resize-border {
+  position: fixed;
+  z-index: 999999;
+  user-select: none;
+  -webkit-app-region: no-drag;
+  touch-action: none;
+}
+
+
+/* --------------------------------------------------------------------------
    Tiptap editor
    -------------------------------------------------------------------------- */
 .tiptap {
@@ -676,4 +695,94 @@
 
 .ProseMirror table .selectedCell {
   background: hsl(var(--brand) / 0.08);
+}
+
+/* ==========================================================================
+   Liquid Glass Component Effect (matching marketing floating navbar)
+   ========================================================================== */
+
+.liquid-glass-shell {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(210, 215, 225, 0.45) 12%, rgba(160, 170, 190, 0.18) 60%, rgba(255, 255, 255, 0.7) 100%);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08), 0 10px 24px rgba(15, 23, 42, 0.06), inset 0 1px 1.5px rgba(255, 255, 255, 0.95);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .liquid-glass-shell {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(200, 200, 200, 0.14) 12%, rgba(120, 120, 120, 0.08) 60%, rgba(255, 255, 255, 0.28) 100%);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), 0 12px 30px rgba(0, 0, 0, 0.4), 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+.liquid-glass-shell:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12), 0 14px 32px rgba(15, 23, 42, 0.08), inset 0 1px 1.5px rgba(255, 255, 255, 1);
+}
+
+.dark .liquid-glass-shell:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), 0 16px 38px rgba(0, 0, 0, 0.5), 0 30px 70px rgba(0, 0, 0, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.55);
+}
+
+.liquid-glass-track {
+  position: relative;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.94) 0%, rgba(245, 247, 250, 0.9) 50%, rgba(255, 255, 255, 0.94) 100%);
+  box-shadow: inset 0px 1px 1.5px 0px rgba(255, 255, 255, 0.98), inset 0px -1px 1.5px 0px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dark .liquid-glass-track {
+  background: linear-gradient(150deg, rgba(20, 22, 28, 0.88) 0%, rgba(12, 13, 16, 0.85) 50%, rgba(18, 20, 26, 0.88) 100%);
+  box-shadow: inset 0px 1px 1.5px 0px rgba(255, 255, 255, 0.22), inset 0px -1px 1.5px 0px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+/* Subtle diagonal light shimmer sweep */
+.liquid-glass-sheen {
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-glass-sheen::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+  transition: transform 0.75s ease;
+}
+
+.dark .liquid-glass-sheen::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.16), transparent);
+}
+
+.liquid-glass-sheen:hover::after {
+  transform: translateX(450%) skewX(-20deg);
+}
+
+/* Glowing emerald/brand active dot */
+.glass-active-beacon {
+  position: relative;
+  display: inline-flex;
+}
+
+.glass-active-beacon::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  background: inherit;
+  opacity: 0.6;
+  animation: glass-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes glass-ping {
+  75%, 100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
 }

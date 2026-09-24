@@ -10,6 +10,7 @@ import { closeCurrentWindow } from "@/lib/tauri/window-manager";
 import { Settings } from "@/features/stash/types/note";
 import { IS_MAC, SHORTCUTS, useShortcuts } from "@/lib/keyboard/shortcuts";
 import { Toaster, toast } from "@/components/ui/toast";
+import { WindowResizeBorders } from "@/components/desktop/window-resize-borders";
 
 export const App: React.FC = () => {
   const {
@@ -248,53 +249,39 @@ export const App: React.FC = () => {
     </div>
   ) : null;
 
+  let content: React.ReactNode;
   if (isPipBrowserWindow) {
-    return (
-      <>
-        <PipBrowserView
-          initialUrl={pipUrl}
-          noteId={noteId || undefined}
-          widgetId={widgetId}
-        />
-        {zoomHudElement}
-        <Toaster />
-      </>
+    content = (
+      <PipBrowserView
+        initialUrl={pipUrl}
+        noteId={noteId || undefined}
+        widgetId={widgetId}
+      />
     );
-  }
-
-  if (isFloatingWindow) {
-    return (
-      <>
-        <FloatingStashView noteId={noteId} />
-        {zoomHudElement}
-        <Toaster />
-      </>
+  } else if (isFloatingWindow) {
+    content = <FloatingStashView noteId={noteId} />;
+  } else if (!settingsReady) {
+    content = <div className="h-screen w-screen bg-background" />;
+  } else if (route === "onboarding") {
+    content = (
+      <OnboardingScreen
+        onCreateFirst={() => void createFirstStash()}
+        onGoToDashboard={() => void finishOnboarding()}
+      />
     );
-  }
-
-  if (!settingsReady) {
-    return <div className="h-screen w-screen bg-background" />;
-  }
-
-  if (route === "onboarding") {
-    return (
-      <>
-        <OnboardingScreen
-          onCreateFirst={() => void createFirstStash()}
-          onGoToDashboard={() => void finishOnboarding()}
-        />
-        {zoomHudElement}
-        <Toaster />
-      </>
+  } else {
+    content = (
+      <LibraryView
+        onUpdateSettings={persistSettings}
+        onCapture={capture}
+      />
     );
   }
 
   return (
     <>
-      <LibraryView
-        onUpdateSettings={persistSettings}
-        onCapture={capture}
-      />
+      <WindowResizeBorders />
+      {content}
       {zoomHudElement}
       <Toaster />
     </>

@@ -254,6 +254,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
   const [exportImageOpen, setExportImageOpen] = useState(false);
   const [carryoverTasks, setCarryoverTasks] = useState<string[]>([]);
   const [carryoverDismissed, setCarryoverDismissed] = useState(false);
+  const isToday = Boolean(note && isTodayTitle(note.title));
 
   useEffect(() => {
     const handleMetaUpdate = (e: Event) => {
@@ -589,6 +590,12 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       habits: "Habit Tracker",
       palette: "Color Palette",
       browser: "Mini Browser",
+      scratchpad: "Daily Scratchpad",
+      meeting: "Meeting Minutes",
+      bug: "Bug Blitz & Triage",
+      idea: "Idea Incubator",
+      api: "API & Tech Blueprint",
+      reading: "Book & Article Digest",
     };
     const newWidget: NoteWidgetData = {
       id: `${type}-${Date.now()}`,
@@ -851,6 +858,18 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                 >
                   {saveStatus === "saving" ? "Saving…" : "Saved"}
                 </span>
+
+                {isToday && (
+                  <div
+                    className="liquid-glass-shell rounded-full p-[1px] shrink-0 no-drag-region select-none"
+                    title="Today's Live Daily Scratchpad"
+                  >
+                    <div className="liquid-glass-track rounded-full px-2 py-0.5 flex items-center gap-1.5 text-[10px] font-semibold text-foreground">
+                      <span className="glass-active-beacon h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
+                      <span>Daily Stash</span>
+                    </div>
+                  </div>
+                )}
 
                 {/* Due Date Indicator Badge */}
                 {dueDateStatus && (
@@ -1526,35 +1545,45 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       >
         {/* Task Carryover Banner for Today's Note */}
         {carryoverTasks.length > 0 && (!hasPin || isSessionUnlocked) && (
-          <div className="relative z-20 flex items-center justify-between gap-2 border-b border-border/40 bg-primary/10 px-3 py-1.5 text-xs text-foreground backdrop-blur-xs select-none shrink-0">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
-                <ListTodo className="h-3 w-3" />
+          <div className="relative z-20 px-3 py-2 flex justify-center shrink-0 select-none">
+            <div className="liquid-glass-shell w-full rounded-2xl p-[1.5px] shadow-lg animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="liquid-glass-track liquid-glass-sheen rounded-2xl px-3.5 py-2 flex items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary border border-primary/20 shadow-2xs">
+                    <ListTodo className="h-3.5 w-3.5" />
+                  </div>
+                  <div className="flex flex-col min-w-0 leading-tight">
+                    <span className="text-[11px] font-semibold text-foreground truncate">
+                      {carryoverTasks.length} Unfinished Task{carryoverTasks.length > 1 ? "s" : ""}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground truncate">
+                      From previous daily scratchpad
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleAcceptCarryover}
+                    className="flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold text-primary-foreground shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <span>Carry Over</span>
+                    <ArrowRight className="h-2.5 w-2.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDismissCarryover}
+                    aria-label="Dismiss task carryover"
+                    className="flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground hover:bg-black/5 dark:hover:bg-white/10 hover:text-foreground transition-colors cursor-pointer"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </div>
-              <span className="truncate text-[11px] font-medium">
-                <strong>{carryoverTasks.length}</strong> unfinished task{carryoverTasks.length > 1 ? "s" : ""} from last daily note
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <button
-                type="button"
-                onClick={handleAcceptCarryover}
-                className="flex items-center gap-1 rounded bg-primary px-2 py-0.5 text-[10px] font-medium text-primary-foreground shadow-2xs hover:bg-primary/90 transition-colors"
-              >
-                <span>Carry Over</span>
-                <ArrowRight className="h-2.5 w-2.5" />
-              </button>
-              <button
-                type="button"
-                onClick={handleDismissCarryover}
-                aria-label="Dismiss task carryover"
-                className="flex h-5 w-5 items-center justify-center rounded text-muted-foreground hover:bg-current/10 hover:text-foreground transition-colors"
-              >
-                <X className="h-3 w-3" />
-              </button>
             </div>
           </div>
         )}
+
 
         {hasPin && !isSessionUnlocked ? (
           <div className="flex flex-1 flex-col items-center justify-center p-6 text-center select-none">

@@ -22,6 +22,12 @@ import {
   RotateCcw,
   ArrowLeftRight,
   Trash2,
+  Sun,
+  Users,
+  Bug,
+  Lightbulb,
+  Code2,
+  BookOpen,
 } from "lucide-react";
 import {
   ContextMenu,
@@ -52,6 +58,12 @@ import { KanbanWidget } from "./kanban-widget";
 import { HabitsWidget } from "./habits-widget";
 import { PaletteWidget } from "./palette-widget";
 import { BrowserWidget } from "./browser-widget";
+import { ScratchpadWidget } from "./scratchpad-widget";
+import { MeetingWidget } from "./meeting-widget";
+import { BugWidget } from "./bug-widget";
+import { IdeaWidget } from "./idea-widget";
+import { ApiWidget } from "./api-widget";
+import { ReadingWidget } from "./reading-widget";
 import { cn } from "@/lib/utils/cn";
 
 interface NoteWidgetsCanvasProps {
@@ -62,7 +74,7 @@ interface NoteWidgetsCanvasProps {
   className?: string;
 }
 
-const DEFAULT_WIDTHS: Record<WidgetType, number> = {
+const DEFAULT_WIDTHS: Record<WidgetType, number | string> = {
   swap: 320,
   ticker: 280,
   calculator: 250,
@@ -75,6 +87,12 @@ const DEFAULT_WIDTHS: Record<WidgetType, number> = {
   habits: 320,
   palette: 280,
   browser: 480,
+  scratchpad: "100%",
+  meeting: "100%",
+  bug: "100%",
+  idea: "100%",
+  api: "100%",
+  reading: "100%",
 };
 
 const SIZE_PRESETS = [
@@ -194,6 +212,18 @@ export const NoteWidgetsCanvas: React.FC<NoteWidgetsCanvasProps> = ({
         return <Palette className="h-3.5 w-3.5 text-pink-500" />;
       case "browser":
         return <Globe className="h-3.5 w-3.5 text-cyan-500" />;
+      case "scratchpad":
+        return <Sun className="h-3.5 w-3.5 text-amber-500" />;
+      case "meeting":
+        return <Users className="h-3.5 w-3.5 text-emerald-500" />;
+      case "bug":
+        return <Bug className="h-3.5 w-3.5 text-rose-500" />;
+      case "idea":
+        return <Lightbulb className="h-3.5 w-3.5 text-yellow-500" />;
+      case "api":
+        return <Code2 className="h-3.5 w-3.5 text-blue-500" />;
+      case "reading":
+        return <BookOpen className="h-3.5 w-3.5 text-indigo-500" />;
     }
   };
 
@@ -483,6 +513,30 @@ export const NoteWidgetsCanvas: React.FC<NoteWidgetsCanvasProps> = ({
                       }}
                       onInsertToNote={onInsertToNote}
                     />
+                  )}
+
+                  {widget.type === "scratchpad" && (
+                    <ScratchpadWidget onInsertToNote={onInsertToNote} />
+                  )}
+
+                  {widget.type === "meeting" && (
+                    <MeetingWidget onInsertToNote={onInsertToNote} />
+                  )}
+
+                  {widget.type === "bug" && (
+                    <BugWidget onInsertToNote={onInsertToNote} />
+                  )}
+
+                  {widget.type === "idea" && (
+                    <IdeaWidget onInsertToNote={onInsertToNote} />
+                  )}
+
+                  {widget.type === "api" && (
+                    <ApiWidget onInsertToNote={onInsertToNote} />
+                  )}
+
+                  {widget.type === "reading" && (
+                    <ReadingWidget onInsertToNote={onInsertToNote} />
                   )}
                 </div>
               )}
