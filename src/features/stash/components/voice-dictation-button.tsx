@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Mic, Check } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils/cn";
+import { stashIpc } from "@/lib/ipc/stash-ipc";
 
 interface VoiceDictationButtonProps {
   onInsertText: (text: string) => void;
@@ -43,16 +44,58 @@ export const VoiceDictationButton: React.FC<VoiceDictationButtonProps> = ({
     setInterimText("");
   }, [onInsertText]);
 
-  const startListening = useCallback(() => {
+  const handleOpenSettings = useCallback(async () => {
+    try {
+      await stashIpc.openMicrophoneSettings();
+    } catch (e) {
+      console.error("Failed to open microphone settings:", e);
+    }
+  }, []);
+
+  const startListening = useCallback(async () => {
     const SpeechRecognition =
       (window as any).SpeechRecognition ||
       (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
+      await handleOpenSettings();
       toast.show({
-        message: "Speech recognition is not supported on this device/runtime",
+        message: "Speech recognition unavailable",
+        description:
+          "Opening Windows Settings so you can enable speech and microphone permissions.",
+        action: {
+          label: "Open Settings",
+          onClick: handleOpenSettings,
+        },
+        duration: 8000,
+        variant: "destructive",
       });
       return;
+    }
+
+    // Proactively verify microphone hardware permission
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Immediately release tracks so speech recognition can access the device
+        stream.getTracks().forEach((track) => track.stop());
+      } catch (micErr: any) {
+        console.warn("Microphone access check failed:", micErr);
+        await handleOpenSettings();
+        toast.show({
+          message: "Microphone permission required",
+          description:
+            "Opening Windows Settings. Please ensure 'Microphone access' and desktop app access are turned ON.",
+          action: {
+            label: "Open Settings",
+            onClick: handleOpenSettings,
+          },
+          duration: 8000,
+          variant: "destructive",
+        });
+        setIsListening(false);
+        return;
+      }
     }
 
     try {
@@ -81,10 +124,25 @@ export const VoiceDictationButton: React.FC<VoiceDictationButtonProps> = ({
         setInterimText(currentInterim);
       };
 
-      recognition.onerror = (event: any) => {
+      recognition.onerror = async (event: any) => {
         console.warn("Speech recognition error:", event.error);
-        if (event.error === "not-allowed") {
-          toast.error("Microphone access denied", "Check microphone permissions in Windows Settings.");
+        if (
+          event.error === "not-allowed" ||
+          event.error === "audio-capture" ||
+          event.error === "service-not-allowed"
+        ) {
+          await handleOpenSettings();
+          toast.show({
+            message: "Microphone access required",
+            description:
+              "Opening Windows Settings so you can enable microphone permissions for Stash.",
+            action: {
+              label: "Open Settings",
+              onClick: handleOpenSettings,
+            },
+            duration: 8000,
+            variant: "destructive",
+          });
         } else if (event.error !== "no-speech") {
           toast.show({ message: `Dictation ended: ${event.error}` });
         }
@@ -99,10 +157,21 @@ export const VoiceDictationButton: React.FC<VoiceDictationButtonProps> = ({
       recognition.start();
     } catch (err) {
       console.error("Failed to start speech recognition:", err);
-      toast.error("Could not start microphone dictation");
+      await handleOpenSettings();
+      toast.show({
+        message: "Microphone dictation unavailable",
+        description:
+          "Opening Windows Settings so you can check microphone permissions.",
+        action: {
+          label: "Open Settings",
+          onClick: handleOpenSettings,
+        },
+        duration: 8000,
+        variant: "destructive",
+      });
       setIsListening(false);
     }
-  }, [stopListening]);
+  }, [handleOpenSettings, stopListening]);
 
   // Clean up on unmount
   useEffect(() => {
@@ -130,10 +199,24 @@ export const VoiceDictationButton: React.FC<VoiceDictationButtonProps> = ({
       <button
         type="button"
         onClick={handleToggle}
+        onContextMenu={async (e) => {
+          e.preventDefault();
+          await handleOpenSettings();
+          toast.show({
+            message: "Opening Windows Settings",
+            description:
+              "Ensure microphone access is enabled for desktop applications.",
+            action: {
+              label: "Reopen Settings",
+              onClick: handleOpenSettings,
+            },
+            duration: 6000,
+          });
+        }}
         title={
           isListening
             ? "Stop dictation and insert text"
-            : "Dictate voice note (Speech-to-Text)"
+            : "Dictate voice note (Speech-to-Text). Right-click to open Windows Settings."
         }
         aria-label="Toggle voice dictation"
         className={cn(

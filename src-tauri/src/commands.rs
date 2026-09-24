@@ -281,16 +281,16 @@ pub async fn open_floating_stash(
         WindowRepository::get(&conn, &note_id)?
     };
 
-    let (default_width, default_height) = (500.0, 580.0);
+    let (default_width, default_height) = (580.0, 640.0);
     let (mut width, mut height) = match window_state.as_ref() {
         Some(s) => {
-            // Upgrade legacy tiny 360x360 default to spacious modern standard
-            let w = if (s.width as f64 - 360.0).abs() < 1.0 && (s.height as f64 - 360.0).abs() < 1.0 {
+            // Upgrade legacy or cramped stash windows to comfortable modern dimensions
+            let w = if s.width < 520 {
                 default_width
             } else {
                 s.width as f64
             };
-            let h = if (s.width as f64 - 360.0).abs() < 1.0 && (s.height as f64 - 360.0).abs() < 1.0 {
+            let h = if s.height < 540 {
                 default_height
             } else {
                 s.height as f64
@@ -299,8 +299,8 @@ pub async fn open_floating_stash(
         }
         None => (default_width, default_height),
     };
-    width = width.clamp(300.0, 1600.0);
-    height = height.clamp(240.0, 1400.0);
+    width = width.clamp(360.0, 1600.0);
+    height = height.clamp(300.0, 1400.0);
     let always_on_top = window_state.as_ref().map(|s| s.always_on_top).unwrap_or(false);
 
     let url_str = format!("/?window=stash&noteId={}", note_id);
@@ -618,5 +618,36 @@ pub fn get_system_username() -> String {
         .unwrap_or_else(|_| "Friend".to_string())
 }
 
+/// Opens the operating system's microphone privacy settings (e.g. Windows Settings ms-settings:privacy-microphone).
+#[tauri::command]
+pub fn open_microphone_settings() -> AppResult<()> {
+    #[cfg(target_os = "windows")]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        let res = std::process::Command::new("explorer")
+            .arg("ms-settings:privacy-microphone")
+            .creation_flags(CREATE_NO_WINDOW)
+            .spawn();
 
-
+        if res.is_err() {
+            let _ = std::process::Command::new("cmd")
+                .args(["/c", "start", "", "ms-settings:privacy-microphone"])
+                .creation_flags(CREATE_NO_WINDOW)
+                .spawn();
+        }
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let _ = std::process::Command::new("open")
+            .arg("x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")
+            .spawn();
+    }
+    #[cfg(target_os = "linux")]
+    {
+        let _ = std::process::Command::new("xdg-open")
+            .arg("settings://privacy/microphone")
+            .spawn();
+    }
+    Ok(())
+}

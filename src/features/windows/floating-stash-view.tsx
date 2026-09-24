@@ -5,6 +5,7 @@ import { stashIpc } from "@/lib/ipc/stash-ipc";
 import { TiptapEditor } from "@/features/editor/components/tiptap-editor";
 import {
   appendPlainTextToContent,
+  docToPlainText,
   extractDoc,
   extractWidgets,
   serializeStashContent,
@@ -60,10 +61,16 @@ import {
   ListTodo,
   ArrowRight,
   ListChecks,
+  Sun,
+  Users,
+  Bug,
+  Lightbulb,
+  BookOpen,
 } from "lucide-react";
 import { NoteStatsHud } from "@/features/stash/components/note-stats-hud";
 import { VoiceDictationButton } from "@/features/stash/components/voice-dictation-button";
-import { organizeChecklist } from "@/features/stash/task-organizer";
+import { organizeChecklist, organizeDocTasks } from "@/features/stash/task-organizer";
+import { playChimeSound, playClickSound } from "@/lib/utils/sound-effects";
 import {
   isTodayTitle,
   findPreviousDailyNote,
@@ -218,7 +225,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
 
   // Window Shade mode
   const [isShaded, setIsShaded] = useState(false);
-  const preShadeHeightRef = useRef<number>(580);
+  const preShadeHeightRef = useRef<number>(640);
 
   // PIN lock & session unlock
   const [hasPin, setHasPin] = useState<boolean>(() => hasNotePin(noteId));
@@ -331,7 +338,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                 await win.setSize(new LogicalSize(curWidth, 38));
               }, 130);
             } else {
-              const targetH = Math.max(preShadeHeightRef.current || 580, 220);
+              const targetH = Math.max(preShadeHeightRef.current || 640, 240);
               await win.setSize(new LogicalSize(curWidth, targetH));
             }
           } catch {
@@ -385,6 +392,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       setIsSessionUnlocked(true);
       setPinError(false);
       setEnteredPin("");
+      playChimeSound();
       toast.show({ message: "Note unlocked" });
     } else {
       setPinError(true);
@@ -392,13 +400,26 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
   };
 
   const handleSavePin = (pin: string) => {
-    setNotePin(noteId, pin);
-    setHasPin(Boolean(pin.trim()));
-    setIsSessionUnlocked(true);
+    const trimmed = pin.trim();
+    setNotePin(noteId, trimmed);
+    setHasPin(Boolean(trimmed));
+    if (trimmed) {
+      lockNoteInSession(noteId);
+      setIsSessionUnlocked(false);
+      setEnteredPin("");
+      setPinError(false);
+      playChimeSound();
+      toast.show({
+        message: "Note protected with PIN & locked",
+      });
+    } else {
+      setIsSessionUnlocked(true);
+      toast.show({
+        message: "PIN removed",
+      });
+    }
     setPinDialogOpen(false);
-    toast.show({
-      message: pin.trim() ? "PIN protection enabled" : "PIN removed",
-    });
+    setNewPinInput("");
   };
 
   const handleLockNow = () => {
@@ -411,6 +432,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
     setNoteDueDate(noteId, dateIso);
     setDueDate(dateIso);
     setDueDateDialogOpen(false);
+    playClickSound();
     toast.show({
       message: dateIso ? "Due date updated" : "Due date cleared",
     });
@@ -509,6 +531,23 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
     let settleTimer: ReturnType<typeof setTimeout> | null = null;
     const win = getCurrentWebviewWindow();
 
+    // Auto-expand legacy or cramped windows on mount to comfortable modern dimensions (580x640)
+    void (async () => {
+      try {
+        const factor = await win.scaleFactor();
+        const outer = await win.outerSize();
+        const curWidth = Math.round(outer.width / factor);
+        const curHeight = Math.round(outer.height / factor);
+        if (curWidth < 520 || curHeight < 540) {
+          const nextW = Math.max(curWidth, 580);
+          const nextH = Math.max(curHeight, 640);
+          await win.setSize(new LogicalSize(nextW, nextH));
+        }
+      } catch {
+        // Silent fallback
+      }
+    })();
+
     // Geometry is written once movement settles, not on every frame.
     const saveGeometry = async () => {
       try {
@@ -596,6 +635,24 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
     type: WidgetType,
     initialConfig?: Record<string, any>
   ) => {
+    flushRef.current?.();
+    if (isShaded) {
+      void handleToggleShade();
+    }
+    if (isTauri()) {
+      const win = getCurrentWebviewWindow();
+      void (async () => {
+        try {
+          const factor = await win.scaleFactor();
+          const outer = await win.outerSize();
+          const curH = Math.round(outer.height / factor);
+          const curW = Math.round(outer.width / factor);
+          if (curH < 520) {
+            await win.setSize(new LogicalSize(Math.max(curW, 580), 580));
+          }
+        } catch {}
+      })();
+    }
     const defaultTitles: Record<WidgetType, string> = {
       swap: "Currency Converter",
       ticker: "Market Tickers",
@@ -625,6 +682,8 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       config: initialConfig,
     };
     handleUpdateWidgets([...widgets, newWidget]);
+    playChimeSound();
+    toast.show({ message: `Attached ${defaultTitles[type] || "widget"}` });
   };
 
   /**
@@ -632,12 +691,67 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
    * `plainText` alone is what made a note read full in the library and open
    * empty.
    */
-  const handleInsertTextToNote = (text: string) => {
+  const handleInsertTextToNote = useCallback((text: string) => {
     if (!note) return;
     flushRef.current?.();
     void persist(appendPlainTextToContent(note.contentJson, widgets, text));
     setContentToken((t) => t + 1);
-  };
+  }, [note, widgets, persist]);
+
+  const handleExportMarkdown = useCallback(() => {
+    if (!note) return;
+    const doc = extractDoc(note.contentJson);
+    const text = docToPlainText(doc) || note.plainText || "";
+    const header = note.title?.trim() ? `# ${note.title.trim()}\n\n` : "";
+    const fullMd = `${header}${text}`.trim();
+
+    const blob = new Blob([fullMd], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const filename =
+      (note.title || "stash")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") || "stash";
+    a.download = `${filename}.md`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      try {
+        document.body.removeChild(a);
+      } catch {}
+      URL.revokeObjectURL(url);
+    }, 150);
+
+    try {
+      navigator.clipboard.writeText(fullMd);
+    } catch {}
+
+    playChimeSound();
+    toast.show({ message: "Exported note as Markdown" });
+  }, [note]);
+
+  const handleImportMarkdown = useCallback(() => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.style.display = "none";
+    input.accept = ".md,.markdown,.txt,text/markdown,text/plain";
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const text = await file.text();
+        handleInsertTextToNote(text);
+        playChimeSound();
+        toast.show({ message: `Imported ${file.name}` });
+      }
+      try {
+        document.body.removeChild(input);
+      } catch {}
+    };
+    document.body.appendChild(input);
+    input.click();
+  }, [handleInsertTextToNote]);
 
   const handleAcceptCarryover = useCallback(() => {
     if (carryoverTasks.length === 0) return;
@@ -658,25 +772,52 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
   }, []);
 
   const handleOrganizeChecklist = useCallback(() => {
-    if (!note?.plainText) return;
-    const result = organizeChecklist(note.plainText);
-    if (!result.hasTasks) {
+    if (!note) return;
+    flushRef.current?.();
+
+    // 1. Try Tiptap AST doc organization first
+    const doc = extractDoc(note.contentJson);
+    const docResult = organizeDocTasks(doc);
+    if (docResult.hasTasks) {
+      if (docResult.completedCount === 0) {
+        toast.show({ message: "All checklist tasks are already active" });
+        return;
+      }
+      const updatedDoc = docResult.updatedDoc;
+      const nextContentJson = serializeStashContent(updatedDoc, widgets);
+      const nextPlainText = docToPlainText(updatedDoc);
+      void persist({
+        contentJson: nextContentJson,
+        plainText: nextPlainText,
+      });
+      setContentToken((t) => t + 1);
+      playClickSound();
+      toast.show({
+        message: `Organized checklist: moved ${docResult.completedCount} completed task${docResult.completedCount > 1 ? "s" : ""} to bottom`,
+      });
+      return;
+    }
+
+    // 2. Fallback to plain text checklist regex
+    const text = note.plainText || "";
+    const textResult = organizeChecklist(text);
+    if (!textResult.hasTasks) {
       toast.show({ message: "No checklist tasks found in this note" });
       return;
     }
-    if (result.completedCount === 0) {
-      toast.show({ message: "All tasks are already active" });
+    if (textResult.completedCount === 0) {
+      toast.show({ message: "All checklist tasks are already active" });
       return;
     }
-    flushRef.current?.();
-    const nextContentJson = stashContentFromPlainText(result.updatedText, widgets);
+    const nextContentJson = stashContentFromPlainText(textResult.updatedText, widgets);
     void persist({
-      plainText: result.updatedText,
+      plainText: textResult.updatedText,
       contentJson: nextContentJson,
     });
     setContentToken((t) => t + 1);
+    playClickSound();
     toast.show({
-      message: `Organized tasks: moved ${result.completedCount} completed task${result.completedCount > 1 ? "s" : ""} to bottom`,
+      message: `Organized checklist: moved ${textResult.completedCount} completed task${textResult.completedCount > 1 ? "s" : ""} to bottom`,
     });
   }, [note, widgets, persist]);
 
@@ -721,12 +862,24 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
     setRevisionsOpen(true);
   };
 
+  const handleCreateCheckpoint = async () => {
+    flushRef.current?.();
+    await stashIpc.createRevisionCheckpoint(noteId);
+    setRevisions(await stashIpc.listRevisions(noteId));
+    playClickSound();
+    toast.show({ message: "Created revision checkpoint" });
+  };
+
   const handleRestoreRevision = async (revId: string) => {
     const restored = await stashIpc.restoreRevision(noteId, revId);
     setNote(restored);
     setTitle(restored.title);
+    const stored = extractWidgets<NoteWidgetData>(restored.contentJson);
+    setWidgets(stored);
     setContentToken((t) => t + 1);
     setRevisionsOpen(false);
+    playChimeSound();
+    toast.show({ message: "Restored revision checkpoint" });
   };
 
   useShortcuts([
@@ -818,7 +971,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
               {/* Left: Color Picker + Title Input + Save indicator + Drag spacer */}
               <div
                 data-tauri-drag-region
-                className="drag-region flex items-center gap-1.5 flex-1 min-w-0 mr-2 cursor-grab active:cursor-grabbing"
+                className="drag-region flex items-center gap-1.5 flex-1 min-w-0 mr-2 overflow-hidden cursor-grab active:cursor-grabbing"
               >
                 <div className="no-drag-region shrink-0">
                   <HeaderTooltip label="Note Color">
@@ -865,7 +1018,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                     onChange={(e) => handleTitleChange(e.target.value)}
                     placeholder="Untitled note"
                     aria-label="Note title"
-                    className="no-drag-region bg-transparent font-semibold text-xs tracking-tight text-foreground placeholder:text-current/30 focus:outline-none focus:ring-1 focus:ring-primary/40 rounded px-1.5 py-0.5 min-w-[70px] max-w-[200px] truncate select-text transition-all cursor-text"
+                    className="no-drag-region bg-transparent font-semibold text-xs tracking-tight text-foreground placeholder:text-current/30 focus:outline-none focus:ring-1 focus:ring-primary/40 rounded px-1.5 py-0.5 min-w-[50px] max-w-[220px] truncate select-text transition-all cursor-text"
                   />
                 </HeaderTooltip>
 
@@ -971,7 +1124,24 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                 </button>
               </DropdownMenuTrigger>
             </HeaderTooltip>
-            <DropdownMenuContent align="end" className="w-56 text-xs">
+            <DropdownMenuContent align="end" className="w-56 text-xs max-h-[85vh] overflow-y-auto">
+              <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+                Interactive Tools
+              </div>
+              <DropdownMenuItem onClick={() => handleAddWidget("calculator")}>
+                <CalcIcon className="mr-2 h-3.5 w-3.5 text-amber-500" />
+                <div className="flex flex-col">
+                  <span className="font-medium">Quick Calculator</span>
+                  <span className="text-[10px] text-muted-foreground">Desktop math scratchpad</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleAddWidget("timer")}>
+                <TimerIcon className="mr-2 h-3.5 w-3.5 text-rose-500" />
+                <div className="flex flex-col">
+                  <span className="font-medium">Focus & Pomodoro Timer</span>
+                  <span className="text-[10px] text-muted-foreground">Pomodoro & count-up stopwatch</span>
+                </div>
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleAddWidget("swap")}>
                 <ArrowUpDown className="mr-2 h-3.5 w-3.5 text-emerald-500" />
                 <div className="flex flex-col">
@@ -986,18 +1156,11 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                   <span className="text-[10px] text-muted-foreground">Live asset prices & 24h trend</span>
                 </div>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("calculator")}>
-                <CalcIcon className="mr-2 h-3.5 w-3.5 text-amber-500" />
+              <DropdownMenuItem onClick={() => handleAddWidget("countdown")}>
+                <CalendarClock className="mr-2 h-3.5 w-3.5 text-orange-500" />
                 <div className="flex flex-col">
-                  <span className="font-medium">Quick Calculator</span>
-                  <span className="text-[10px] text-muted-foreground">Desktop math scratchpad</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("timer")}>
-                <TimerIcon className="mr-2 h-3.5 w-3.5 text-rose-500" />
-                <div className="flex flex-col">
-                  <span className="font-medium">Focus & Pomodoro Timer</span>
-                  <span className="text-[10px] text-muted-foreground">Pomodoro & count-up stopwatch</span>
+                  <span className="font-medium">Countdown Timer</span>
+                  <span className="text-[10px] text-muted-foreground">Count down to any date or event</span>
                 </div>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleAddWidget("worldclock")}>
@@ -1021,11 +1184,30 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                   <span className="text-[10px] text-muted-foreground">Habit, task & quantity tracker</span>
                 </div>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("countdown")}>
-                <CalendarClock className="mr-2 h-3.5 w-3.5 text-orange-500" />
+              <DropdownMenuItem onClick={() => handleAddWidget("browser")}>
+                <Globe className="mr-2 h-3.5 w-3.5 text-cyan-500" />
                 <div className="flex flex-col">
-                  <span className="font-medium">Countdown Timer</span>
-                  <span className="text-[10px] text-muted-foreground">Count down to any date or event</span>
+                  <span className="font-medium">Web Browser (PiP)</span>
+                  <span className="text-[10px] text-muted-foreground">Embedded web & detachable PiP</span>
+                </div>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+              <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+                Component Blocks
+              </div>
+              <DropdownMenuItem onClick={() => handleAddWidget("scratchpad")}>
+                <Sun className="mr-2 h-3.5 w-3.5 text-amber-500" />
+                <div className="flex flex-col">
+                  <span className="font-medium">Daily Scratchpad</span>
+                  <span className="text-[10px] text-muted-foreground">Focus timer, streak & notes</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleAddWidget("meeting")}>
+                <Users className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+                <div className="flex flex-col">
+                  <span className="font-medium">Meeting Minutes</span>
+                  <span className="text-[10px] text-muted-foreground">Agenda, presence & actions</span>
                 </div>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleAddWidget("kanban")}>
@@ -1039,7 +1221,28 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                 <Sparkles className="mr-2 h-3.5 w-3.5 text-emerald-500" />
                 <div className="flex flex-col">
                   <span className="font-medium">7-Day Habit Tracker</span>
-                  <span className="text-[10px] text-muted-foreground">Weekly streaks & daily check-ins</span>
+                  <span className="text-[10px] text-muted-foreground">Weekly streaks & daily checks</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleAddWidget("bug")}>
+                <Bug className="mr-2 h-3.5 w-3.5 text-rose-500" />
+                <div className="flex flex-col">
+                  <span className="font-medium">Bug Blitz & Triage</span>
+                  <span className="text-[10px] text-muted-foreground">Severity, status & repro steps</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleAddWidget("idea")}>
+                <Lightbulb className="mr-2 h-3.5 w-3.5 text-yellow-500" />
+                <div className="flex flex-col">
+                  <span className="font-medium">Idea Incubator</span>
+                  <span className="text-[10px] text-muted-foreground">Confidence slider & notes</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleAddWidget("reading")}>
+                <BookOpen className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+                <div className="flex flex-col">
+                  <span className="font-medium">Book & Article Digest</span>
+                  <span className="text-[10px] text-muted-foreground">Rating, takeaways & quotes</span>
                 </div>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleAddWidget("palette")}>
@@ -1047,13 +1250,6 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                 <div className="flex flex-col">
                   <span className="font-medium">Color Palette</span>
                   <span className="text-[10px] text-muted-foreground">Hex swatches & 1-click copy</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("browser")}>
-                <Globe className="mr-2 h-3.5 w-3.5 text-cyan-500" />
-                <div className="flex flex-col">
-                  <span className="font-medium">Web Browser (PiP)</span>
-                  <span className="text-[10px] text-muted-foreground">Embedded web view & detachable PiP window</span>
                 </div>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -1120,7 +1316,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
           </HeaderTooltip>
 
           {/* Voice to Stash Dictation */}
-          <HeaderTooltip label="Voice Dictation (Speech-to-Text)">
+          <HeaderTooltip label="Voice Dictation (Speech-to-Text · Right-click for Settings)">
             <div className="no-drag-region">
               <VoiceDictationButton
                 onInsertText={handleInsertTextToNote}
@@ -1164,46 +1360,11 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                 <History className="mr-2 h-3.5 w-3.5" />
                 Revision history
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  const md = note.title
-                    ? `# ${note.title}\n\n${note.plainText || ""}`.trim()
-                    : (note.plainText || "").trim();
-                  const blob = new Blob([md], {
-                    type: "text/markdown;charset=utf-8",
-                  });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement("a");
-                  a.href = url;
-                  const filename =
-                    (note.title || "untitled")
-                      .toLowerCase()
-                      .replace(/[^a-z0-9]+/g, "-")
-                      .replace(/^-|-$/g, "") || "stash";
-                  a.download = `${filename}.md`;
-                  a.click();
-                  URL.revokeObjectURL(url);
-                  toast.show({ message: "Exported note as Markdown" });
-                }}
-              >
+              <DropdownMenuItem onClick={handleExportMarkdown}>
                 <FileDown className="mr-2 h-3.5 w-3.5" />
                 Export as Markdown
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  const input = document.createElement("input");
-                  input.type = "file";
-                  input.accept = ".md,.markdown,.txt,text/markdown,text/plain";
-                  input.onchange = async (e) => {
-                    const file = (e.target as HTMLInputElement).files?.[0];
-                    if (!file) return;
-                    const text = await file.text();
-                    handleInsertTextToNote(text);
-                    toast.show({ message: "Imported Markdown into note" });
-                  };
-                  input.click();
-                }}
-              >
+              <DropdownMenuItem onClick={handleImportMarkdown}>
                 <FileUp className="mr-2 h-3.5 w-3.5" />
                 Import Markdown
               </DropdownMenuItem>
@@ -1474,7 +1635,18 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
           <Plus className="mr-2 h-3.5 w-3.5 text-emerald-500" />
           <span>Attach Widget</span>
         </ContextMenuSubTrigger>
-        <ContextMenuSubContent className="w-48">
+        <ContextMenuSubContent className="w-56 max-h-[80vh] overflow-y-auto">
+          <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+            Interactive Tools
+          </div>
+          <ContextMenuItem onClick={() => handleAddWidget("calculator")}>
+            <CalcIcon className="mr-2 h-3.5 w-3.5 text-amber-500" />
+            <span>Quick Calculator</span>
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => handleAddWidget("timer")}>
+            <TimerIcon className="mr-2 h-3.5 w-3.5 text-rose-500" />
+            <span>Focus & Pomodoro</span>
+          </ContextMenuItem>
           <ContextMenuItem onClick={() => handleAddWidget("countdown")}>
             <CalendarClock className="mr-2 h-3.5 w-3.5 text-orange-500" />
             <span>Countdown Timer</span>
@@ -1482,10 +1654,6 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
           <ContextMenuItem onClick={() => handleAddWidget("worldclock")}>
             <Globe className="mr-2 h-3.5 w-3.5 text-cyan-500" />
             <span>World Clock</span>
-          </ContextMenuItem>
-          <ContextMenuItem onClick={() => handleAddWidget("calculator")}>
-            <CalcIcon className="mr-2 h-3.5 w-3.5 text-amber-500" />
-            <span>Calculator</span>
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleAddWidget("unitconverter")}>
             <Ruler className="mr-2 h-3.5 w-3.5 text-indigo-500" />
@@ -1495,13 +1663,46 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
             <Target className="mr-2 h-3.5 w-3.5 text-purple-500" />
             <span>Tally Counter</span>
           </ContextMenuItem>
-          <ContextMenuItem onClick={() => handleAddWidget("habits")}>
-            <Sparkles className="mr-2 h-3.5 w-3.5 text-emerald-500" />
-            <span>Habit Tracker</span>
+          <ContextMenuItem onClick={() => handleAddWidget("browser")}>
+            <Globe className="mr-2 h-3.5 w-3.5 text-cyan-500" />
+            <span>Mini Web Browser</span>
+          </ContextMenuItem>
+
+          <ContextMenuSeparator />
+          <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+            Component Blocks
+          </div>
+          <ContextMenuItem onClick={() => handleAddWidget("scratchpad")}>
+            <Sun className="mr-2 h-3.5 w-3.5 text-amber-500" />
+            <span>Daily Scratchpad</span>
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => handleAddWidget("meeting")}>
+            <Users className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+            <span>Meeting Minutes</span>
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleAddWidget("kanban")}>
             <Kanban className="mr-2 h-3.5 w-3.5 text-blue-500" />
             <span>Kanban Board</span>
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => handleAddWidget("habits")}>
+            <Sparkles className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+            <span>7-Day Habit Tracker</span>
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => handleAddWidget("bug")}>
+            <Bug className="mr-2 h-3.5 w-3.5 text-rose-500" />
+            <span>Bug Blitz & Triage</span>
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => handleAddWidget("idea")}>
+            <Lightbulb className="mr-2 h-3.5 w-3.5 text-yellow-500" />
+            <span>Idea Incubator</span>
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => handleAddWidget("reading")}>
+            <BookOpen className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+            <span>Book & Article Digest</span>
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => handleAddWidget("palette")}>
+            <Palette className="mr-2 h-3.5 w-3.5 text-pink-500" />
+            <span>Color Palette</span>
           </ContextMenuItem>
         </ContextMenuSubContent>
       </ContextMenuSub>
@@ -1509,11 +1710,6 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       <ContextMenuItem onClick={() => setPersonaModalOpen(true)}>
         <Sparkles className="mr-2 h-3.5 w-3.5 text-primary" />
         <span>Personalize Note Persona</span>
-      </ContextMenuItem>
-
-      <ContextMenuItem onClick={() => setExportImageOpen(true)}>
-        <Camera className="mr-2 h-3.5 w-3.5 text-primary" />
-        <span>Share as Beautiful Image</span>
       </ContextMenuItem>
 
       <ContextMenuItem onClick={handleOrganizeChecklist}>
@@ -1524,6 +1720,38 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       <ContextMenuItem onClick={() => setDueDateDialogOpen(true)}>
         <CalendarClock className="mr-2 h-3.5 w-3.5 text-amber-500" />
         <span>Due Date & Reminder</span>
+      </ContextMenuItem>
+
+      <ContextMenuItem onClick={() => setPinDialogOpen(true)}>
+        <Lock className="mr-2 h-3.5 w-3.5 text-primary" />
+        <span>{hasPin ? "Change or Remove PIN" : "Protect Note with PIN"}</span>
+      </ContextMenuItem>
+
+      {hasPin && isSessionUnlocked && (
+        <ContextMenuItem onClick={handleLockNow}>
+          <KeyRound className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+          <span>Lock Note Now</span>
+        </ContextMenuItem>
+      )}
+
+      <ContextMenuItem onClick={handleOpenRevisions}>
+        <History className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+        <span>Revision History</span>
+      </ContextMenuItem>
+
+      <ContextMenuItem onClick={handleExportMarkdown}>
+        <FileDown className="mr-2 h-3.5 w-3.5 text-purple-500" />
+        <span>Export as Markdown</span>
+      </ContextMenuItem>
+
+      <ContextMenuItem onClick={handleImportMarkdown}>
+        <FileUp className="mr-2 h-3.5 w-3.5 text-sky-500" />
+        <span>Import Markdown</span>
+      </ContextMenuItem>
+
+      <ContextMenuItem onClick={() => setExportImageOpen(true)}>
+        <Camera className="mr-2 h-3.5 w-3.5 text-primary" />
+        <span>Share as Beautiful Image</span>
       </ContextMenuItem>
 
       <ContextMenuItem
@@ -1689,6 +1917,15 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                 isDockMinimized={isDockMinimized}
                 onToggleDock={handleToggleDock}
                 className={currentFontPersona?.fontClass}
+                onAddWidget={handleAddWidget}
+                onPersonalizePersona={() => setPersonaModalOpen(true)}
+                onOrganizeChecklist={handleOrganizeChecklist}
+                onDueDate={() => setDueDateDialogOpen(true)}
+                onPin={() => setPinDialogOpen(true)}
+                onExportMarkdown={handleExportMarkdown}
+                onImportMarkdown={handleImportMarkdown}
+                onRevisions={handleOpenRevisions}
+                onRefreshNote={handleRefreshNote}
               />
             </div>
 
@@ -1715,11 +1952,22 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       <Dialog open={revisionsOpen} onOpenChange={setRevisionsOpen}>
         <DialogContent className="max-w-md gap-3 p-5">
           <DialogHeader>
-            <DialogTitle className="text-sm">Revision history</DialogTitle>
-            <DialogDescription>
-              Checkpoints are kept when you close a stash or make a substantial
-              edit. Restoring one keeps the current version recoverable.
-            </DialogDescription>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <DialogTitle className="text-sm">Revision history</DialogTitle>
+                <DialogDescription>
+                  Checkpoints are kept when you close a stash or make edits.
+                </DialogDescription>
+              </div>
+              <button
+                type="button"
+                onClick={() => void handleCreateCheckpoint()}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-2xs shrink-0 cursor-pointer"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>Save Checkpoint</span>
+              </button>
+            </div>
           </DialogHeader>
 
           <div className="max-h-72 divide-y divide-border overflow-y-auto">

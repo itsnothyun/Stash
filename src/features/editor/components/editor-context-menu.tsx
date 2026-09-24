@@ -39,16 +39,58 @@ import {
   Type,
   Underline as UnderlineIcon,
   Undo2,
+  Sparkles,
+  ListChecks,
+  CalendarClock,
+  Lock,
+  FileDown,
+  FileUp,
+  History,
+  RefreshCw,
+  Plus,
+  Calculator as CalcIcon,
+  Timer as TimerIcon,
+  Globe,
+  Ruler,
+  Target,
+  Kanban,
+  Palette,
+  Sun,
+  Users,
+  Bug,
+  Lightbulb,
+  BookOpen,
+  ArrowUpDown,
+  TrendingUp,
 } from "lucide-react";
+import { WidgetType } from "@/features/widgets/types";
 
-interface EditorContextMenuProps {
+export interface EditorContextMenuProps {
   editor: Editor | null;
   children: React.ReactNode;
+  onAddWidget?: (type: WidgetType) => void;
+  onPersonalizePersona?: () => void;
+  onOrganizeChecklist?: () => void;
+  onDueDate?: () => void;
+  onPin?: () => void;
+  onExportMarkdown?: () => void;
+  onImportMarkdown?: () => void;
+  onRevisions?: () => void;
+  onRefreshNote?: () => void;
 }
 
 export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
   editor,
   children,
+  onAddWidget,
+  onPersonalizePersona,
+  onOrganizeChecklist,
+  onDueDate,
+  onPin,
+  onExportMarkdown,
+  onImportMarkdown,
+  onRevisions,
+  onRefreshNote,
 }) => {
   if (!editor) {
     return <>{children}</>;
@@ -388,6 +430,167 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
           <Eraser className="mr-2 h-3.5 w-3.5 text-rose-500" />
           <span>Clear Formatting</span>
         </ContextMenuItem>
+
+        {/* Note / Stash Features */}
+        {(onAddWidget ||
+          onPersonalizePersona ||
+          onOrganizeChecklist ||
+          onDueDate ||
+          onPin ||
+          onExportMarkdown ||
+          onImportMarkdown ||
+          onRevisions ||
+          onRefreshNote) && (
+          <>
+            <ContextMenuSeparator />
+            <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+              Stash Actions
+            </div>
+
+            {onAddWidget && (
+              <ContextMenuSub>
+                <ContextMenuSubTrigger>
+                  <Plus className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+                  <span>Attach Widget</span>
+                </ContextMenuSubTrigger>
+                <ContextMenuSubContent className="w-56">
+                  <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+                    Interactive Tools
+                  </div>
+                  <ContextMenuItem onClick={() => onAddWidget("calculator")}>
+                    <CalcIcon className="mr-2 h-3.5 w-3.5 text-amber-500" />
+                    <span>Quick Calculator</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("timer")}>
+                    <TimerIcon className="mr-2 h-3.5 w-3.5 text-rose-500" />
+                    <span>Focus & Pomodoro</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("swap")}>
+                    <ArrowUpDown className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+                    <span>Currency Converter</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("ticker")}>
+                    <TrendingUp className="mr-2 h-3.5 w-3.5 text-blue-500" />
+                    <span>Market Tickers</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("countdown")}>
+                    <CalendarClock className="mr-2 h-3.5 w-3.5 text-orange-500" />
+                    <span>Countdown Timer</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("worldclock")}>
+                    <Globe className="mr-2 h-3.5 w-3.5 text-cyan-500" />
+                    <span>World Clock</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("unitconverter")}>
+                    <Ruler className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+                    <span>Unit Converter</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("counter")}>
+                    <Target className="mr-2 h-3.5 w-3.5 text-purple-500" />
+                    <span>Tally Counter</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("browser")}>
+                    <Globe className="mr-2 h-3.5 w-3.5 text-cyan-500" />
+                    <span>Mini Web Browser</span>
+                  </ContextMenuItem>
+
+                  <ContextMenuSeparator />
+                  <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+                    Component Blocks
+                  </div>
+                  <ContextMenuItem onClick={() => onAddWidget("scratchpad")}>
+                    <Sun className="mr-2 h-3.5 w-3.5 text-amber-500" />
+                    <span>Daily Scratchpad</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("meeting")}>
+                    <Users className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+                    <span>Meeting Minutes</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("kanban")}>
+                    <Kanban className="mr-2 h-3.5 w-3.5 text-blue-500" />
+                    <span>Kanban Board</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("habits")}>
+                    <Sparkles className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+                    <span>7-Day Habit Tracker</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("bug")}>
+                    <Bug className="mr-2 h-3.5 w-3.5 text-rose-500" />
+                    <span>Bug Blitz & Triage</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("idea")}>
+                    <Lightbulb className="mr-2 h-3.5 w-3.5 text-yellow-500" />
+                    <span>Idea Incubator</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("reading")}>
+                    <BookOpen className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+                    <span>Book & Article Digest</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("palette")}>
+                    <Palette className="mr-2 h-3.5 w-3.5 text-pink-500" />
+                    <span>Color Palette</span>
+                  </ContextMenuItem>
+                </ContextMenuSubContent>
+              </ContextMenuSub>
+            )}
+
+            {onPersonalizePersona && (
+              <ContextMenuItem onClick={onPersonalizePersona}>
+                <Sparkles className="mr-2 h-3.5 w-3.5 text-primary" />
+                <span>Personalize Note Persona</span>
+              </ContextMenuItem>
+            )}
+
+            {onOrganizeChecklist && (
+              <ContextMenuItem onClick={onOrganizeChecklist}>
+                <ListChecks className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+                <span>Organize Checklist (Done to bottom)</span>
+              </ContextMenuItem>
+            )}
+
+            {onDueDate && (
+              <ContextMenuItem onClick={onDueDate}>
+                <CalendarClock className="mr-2 h-3.5 w-3.5 text-amber-500" />
+                <span>Set Due Date & Reminder</span>
+              </ContextMenuItem>
+            )}
+
+            {onPin && (
+              <ContextMenuItem onClick={onPin}>
+                <Lock className="mr-2 h-3.5 w-3.5 text-primary" />
+                <span>Protect Note with PIN</span>
+              </ContextMenuItem>
+            )}
+
+            {onRevisions && (
+              <ContextMenuItem onClick={onRevisions}>
+                <History className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+                <span>Revision History</span>
+              </ContextMenuItem>
+            )}
+
+            {onExportMarkdown && (
+              <ContextMenuItem onClick={onExportMarkdown}>
+                <FileDown className="mr-2 h-3.5 w-3.5 text-purple-500" />
+                <span>Export as Markdown</span>
+              </ContextMenuItem>
+            )}
+
+            {onImportMarkdown && (
+              <ContextMenuItem onClick={onImportMarkdown}>
+                <FileUp className="mr-2 h-3.5 w-3.5 text-sky-500" />
+                <span>Import Markdown</span>
+              </ContextMenuItem>
+            )}
+
+            {onRefreshNote && (
+              <ContextMenuItem onClick={onRefreshNote}>
+                <RefreshCw className="mr-2 h-3.5 w-3.5 text-primary" />
+                <span>Refresh Note</span>
+              </ContextMenuItem>
+            )}
+          </>
+        )}
       </ContextMenuContent>
     </ContextMenu>
   );

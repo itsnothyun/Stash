@@ -59,11 +59,15 @@ import {
   Star,
   Trash2,
   X,
+  Filter,
+  RotateCcw,
 } from "lucide-react";
 import {
   openOrCreateTodayStash,
   findTodayNote,
+  isTodayTitle,
 } from "@/features/stash/daily-stash";
+import { hasNotePin, hasNoteWidgets } from "@/features/stash/note-meta";
 import { FilterSortControl } from "./components/filter-sort-control";
 import { getSystemUsername, getQuirkyGreeting } from "@/lib/utils/greetings";
 import { cn } from "@/lib/utils/cn";
@@ -135,6 +139,12 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
     setSort,
     groupBy,
     setGroupBy,
+    quickFilter,
+    setQuickFilter,
+    dateHorizon,
+    setDateHorizon,
+    userDisplayName,
+    showGreetingHeader,
   } = useUIStore();
 
   const [notes, setNotes] = useState<Note[]>([]);
@@ -150,7 +160,8 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
     getSystemUsername().then(setUsername);
   }, []);
 
-  const quirkyGreeting = useMemo(() => getQuirkyGreeting(username), [username]);
+  const activeUsername = (userDisplayName && userDisplayName.trim().length > 0) ? userDisplayName.trim() : username;
+  const quirkyGreeting = useMemo(() => getQuirkyGreeting(activeUsername), [activeUsername]);
 
   const isSearching = searchQuery.trim().length > 0;
 
@@ -175,6 +186,10 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
           cmp = (a.color || "").localeCompare(b.color || "");
         } else if (sortField === "createdAt") {
           cmp = a.createdAt.localeCompare(b.createdAt);
+        } else if (sortField === "words") {
+          const aWords = (a.plainText?.trim() || "").split(/\s+/).filter(Boolean).length;
+          const bWords = (b.plainText?.trim() || "").split(/\s+/).filter(Boolean).length;
+          cmp = aWords - bWords;
         } else {
           cmp = a.updatedAt.localeCompare(b.updatedAt);
         }
@@ -375,24 +390,91 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
     toast.show({ message: `${count} notes moved to Trash` });
   };
 
+  /* -------------------------- filtering & counts ------------------------- */
+
+  const noteCountsByColor = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const n of notes) {
+      const color = n.color || "paper";
+      counts[color] = (counts[color] || 0) + 1;
+    }
+    return counts;
+  }, [notes]);
+
+  const noteCountsByTag = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const n of notes) {
+      if (n.tags) {
+        for (const t of n.tags) {
+          counts[t.id] = (counts[t.id] || 0) + 1;
+        }
+      }
+    }
+    return counts;
+  }, [notes]);
+
+  const filteredNotes = useMemo(() => {
+    let result = notes;
+
+    // Quick filter preset
+    if (quickFilter === "pinned") {
+      result = result.filter((n) => n.isPinned);
+    } else if (quickFilter === "favorites") {
+      result = result.filter((n) => n.isFavorite);
+    } else if (quickFilter === "todos") {
+      result = result.filter((n) => taskSummary(n.contentJson).total > 0);
+    } else if (quickFilter === "completed") {
+      result = result.filter((n) => {
+        const s = taskSummary(n.contentJson);
+        return s.total > 0 && s.done === s.total;
+      });
+    } else if (quickFilter === "vault") {
+      result = result.filter((n) => hasNotePin(n.id));
+    } else if (quickFilter === "has_widgets") {
+      result = result.filter((n) => hasNoteWidgets(n.id));
+    }
+
+    // Date horizon filter
+    if (dateHorizon && dateHorizon !== "all") {
+      const now = Date.now();
+      result = result.filter((n) => {
+        const d = new Date(n.updatedAt).getTime();
+        if (isNaN(d)) return true;
+        if (dateHorizon === "today") {
+          return (
+            new Date(n.updatedAt).toDateString() === new Date().toDateString() ||
+            isTodayTitle(n.title)
+          );
+        } else if (dateHorizon === "week") {
+          return now - d <= 7 * 86400000;
+        } else if (dateHorizon === "month") {
+          return now - d <= 30 * 86400000;
+        }
+        return true;
+      });
+    }
+
+    return result;
+  }, [notes, quickFilter, dateHorizon]);
+
   /* ------------------------------ keyboard ------------------------------ */
 
   const selectedNote = useMemo(
-    () => notes.find((n) => n.id === selectedNoteId) ?? null,
-    [notes, selectedNoteId]
+    () => filteredNotes.find((n) => n.id === selectedNoteId) ?? null,
+    [filteredNotes, selectedNoteId]
   );
 
   const moveSelection = useCallback(
     (delta: number) => {
-      if (notes.length === 0) return;
-      const current = notes.findIndex((n) => n.id === selectedNoteId);
+      if (filteredNotes.length === 0) return;
+      const current = filteredNotes.findIndex((n) => n.id === selectedNoteId);
       const next =
         current === -1
           ? 0
-          : Math.min(Math.max(current + delta, 0), notes.length - 1);
-      setSelectedNoteId(notes[next].id);
+          : Math.min(Math.max(current + delta, 0), filteredNotes.length - 1);
+      setSelectedNoteId(filteredNotes[next].id);
     },
-    [notes, selectedNoteId, setSelectedNoteId]
+    [filteredNotes, selectedNoteId, setSelectedNoteId]
   );
 
   const todayNote = useMemo(() => findTodayNote(notes), [notes]);
@@ -469,10 +551,22 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
     : SECTION_TITLES[activeSection];
 
   const groupedNotes = useMemo((): { label: string; notes: Note[] }[] => {
-    if (groupBy === "none") return [{ label: "", notes }];
+    if (groupBy === "none") return [{ label: "", notes: filteredNotes }];
+    if (groupBy === "pinned") {
+      const pinned = filteredNotes.filter((n) => n.isPinned);
+      const others = filteredNotes.filter((n) => !n.isPinned);
+      const groups: { label: string; notes: Note[] }[] = [];
+      if (pinned.length > 0) {
+        groups.push({ label: "📌 Pinned Stashes", notes: pinned });
+      }
+      if (others.length > 0) {
+        groups.push({ label: "Other Stashes", notes: others });
+      }
+      return groups;
+    }
     if (groupBy === "color") {
       const map = new Map<string, Note[]>();
-      for (const n of notes) {
+      for (const n of filteredNotes) {
         const key = n.color || "Paper";
         if (!map.has(key)) map.set(key, []);
         map.get(key)!.push(n);
@@ -481,7 +575,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
     }
     // month
     const map = new Map<string, Note[]>();
-    for (const n of notes) {
+    for (const n of filteredNotes) {
       const key = n.updatedAt.slice(0, 7);
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(n);
@@ -495,10 +589,10 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
         }),
         notes: grouped,
       }));
-  }, [notes, groupBy]);
+  }, [filteredNotes, groupBy]);
 
   const collectionProps = {
-    notes,
+    notes: filteredNotes,
     selectedNoteId,
     onSelectNote: setSelectedNoteId,
     onOpenFloating: openFloating,
@@ -869,7 +963,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
         {/* Page header */}
         <div className="flex shrink-0 flex-wrap items-end justify-between gap-3 border-b border-border px-6 py-4">
           <div className="min-w-0">
-            {activeSection === "all" && !isSearching && !selectedTagId && !selectedColorFilter ? (
+            {activeSection === "all" && !isSearching && !selectedTagId && !selectedColorFilter && showGreetingHeader ? (
               <>
                 <h1 className="text-[1.375rem] font-semibold tracking-tight text-foreground">
                   {quirkyGreeting.title}
@@ -880,7 +974,9 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                   <span className="font-medium text-foreground/80">
                     {isLoading
                       ? "Loading…"
-                      : `${notes.length} ${notes.length === 1 ? "stash" : "stashes"}`}
+                      : `${filteredNotes.length} ${filteredNotes.length === 1 ? "stash" : "stashes"}${
+                          filteredNotes.length !== notes.length ? ` (of ${notes.length})` : ""
+                        }`}
                   </span>
                 </p>
               </>
@@ -892,7 +988,9 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 <p className="mt-0.5 text-xs text-muted-foreground">
                   {isLoading
                     ? "Loading…"
-                    : `${notes.length} ${notes.length === 1 ? "note" : "notes"}`}
+                    : `${filteredNotes.length} ${filteredNotes.length === 1 ? "note" : "notes"}${
+                        filteredNotes.length !== notes.length ? ` (of ${notes.length})` : ""
+                      }`}
                   {activeSection === "trash" && notes.length > 0 && (
                     <>
                       {" · "}
@@ -937,6 +1035,14 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
               tags={tags}
               selectedTagId={selectedTagId}
               onSelectTag={setSelectedTagId}
+              quickFilter={quickFilter}
+              onQuickFilterChange={setQuickFilter}
+              dateHorizon={dateHorizon}
+              onDateHorizonChange={setDateHorizon}
+              noteCountsByColor={noteCountsByColor}
+              noteCountsByTag={noteCountsByTag}
+              totalNotesCount={notes.length}
+              filteredNotesCount={filteredNotes.length}
               includeArchived={includeArchived}
               onToggleIncludeArchived={setIncludeArchived}
             />
@@ -949,12 +1055,36 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
         <ContextMenu>
           <ContextMenuTrigger asChild>
             <div className="relative flex-1 overflow-y-auto px-6 py-5">
-              {notes.length === 0 && !isLoading ? (
-                <EmptyStash
-                  section={activeSection}
-                  isSearching={isSearching}
-                  onCapture={onCapture}
-                />
+              {filteredNotes.length === 0 && !isLoading ? (
+                notes.length === 0 ? (
+                  <EmptyStash
+                    section={activeSection}
+                    isSearching={isSearching}
+                    onCapture={onCapture}
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-20 text-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted/60 text-muted-foreground mb-3">
+                      <Filter className="h-6 w-6 stroke-[1.5]" />
+                    </div>
+                    <p className="text-sm font-medium text-foreground">No stashes match your filters</p>
+                    <p className="text-xs text-muted-foreground mt-1 max-w-xs">
+                      Try clearing or adjusting your quick filter preset or date horizon.
+                    </p>
+                    <button
+                      onClick={() => {
+                        setQuickFilter("all");
+                        setDateHorizon("all");
+                        setSelectedColorFilter(null);
+                        setSelectedTagId(null);
+                      }}
+                      className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors cursor-pointer"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" />
+                      Reset All Filters
+                    </button>
+                  </div>
+                )
               ) : groupBy === "none" ? (
                 viewMode === "grid" ? (
                   <NoteGrid {...collectionProps} />

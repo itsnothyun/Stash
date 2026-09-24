@@ -6,7 +6,20 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ConfirmDialog } from "@/components/ui/alert-dialog";
-import { useUIStore, ZOOM_PRESETS, MIN_ZOOM, MAX_ZOOM } from "@/stores/ui-store";
+import {
+  useUIStore,
+  ZOOM_PRESETS,
+  MIN_ZOOM,
+  MAX_ZOOM,
+  ACCENT_COLORS,
+  FontFamily,
+  CardDensity,
+} from "@/stores/ui-store";
+import {
+  playSuccessSound,
+  playPopSound,
+  playClickSound,
+} from "@/lib/utils/sound-effects";
 import { stashIpc } from "@/lib/ipc/stash-ipc";
 import { Settings } from "@/features/stash/types/note";
 import { NOTE_COLORS } from "@/features/stash/types/color";
@@ -25,14 +38,22 @@ import {
   Sun,
   Trash2,
   Upload,
+  Volume2,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
-type SettingsTab = "general" | "appearance" | "notes" | "data" | "about";
+type SettingsTab =
+  | "general"
+  | "appearance"
+  | "personalization"
+  | "notes"
+  | "data"
+  | "about";
 
 const TABS: { id: SettingsTab; label: string }[] = [
   { id: "general", label: "General" },
   { id: "appearance", label: "Appearance" },
+  { id: "personalization", label: "Personalization" },
   { id: "notes", label: "Notes" },
   { id: "data", label: "Data" },
   { id: "about", label: "About" },
@@ -140,6 +161,26 @@ export const SettingsModal: React.FC = () => {
     zoomIn,
     zoomOut,
     resetZoom,
+    accentColor,
+    setAccentColor,
+    fontFamily,
+    setFontFamily,
+    cardDensity,
+    setCardDensity,
+    soundEffectsEnabled,
+    setSoundEffectsEnabled,
+    showWordCount,
+    setShowWordCount,
+    showRelativeTime,
+    setShowRelativeTime,
+    showColorRibbon,
+    setShowColorRibbon,
+    showWidgetBadges,
+    setShowWidgetBadges,
+    userDisplayName,
+    setUserDisplayName,
+    showGreetingHeader,
+    setShowGreetingHeader,
   } = useUIStore();
   const [settings, setSettings] = useState<Settings | null>(null);
   const [activeTab, setActiveTab] = useState<SettingsTab>("general");
@@ -222,9 +263,9 @@ export const SettingsModal: React.FC = () => {
   return (
     <>
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-        <DialogContent className="max-w-xl gap-0 overflow-hidden p-0">
+        <DialogContent className="max-w-2xl gap-0 overflow-hidden p-0 rounded-2xl">
           <DialogHeader className="flex flex-row items-center justify-between border-b border-border px-4 py-3">
-            <DialogTitle className="text-sm">Settings</DialogTitle>
+            <DialogTitle className="text-sm font-semibold">Settings</DialogTitle>
             {justSaved && (
               <span className="flex items-center gap-1 pr-6 text-2xs font-medium text-success">
                 <Check className="h-3 w-3" /> Saved
@@ -232,8 +273,8 @@ export const SettingsModal: React.FC = () => {
             )}
           </DialogHeader>
 
-          <div className="flex h-[400px]">
-            <nav className="w-36 shrink-0 space-y-px border-r border-border bg-surface p-2">
+          <div className="flex h-[480px]">
+            <nav className="w-40 shrink-0 space-y-1 border-r border-border bg-surface p-2.5">
               {TABS.map((tab) => (
                 <button
                   key={tab.id}
@@ -471,7 +512,289 @@ export const SettingsModal: React.FC = () => {
                 </div>
               )}
 
-              {activeTab === "notes" && settings && (
+      {activeTab === "personalization" && (
+        <div className="space-y-6">
+          {/* Accent Color */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-semibold text-foreground">
+                Brand Accent & Aura Glow
+              </span>
+              <span className="text-[10px] font-mono text-muted-foreground uppercase">
+                Active: {ACCENT_COLORS.find((a) => a.id === accentColor)?.label}
+              </span>
+            </div>
+            <p className="text-2xs text-muted-foreground mb-3">
+              Select your signature desktop accent color. Immediately tints buttons, indicators, and glow highlights.
+            </p>
+            <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+              {ACCENT_COLORS.map((accent) => {
+                const isSelected = accentColor === accent.id;
+                return (
+                  <button
+                    key={accent.id}
+                    type="button"
+                    onClick={() => {
+                      setAccentColor(accent.id);
+                      if (soundEffectsEnabled) playPopSound();
+                    }}
+                    className={cn(
+                      "flex flex-col items-center gap-1.5 rounded-lg border p-2 text-center transition-all cursor-pointer",
+                      isSelected
+                        ? "border-brand bg-brand/10 shadow-xs ring-1 ring-brand/30"
+                        : "border-border/60 hover:bg-surface-hover hover:border-border"
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "h-5 w-5 rounded-full border border-black/20 dark:border-white/20 flex items-center justify-center transition-transform",
+                        isSelected ? "scale-110 shadow-sm" : ""
+                      )}
+                      style={{ backgroundColor: accent.dotColor }}
+                    >
+                      {isSelected && (
+                        <Check className="h-3 w-3 text-white drop-shadow stroke-[3]" />
+                      )}
+                    </span>
+                    <span className="text-[10px] font-medium truncate max-w-full">
+                      {accent.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Typography Font Family */}
+          <div className="border-t border-border pt-5">
+            <span className="block text-xs font-semibold text-foreground mb-1">
+              Typography & Font Family
+            </span>
+            <p className="text-2xs text-muted-foreground mb-3">
+              Change the font style across your scratchpads, library cards, and markdown editor.
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                {
+                  id: "sans",
+                  label: "Modern Sans",
+                  sample: "Clean & Crisp UI",
+                  fontClass: "font-sans",
+                },
+                {
+                  id: "mono",
+                  label: "Developer Mono",
+                  sample: "const code = true;",
+                  fontClass: "font-mono",
+                },
+                {
+                  id: "serif",
+                  label: "Editorial Serif",
+                  sample: "Calm & Bookish Prose",
+                  fontClass: "font-serif",
+                },
+                {
+                  id: "rounded",
+                  label: "Soft Rounded",
+                  sample: "Friendly & Casual",
+                  fontClass: "font-sans",
+                },
+              ].map((item) => {
+                const isSelected = fontFamily === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => {
+                      setFontFamily(item.id as FontFamily);
+                      if (soundEffectsEnabled) playClickSound();
+                    }}
+                    className={cn(
+                      "flex flex-col items-start gap-1 rounded-lg border p-2.5 text-left transition-all cursor-pointer",
+                      isSelected
+                        ? "border-brand bg-brand/10 shadow-xs ring-1 ring-brand/30"
+                        : "border-border/60 hover:bg-surface-hover hover:border-border"
+                    )}
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span className="text-xs font-medium text-foreground">
+                        {item.label}
+                      </span>
+                      {isSelected && <Check className="h-3.5 w-3.5 text-brand" />}
+                    </div>
+                    <span className="text-[11px] text-muted-foreground">
+                      {item.sample}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Card Density */}
+          <div className="border-t border-border pt-5">
+            <span className="block text-xs font-semibold text-foreground mb-1">
+              Library Card Density
+            </span>
+            <p className="text-2xs text-muted-foreground mb-3">
+              Control the compactness and spacing of note cards in the library.
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                {
+                  id: "compact",
+                  label: "Compact",
+                  desc: "1-line summary, high density",
+                },
+                {
+                  id: "comfortable",
+                  label: "Comfortable",
+                  desc: "Standard spacing & preview",
+                },
+                {
+                  id: "spacious",
+                  label: "Spacious",
+                  desc: "Expanded padding & metadata",
+                },
+              ].map((d) => {
+                const isSelected = cardDensity === d.id;
+                return (
+                  <button
+                    key={d.id}
+                    type="button"
+                    onClick={() => {
+                      setCardDensity(d.id as CardDensity);
+                      if (soundEffectsEnabled) playClickSound();
+                    }}
+                    className={cn(
+                      "flex flex-col items-start gap-0.5 rounded-lg border p-2.5 text-left transition-all cursor-pointer",
+                      isSelected
+                        ? "border-brand bg-brand/10 shadow-xs ring-1 ring-brand/30 font-semibold"
+                        : "border-border/60 hover:bg-surface-hover hover:border-border"
+                    )}
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span className="text-xs font-medium text-foreground">
+                        {d.label}
+                      </span>
+                      {isSelected && <Check className="h-3 w-3 text-brand" />}
+                    </div>
+                    <span className="text-[10px] text-muted-foreground leading-tight">
+                      {d.desc}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Visual Metadata Toggles */}
+          <div className="border-t border-border pt-5 space-y-3">
+            <span className="block text-xs font-semibold text-foreground mb-1">
+              Card Metadata Badges
+            </span>
+
+            <Row
+              title="Word count & reading time"
+              description="Display word count badge (e.g. 142 words · 1m read) on note cards."
+            >
+              <Switch
+                checked={showWordCount}
+                onCheckedChange={setShowWordCount}
+              />
+            </Row>
+
+            <Row
+              title="Relative timestamps"
+              description="Show friendly time descriptions (e.g. '5m ago', 'Yesterday') instead of raw timestamps."
+              className="border-t border-border/50 pt-3"
+            >
+              <Switch
+                checked={showRelativeTime}
+                onCheckedChange={setShowRelativeTime}
+              />
+            </Row>
+
+            <Row
+              title="Color accent ribbon"
+              description="Highlight cards with a vertical accent bar matching the stash color."
+              className="border-t border-border/50 pt-3"
+            >
+              <Switch
+                checked={showColorRibbon}
+                onCheckedChange={setShowColorRibbon}
+              />
+            </Row>
+
+            <Row
+              title="Widget indicator badges"
+              description="Show miniature icon badges for attached widgets (currency, timer, streaks)."
+              className="border-t border-border/50 pt-3"
+            >
+              <Switch
+                checked={showWidgetBadges}
+                onCheckedChange={setShowWidgetBadges}
+              />
+            </Row>
+          </div>
+
+          {/* Audio & Sound Effects */}
+          <div className="border-t border-border pt-5">
+            <Row
+              title="Sound Effects (Haptic Audio)"
+              description="Play synthesized gentle micro-chimes when stashing, completing tasks, or toggling filters."
+            >
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-2xs gap-1.5 cursor-pointer"
+                  onClick={() => playSuccessSound()}
+                >
+                  <Volume2 className="h-3.5 w-3.5 text-brand" />
+                  <span>Test Chime</span>
+                </Button>
+                <Switch
+                  checked={soundEffectsEnabled}
+                  onCheckedChange={setSoundEffectsEnabled}
+                />
+              </div>
+            </Row>
+          </div>
+
+          {/* Personalized Greeting */}
+          <div className="border-t border-border pt-5 space-y-3">
+            <span className="block text-xs font-semibold text-foreground mb-1">
+              Identity & Greeting
+            </span>
+            <Row
+              title="Personalized Moniker"
+              description="The name used in library greetings and focus prompts."
+            >
+              <input
+                type="text"
+                placeholder="e.g. Hyun, Alex..."
+                value={userDisplayName}
+                onChange={(e) => setUserDisplayName(e.target.value)}
+                className="h-7 w-32 rounded-md border border-border bg-surface px-2.5 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-brand"
+              />
+            </Row>
+
+            <Row
+              title="Show Daily Focus Greeting"
+              description="Display the greeting banner and focus summary in the library header."
+              className="border-t border-border/50 pt-3"
+            >
+              <Switch
+                checked={showGreetingHeader}
+                onCheckedChange={setShowGreetingHeader}
+              />
+            </Row>
+          </div>
+        </div>
+      )}
+
+      {activeTab === "notes" && settings && (
                 <>
                   <div>
                     <span className="mb-2 block text-xs font-medium">

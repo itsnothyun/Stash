@@ -312,3 +312,42 @@ export function getFrameStyleClass(frame: NoteFrameStyle): string {
   }
 }
 
+/* --------------------------- EMBEDDED WIDGETS --------------------------- */
+
+const WIDGETS_PREFIX = "stash:widgets:";
+
+export function getNoteWidgets<T = any>(noteId: string): T[] {
+  if (typeof window === "undefined") return [];
+  const saved = localStorage.getItem(`${WIDGETS_PREFIX}${noteId}`);
+  if (!saved) return [];
+  try {
+    const parsed = JSON.parse(saved);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export function setNoteWidgets(noteId: string, widgets: any[]): void {
+  if (typeof window === "undefined") return;
+  if (!widgets || widgets.length === 0) {
+    localStorage.removeItem(`${WIDGETS_PREFIX}${noteId}`);
+  } else {
+    localStorage.setItem(`${WIDGETS_PREFIX}${noteId}`, JSON.stringify(widgets));
+  }
+  dispatchMetaChangeEvent(noteId);
+}
+
+export function hasNoteWidgets(noteId: string): boolean {
+  if (typeof window === "undefined") return false;
+  const raw = localStorage.getItem(`${WIDGETS_PREFIX}${noteId}`);
+  if (!raw) return false;
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+

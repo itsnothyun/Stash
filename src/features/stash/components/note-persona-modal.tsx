@@ -93,8 +93,8 @@ export const NotePersonaModal: React.FC<NotePersonaModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-xl p-0 overflow-hidden gap-0 border border-border shadow-2xl rounded-2xl bg-background">
-        <DialogHeader className="p-4 pb-3 border-b border-border/60 bg-muted/20">
+      <DialogContent className="w-[calc(100vw-16px)] max-w-lg p-0 overflow-hidden gap-0 border border-border shadow-2xl rounded-2xl bg-background flex flex-col max-h-[calc(100vh-20px)]">
+        <DialogHeader className="p-4 pb-3 border-b border-border/60 bg-muted/20 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -123,7 +123,7 @@ export const NotePersonaModal: React.FC<NotePersonaModalProps> = ({
         </DialogHeader>
 
         {/* Live Stash Preview Badge */}
-        <div className="px-5 py-2.5 bg-muted/40 border-b border-border/40 flex items-center justify-between text-xs">
+        <div className="px-5 py-2.5 bg-muted/40 border-b border-border/40 flex items-center justify-between text-xs shrink-0">
           <span className="text-[11px] text-muted-foreground font-medium">Live Note Header:</span>
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-background border border-border/60 shadow-xs max-w-[280px]">
             <span className="text-base leading-none shrink-0">
@@ -139,7 +139,7 @@ export const NotePersonaModal: React.FC<NotePersonaModalProps> = ({
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex border-b border-border/60 px-4 bg-muted/10 gap-1 overflow-x-auto">
+        <div className="flex border-b border-border/60 px-4 bg-muted/10 gap-1 overflow-x-auto shrink-0">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -163,7 +163,7 @@ export const NotePersonaModal: React.FC<NotePersonaModalProps> = ({
         </div>
 
         {/* Tab Content Body */}
-        <div className="p-5 min-h-[300px] max-h-[380px] overflow-y-auto">
+        <div className="p-4 sm:p-5 flex-1 overflow-y-auto min-h-0">
           {/* TAB 1: EMOJI & ICON */}
           {activeTab === "emoji" && (
             <div className="space-y-4">

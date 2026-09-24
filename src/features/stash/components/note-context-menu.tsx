@@ -32,6 +32,7 @@ import {
   ExternalLink,
   FileDown,
   FileText,
+  FileUp,
   Hash,
   Palette,
   Pin,
@@ -46,6 +47,25 @@ import {
   Type,
   Square,
   Camera,
+  ListChecks,
+  CalendarClock,
+  Calendar,
+  Lock,
+  History,
+  Plus,
+  Calculator as CalcIcon,
+  Timer as TimerIcon,
+  Globe,
+  Ruler,
+  Target,
+  Kanban,
+  Sun,
+  Users,
+  Bug,
+  Lightbulb,
+  BookOpen,
+  ArrowUpDown,
+  TrendingUp,
 } from "lucide-react";
 import {
   getNoteOpacity,
@@ -61,8 +81,35 @@ import {
   FRAME_STYLES,
   getNoteFrame,
   setNoteFrame,
+  hasNotePin,
+  setNotePin,
+  lockNoteInSession,
+  getNoteDueDate,
+  setNoteDueDate,
 } from "@/features/stash/note-meta";
 import { NoteExportImageModal } from "./note-export-image-modal";
+import { NotePersonaModal } from "./note-persona-modal";
+import { stashIpc } from "@/lib/ipc/stash-ipc";
+import {
+  extractDoc,
+  extractWidgets,
+  serializeStashContent,
+  docToPlainText,
+  appendPlainTextToContent,
+  stashContentFromPlainText,
+} from "@/features/editor/stash-content";
+import { organizeDocTasks, organizeChecklist } from "@/features/stash/task-organizer";
+import { playChimeSound, playClickSound } from "@/lib/utils/sound-effects";
+import { WidgetType, NoteWidgetData } from "@/features/widgets/types";
+import { Revision } from "@/features/stash/types/note";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { formatNoteDate } from "@/lib/utils/dates";
 
 export interface NoteActionProps {
   note: Note;
@@ -125,6 +172,15 @@ export const NoteMenuItems: React.FC<
   const noteFont = getNoteFont(note.id);
   const noteFrame = getNoteFrame(note.id);
   const [exportImageOpen, setExportImageOpen] = useState(false);
+  const [personaModalOpen, setPersonaModalOpen] = useState(false);
+  const [pinDialogOpen, setPinDialogOpen] = useState(false);
+  const [newPinInput, setNewPinInput] = useState("");
+  const [dueDateDialogOpen, setDueDateDialogOpen] = useState(false);
+  const [customDueDateInput, setCustomDueDateInput] = useState("");
+  const [revisionsOpen, setRevisionsOpen] = useState(false);
+  const [revisions, setRevisions] = useState<Revision[]>([]);
+  const hasPin = hasNotePin(note.id);
+  const dueDate = getNoteDueDate(note.id);
 
   const handleCopyText = () => {
     const text = note.plainText || note.title || "";
@@ -148,12 +204,19 @@ export const NoteMenuItems: React.FC<
   };
 
   const handleExportMarkdown = () => {
+    const doc = extractDoc(note.contentJson);
+    const text = docToPlainText(doc) || note.plainText || "";
+    const header = note.title?.trim() ? `# ${note.title.trim()}\n\n` : "";
+    const fullMd = `${header}${text}`.trim();
     const safeTitle = (note.title || "stash-note")
       .toLowerCase()
       .replace(/[^a-z0-9_-]+/g, "-")
-      .slice(0, 40);
-    const content = `# ${note.title || "Untitled Stash"}\n\n${note.plainText || ""}\n`;
-    downloadFile(`${safeTitle}.md`, content, "text/markdown");
+      .slice(0, 40) || "stash";
+    downloadFile(`${safeTitle}.md`, fullMd, "text/markdown");
+    try {
+      navigator.clipboard.writeText(fullMd);
+    } catch {}
+    playChimeSound();
     toast.show({ message: `Exported ${safeTitle}.md` });
   };
 
@@ -175,6 +238,173 @@ export const NoteMenuItems: React.FC<
     const content = JSON.stringify(note, null, 2);
     downloadFile(`${safeTitle}.json`, content, "application/json");
     toast.show({ message: `Exported ${safeTitle}.json` });
+  };
+
+  const handleAddWidget = async (type: WidgetType) => {
+    try {
+      const currentWidgets = extractWidgets<NoteWidgetData>(note.contentJson);
+      const defaultTitles: Record<WidgetType, string> = {
+        swap: "Currency Converter",
+        ticker: "Market Tickers",
+        calculator: "Quick Calculator",
+        timer: "Timer & Stopwatch",
+        worldclock: "World Clock",
+        unitconverter: "Unit Converter",
+        counter: "Tally Counter",
+        countdown: "Countdown Timer",
+        kanban: "Kanban Board",
+        habits: "Habit Tracker",
+        palette: "Color Palette",
+        browser: "Mini Browser",
+        scratchpad: "Daily Scratchpad",
+        meeting: "Meeting Minutes",
+        bug: "Bug Blitz & Triage",
+        idea: "Idea Incubator",
+        api: "API & Tech Blueprint",
+        reading: "Book & Article Digest",
+      };
+      const newWidget: NoteWidgetData = {
+        id: `${type}-${Date.now()}`,
+        type,
+        title: defaultTitles[type],
+        x: 0,
+        y: 0,
+      };
+      const nextWidgets = [...currentWidgets, newWidget];
+      const doc = extractDoc(note.contentJson);
+      const nextContentJson = serializeStashContent(doc, nextWidgets);
+      await stashIpc.updateNote({
+        id: note.id,
+        version: note.version,
+        contentJson: nextContentJson,
+      });
+      playChimeSound();
+      toast.show({ message: `Attached ${defaultTitles[type]} to note` });
+    } catch {
+      toast.error("Could not attach widget");
+    }
+  };
+
+  const handleOrganizeChecklist = async () => {
+    try {
+      const doc = extractDoc(note.contentJson);
+      const docResult = organizeDocTasks(doc);
+      const currentWidgets = extractWidgets<NoteWidgetData>(note.contentJson);
+
+      if (docResult.hasTasks) {
+        if (docResult.completedCount === 0) {
+          toast.show({ message: "All checklist tasks are already active" });
+          return;
+        }
+        const updatedDoc = docResult.updatedDoc;
+        const nextContentJson = serializeStashContent(updatedDoc, currentWidgets);
+        const nextPlainText = docToPlainText(updatedDoc);
+        await stashIpc.updateNote({
+          id: note.id,
+          version: note.version,
+          contentJson: nextContentJson,
+          plainText: nextPlainText,
+        });
+        playClickSound();
+        toast.show({
+          message: `Organized checklist: moved ${docResult.completedCount} completed task${docResult.completedCount > 1 ? "s" : ""} to bottom`,
+        });
+        return;
+      }
+
+      const text = note.plainText || "";
+      const textResult = organizeChecklist(text);
+      if (!textResult.hasTasks) {
+        toast.show({ message: "No checklist tasks found in this note" });
+        return;
+      }
+      if (textResult.completedCount === 0) {
+        toast.show({ message: "All checklist tasks are already active" });
+        return;
+      }
+      const nextContentJson = stashContentFromPlainText(textResult.updatedText, currentWidgets);
+      await stashIpc.updateNote({
+        id: note.id,
+        version: note.version,
+        plainText: textResult.updatedText,
+        contentJson: nextContentJson,
+      });
+      playClickSound();
+      toast.show({
+        message: `Organized checklist: moved ${textResult.completedCount} completed task${textResult.completedCount > 1 ? "s" : ""} to bottom`,
+      });
+    } catch {
+      toast.error("Could not organize checklist");
+    }
+  };
+
+  const handleImportMarkdown = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.style.display = "none";
+    input.accept = ".md,.markdown,.txt,text/markdown,text/plain";
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const text = await file.text();
+        const currentWidgets = extractWidgets<NoteWidgetData>(note.contentJson);
+        const patch = appendPlainTextToContent(note.contentJson, currentWidgets, text);
+        await stashIpc.updateNote({
+          id: note.id,
+          version: note.version,
+          ...patch,
+        });
+        playChimeSound();
+        toast.show({ message: `Imported ${file.name}` });
+      }
+      try {
+        document.body.removeChild(input);
+      } catch {}
+    };
+    document.body.appendChild(input);
+    input.click();
+  };
+
+  const handleSavePin = (pin: string) => {
+    const trimmed = pin.trim();
+    setNotePin(note.id, trimmed);
+    if (trimmed) {
+      lockNoteInSession(note.id);
+      playChimeSound();
+      toast.show({ message: "Note protected with PIN & locked" });
+    } else {
+      toast.show({ message: "PIN removed" });
+    }
+    setPinDialogOpen(false);
+    setNewPinInput("");
+  };
+
+  const handleSaveDueDate = (dateIso: string | null) => {
+    setNoteDueDate(note.id, dateIso);
+    setDueDateDialogOpen(false);
+    playClickSound();
+    toast.show({ message: dateIso ? "Due date updated" : "Due date cleared" });
+  };
+
+  const handleOpenRevisions = async () => {
+    const revs = await stashIpc.listRevisions(note.id);
+    setRevisions(revs);
+    setRevisionsOpen(true);
+  };
+
+  const handleCreateCheckpoint = async () => {
+    await stashIpc.createRevisionCheckpoint(note.id);
+    const revs = await stashIpc.listRevisions(note.id);
+    setRevisions(revs);
+    playClickSound();
+    toast.show({ message: "Created revision checkpoint" });
+  };
+
+  const handleRestoreRevision = async (revId: string) => {
+    await stashIpc.restoreRevision(note.id, revId);
+    setRevisionsOpen(false);
+    playChimeSound();
+    toast.show({ message: "Restored checkpoint" });
   };
 
   return (
@@ -480,6 +710,130 @@ export const NoteMenuItems: React.FC<
         </SubContent>
       </Sub>
 
+      {/* Attach Widget Submenu */}
+      <Sub>
+        <SubTrigger>
+          <Plus className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+          <span>Attach Widget</span>
+        </SubTrigger>
+        <SubContent className="w-56 max-h-[80vh] overflow-y-auto">
+          <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+            Interactive Tools
+          </div>
+          <Item onClick={() => handleAddWidget("calculator")}>
+            <CalcIcon className="mr-2 h-3.5 w-3.5 text-amber-500" />
+            <span>Quick Calculator</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("timer")}>
+            <TimerIcon className="mr-2 h-3.5 w-3.5 text-rose-500" />
+            <span>Focus & Pomodoro</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("swap")}>
+            <ArrowUpDown className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+            <span>Currency Converter</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("ticker")}>
+            <TrendingUp className="mr-2 h-3.5 w-3.5 text-blue-500" />
+            <span>Market Tickers</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("countdown")}>
+            <CalendarClock className="mr-2 h-3.5 w-3.5 text-orange-500" />
+            <span>Countdown Timer</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("worldclock")}>
+            <Globe className="mr-2 h-3.5 w-3.5 text-cyan-500" />
+            <span>World Clock</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("unitconverter")}>
+            <Ruler className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+            <span>Unit Converter</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("counter")}>
+            <Target className="mr-2 h-3.5 w-3.5 text-purple-500" />
+            <span>Tally Counter</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("browser")}>
+            <Globe className="mr-2 h-3.5 w-3.5 text-cyan-500" />
+            <span>Mini Web Browser</span>
+          </Item>
+
+          <Separator />
+          <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+            Component Blocks
+          </div>
+          <Item onClick={() => handleAddWidget("scratchpad")}>
+            <Sun className="mr-2 h-3.5 w-3.5 text-amber-500" />
+            <span>Daily Scratchpad</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("meeting")}>
+            <Users className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+            <span>Meeting Minutes</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("kanban")}>
+            <Kanban className="mr-2 h-3.5 w-3.5 text-blue-500" />
+            <span>Kanban Board</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("habits")}>
+            <Sparkles className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+            <span>7-Day Habit Tracker</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("bug")}>
+            <Bug className="mr-2 h-3.5 w-3.5 text-rose-500" />
+            <span>Bug Blitz & Triage</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("idea")}>
+            <Lightbulb className="mr-2 h-3.5 w-3.5 text-yellow-500" />
+            <span>Idea Incubator</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("reading")}>
+            <BookOpen className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+            <span>Book & Article Digest</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("palette")}>
+            <Palette className="mr-2 h-3.5 w-3.5 text-pink-500" />
+            <span>Color Palette</span>
+          </Item>
+        </SubContent>
+      </Sub>
+
+      {/* Personalize Note Persona Modal Trigger */}
+      <Item onClick={() => setPersonaModalOpen(true)}>
+        <Sparkles className="mr-2 h-3.5 w-3.5 text-primary" />
+        <span>Personalize Note Persona</span>
+      </Item>
+
+      {/* Organize Checklist */}
+      <Item onClick={handleOrganizeChecklist}>
+        <ListChecks className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+        <span>Organize Checklist (Done to bottom)</span>
+      </Item>
+
+      {/* Due Date & Reminder */}
+      <Item onClick={() => setDueDateDialogOpen(true)}>
+        <CalendarClock className="mr-2 h-3.5 w-3.5 text-amber-500" />
+        <span>Due Date & Reminder</span>
+      </Item>
+
+      {/* PIN Protection */}
+      <Item onClick={() => setPinDialogOpen(true)}>
+        <Lock className="mr-2 h-3.5 w-3.5 text-primary" />
+        <span>{hasPin ? "Change or Remove PIN" : "Protect Note with PIN"}</span>
+      </Item>
+
+      {/* Revision History */}
+      <Item onClick={handleOpenRevisions}>
+        <History className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+        <span>Revision History</span>
+      </Item>
+
+      {/* Import Markdown */}
+      <Item onClick={handleImportMarkdown}>
+        <FileUp className="mr-2 h-3.5 w-3.5 text-sky-500" />
+        <span>Import Markdown</span>
+      </Item>
+
+      <Separator />
+
       {/* Duplicate */}
       <Item onClick={() => onDuplicate(note)}>
         <CopyPlus className="mr-2 h-3.5 w-3.5 text-blue-500" />
@@ -560,6 +914,252 @@ export const NoteMenuItems: React.FC<
         noteFont={noteFont}
         noteFrame={noteFrame}
       />
+
+      {/* Note Persona Customization Modal */}
+      <NotePersonaModal
+        isOpen={personaModalOpen}
+        onClose={() => setPersonaModalOpen(false)}
+        noteId={note.id}
+        noteTitle={note.title || "Untitled Stash"}
+        noteColor={note.color}
+        onChangeColor={(col) => onChangeColor(note, col)}
+        currentEmoji={noteEmoji}
+        onChangeEmoji={(em) => setNoteEmoji(note.id, em)}
+        currentPaper={notePaper}
+        onChangePaper={(pp) => setNotePaper(note.id, pp)}
+        currentFont={noteFont}
+        onChangeFont={(ft) => setNoteFont(note.id, ft)}
+        currentFrame={noteFrame}
+        onChangeFrame={(fm) => setNoteFrame(note.id, fm)}
+      />
+
+      {/* PIN Configuration Dialog */}
+      <Dialog open={pinDialogOpen} onOpenChange={setPinDialogOpen}>
+        <DialogContent className="max-w-sm gap-3 p-5">
+          <DialogHeader>
+            <DialogTitle className="text-sm flex items-center gap-2">
+              <Lock className="h-4 w-4 text-primary" />
+              {hasPin ? "Change or Remove PIN" : "Protect Note with PIN"}
+            </DialogTitle>
+            <DialogDescription>
+              {hasPin
+                ? "Enter a new PIN to change it, or clear to remove protection."
+                : "Enter a 4–8 digit PIN to protect this note from prying eyes."}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-3 py-2">
+            <input
+              type="password"
+              placeholder="Enter PIN (or leave blank to remove)"
+              value={newPinInput}
+              onChange={(e) => setNewPinInput(e.target.value)}
+              className="w-full px-3 py-1.5 text-center text-sm rounded-md border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary tracking-widest"
+              autoFocus
+            />
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setPinDialogOpen(false)}
+                className="px-3 py-1.5 text-xs rounded border border-border hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              {hasPin && (
+                <button
+                  type="button"
+                  onClick={() => handleSavePin("")}
+                  className="px-3 py-1.5 text-xs rounded border border-destructive/40 text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
+                >
+                  Remove PIN
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => handleSavePin(newPinInput)}
+                className="px-3 py-1.5 text-xs rounded bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium cursor-pointer"
+              >
+                Save PIN
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Due Date & Reminder Dialog */}
+      <Dialog open={dueDateDialogOpen} onOpenChange={setDueDateDialogOpen}>
+        <DialogContent className="max-w-sm gap-3 p-5">
+          <DialogHeader>
+            <DialogTitle className="text-sm flex items-center gap-2">
+              <CalendarClock className="h-4 w-4 text-amber-500" />
+              Due Date & Reminder
+            </DialogTitle>
+            <DialogDescription>
+              Set a target due date to stay on top of deadlines and milestones.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-3 py-2">
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <button
+                type="button"
+                onClick={() => {
+                  const d = new Date();
+                  d.setHours(17, 0, 0, 0);
+                  handleSaveDueDate(d.toISOString());
+                }}
+                className="px-2.5 py-1.5 rounded border border-border/80 hover:bg-muted text-left font-medium transition-colors cursor-pointer"
+              >
+                Today 5:00 PM
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const d = new Date();
+                  d.setDate(d.getDate() + 1);
+                  d.setHours(9, 0, 0, 0);
+                  handleSaveDueDate(d.toISOString());
+                }}
+                className="px-2.5 py-1.5 rounded border border-border/80 hover:bg-muted text-left font-medium transition-colors cursor-pointer"
+              >
+                Tomorrow 9:00 AM
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const d = new Date();
+                  d.setDate(d.getDate() + 3);
+                  d.setHours(12, 0, 0, 0);
+                  handleSaveDueDate(d.toISOString());
+                }}
+                className="px-2.5 py-1.5 rounded border border-border/80 hover:bg-muted text-left font-medium transition-colors cursor-pointer"
+              >
+                In 3 Days
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const d = new Date();
+                  const day = d.getDay();
+                  const diff = (8 - day) % 7 || 7;
+                  d.setDate(d.getDate() + diff);
+                  d.setHours(9, 0, 0, 0);
+                  handleSaveDueDate(d.toISOString());
+                }}
+                className="px-2.5 py-1.5 rounded border border-border/80 hover:bg-muted text-left font-medium transition-colors cursor-pointer"
+              >
+                Next Monday
+              </button>
+            </div>
+
+            <div className="border-t border-border/40 pt-2 flex flex-col gap-1.5">
+              <label className="text-[11px] font-medium text-muted-foreground flex items-center gap-1">
+                <Calendar className="h-3 w-3" />
+                <span>Custom Date & Time</span>
+              </label>
+              <input
+                type="datetime-local"
+                value={customDueDateInput}
+                onChange={(e) => setCustomDueDateInput(e.target.value)}
+                className="w-full px-2.5 py-1.5 text-xs rounded border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-border/40">
+              {dueDate ? (
+                <button
+                  type="button"
+                  onClick={() => handleSaveDueDate(null)}
+                  className="px-2.5 py-1 text-xs text-destructive hover:bg-destructive/10 rounded transition-colors cursor-pointer"
+                >
+                  Clear Due Date
+                </button>
+              ) : (
+                <div />
+              )}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setDueDateDialogOpen(false)}
+                  className="px-3 py-1.5 text-xs rounded border border-border hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                {customDueDateInput && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const iso = new Date(customDueDateInput).toISOString();
+                      handleSaveDueDate(iso);
+                    }}
+                    className="px-3 py-1.5 text-xs rounded bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium cursor-pointer"
+                  >
+                    Save
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Revision History Dialog */}
+      <Dialog open={revisionsOpen} onOpenChange={setRevisionsOpen}>
+        <DialogContent className="max-w-md gap-3 p-5">
+          <DialogHeader>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <DialogTitle className="text-sm">Revision history</DialogTitle>
+                <DialogDescription>
+                  Checkpoints preserve milestones. Restoring one keeps previous versions recoverable.
+                </DialogDescription>
+              </div>
+              <button
+                type="button"
+                onClick={() => void handleCreateCheckpoint()}
+                className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-2xs shrink-0 cursor-pointer"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>Save Checkpoint</span>
+              </button>
+            </div>
+          </DialogHeader>
+
+          <div className="max-h-72 divide-y divide-border overflow-y-auto">
+            {revisions.length === 0 ? (
+              <p className="py-6 text-center text-xs text-muted-foreground">
+                No checkpoints yet. Click Save Checkpoint to create one.
+              </p>
+            ) : (
+              revisions.map((rev) => (
+                <div
+                  key={rev.id}
+                  className="flex items-center justify-between gap-3 py-2.5"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-xs font-medium text-foreground">
+                      {rev.title || "Untitled stash"}
+                    </div>
+                    <div className="text-2xs text-muted-foreground">
+                      v{rev.version} · {formatNoteDate(rev.createdAt)}
+                    </div>
+                    <div className="mt-0.5 truncate text-2xs text-muted-foreground/80">
+                      {rev.plainText}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => void handleRestoreRevision(rev.id)}
+                    className="flex shrink-0 items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-2xs font-medium transition-colors hover:bg-muted cursor-pointer"
+                  >
+                    <RotateCcw className="h-3 w-3" />
+                    Restore
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

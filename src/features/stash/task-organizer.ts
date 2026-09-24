@@ -9,6 +9,70 @@ export interface OrganizeTasksResult {
   updatedText: string;
 }
 
+export interface OrganizeDocTasksResult {
+  hasTasks: boolean;
+  completedCount: number;
+  pendingCount: number;
+  updatedDoc: any;
+}
+
+/**
+ * Re-orders task items in a Tiptap AST document so active tasks are first,
+ * and checked tasks are grouped at the bottom of the list.
+ */
+export function organizeDocTasks(doc: any): OrganizeDocTasksResult {
+  if (!doc || typeof doc !== "object") {
+    return { hasTasks: false, completedCount: 0, pendingCount: 0, updatedDoc: doc };
+  }
+
+  let hasTasks = false;
+  let completedCount = 0;
+  let pendingCount = 0;
+
+  const processNode = (node: any): any => {
+    if (!node || typeof node !== "object") return node;
+
+    if (node.type === "taskList" && Array.isArray(node.content)) {
+      hasTasks = true;
+      const pending: any[] = [];
+      const completed: any[] = [];
+
+      for (const item of node.content) {
+        if (item.attrs?.checked === true) {
+          completed.push(item);
+          completedCount++;
+        } else {
+          pending.push(item);
+          pendingCount++;
+        }
+      }
+
+      return {
+        ...node,
+        content: [...pending, ...completed],
+      };
+    }
+
+    if (Array.isArray(node.content)) {
+      return {
+        ...node,
+        content: node.content.map(processNode),
+      };
+    }
+
+    return node;
+  };
+
+  const updatedDoc = processNode(doc);
+
+  return {
+    hasTasks,
+    completedCount,
+    pendingCount,
+    updatedDoc,
+  };
+}
+
 /**
  * Re-orders checklist items in plain text so all active items (- [ ]) come first,
  * and all completed items (- [x]) are grouped at the bottom.
@@ -25,8 +89,8 @@ export function organizeChecklist(text: string): OrganizeTasksResult {
     const raw = lines[i];
     const trimmed = raw.trim();
 
-    const isPending = /^([-*]\s*)?\[\s*\]\s+/.test(trimmed);
-    const isCompleted = /^([-*]\s*)?\[[xX]\]\s+/.test(trimmed);
+    const isPending = /^([-*+]|\d+\.)?\s*\[\s*\]\s+/.test(trimmed);
+    const isCompleted = /^([-*+]|\d+\.)?\s*\[[xX]\]\s+/.test(trimmed);
 
     if (isPending) {
       if (firstTaskLineIndex === -1) firstTaskLineIndex = i;
@@ -79,7 +143,7 @@ export function organizeChecklist(text: string): OrganizeTasksResult {
   }
 
   if (completedTasks.length > 0) {
-    parts.push(`### ✅ Completed\n` + completedTasks.join("\n"));
+    parts.push(completedTasks.join("\n"));
   }
 
   const updatedText = parts.filter(Boolean).join("\n\n");

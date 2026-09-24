@@ -15,11 +15,12 @@ import Superscript from "@tiptap/extension-superscript";
 import TextAlign from "@tiptap/extension-text-align";
 import { Table, TableRow, TableHeader, TableCell } from "@tiptap/extension-table";
 import { FontSize } from "../extensions/font-size";
-import { docForEditor } from "../stash-content";
+import { docForEditor, docToPlainText } from "../stash-content";
 import { evaluateInlineMath } from "../inline-math";
 import { SlashMenu } from "./slash-menu";
 import { FloatingToolbar } from "./floating-toolbar";
 import { EditorContextMenu } from "./editor-context-menu";
+import { WidgetType } from "@/features/widgets/types";
 import { cn } from "@/lib/utils/cn";
 
 interface TiptapEditorProps {
@@ -45,6 +46,15 @@ interface TiptapEditorProps {
   showToolbar?: boolean;
   isDockMinimized?: boolean;
   onToggleDock?: (minimized?: boolean) => void;
+  onAddWidget?: (type: WidgetType) => void;
+  onPersonalizePersona?: () => void;
+  onOrganizeChecklist?: () => void;
+  onDueDate?: () => void;
+  onPin?: () => void;
+  onExportMarkdown?: () => void;
+  onImportMarkdown?: () => void;
+  onRevisions?: () => void;
+  onRefreshNote?: () => void;
 }
 
 export const TiptapEditor: React.FC<TiptapEditorProps> = ({
@@ -57,6 +67,15 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
   className,
   isDockMinimized,
   onToggleDock,
+  onAddWidget,
+  onPersonalizePersona,
+  onOrganizeChecklist,
+  onDueDate,
+  onPin,
+  onExportMarkdown,
+  onImportMarkdown,
+  onRevisions,
+  onRefreshNote,
 }) => {
   const [slashMenuOpen, setSlashMenuOpen] = useState(false);
   const [slashMenuPos, setSlashMenuPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
@@ -188,8 +207,9 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
       },
     },
     onUpdate: ({ editor: currentEditor }) => {
-      const json = JSON.stringify(currentEditor.getJSON());
-      const text = currentEditor.getText();
+      const jsonObj = currentEditor.getJSON();
+      const json = JSON.stringify(jsonObj);
+      const text = docToPlainText(jsonObj);
       handleUpdate(json, text);
     },
     onBlur: () => {
@@ -218,9 +238,20 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
         }
       }}
     >
-      <EditorContextMenu editor={editor}>
+      <EditorContextMenu
+        editor={editor}
+        onAddWidget={onAddWidget}
+        onPersonalizePersona={onPersonalizePersona}
+        onOrganizeChecklist={onOrganizeChecklist}
+        onDueDate={onDueDate}
+        onPin={onPin}
+        onExportMarkdown={onExportMarkdown}
+        onImportMarkdown={onImportMarkdown}
+        onRevisions={onRevisions}
+        onRefreshNote={onRefreshNote}
+      >
         <div className="h-full min-h-full w-full flex-1">
-          <EditorContent editor={editor} className="h-full min-h-full w-full flex-1 [&_.ProseMirror]:min-h-full" />
+          <EditorContent editor={editor} className={cn("h-full min-h-full w-full flex-1 [&_.ProseMirror]:min-h-full", className)} />
         </div>
       </EditorContextMenu>
 

@@ -168,7 +168,18 @@ export function docToPlainText(doc: unknown): string {
       n.type === "codeBlock" ||
       (!insideItem && (n.type === "paragraph" || n.type === "heading"));
 
-    if (startsLine) lines.push("");
+    if (startsLine) {
+      lines.push("");
+      if (n.type === "taskItem") {
+        const checked = (n.attrs as { checked?: boolean })?.checked === true;
+        lines[lines.length - 1] += checked ? "- [x] " : "- [ ] ";
+      } else if (n.type === "listItem") {
+        lines[lines.length - 1] += "- ";
+      } else if (n.type === "heading") {
+        const level = (n.attrs as { level?: number })?.level || 1;
+        lines[lines.length - 1] += `${"#".repeat(level)} `;
+      }
+    }
     if (Array.isArray(n.content)) {
       for (const child of n.content) walk(child, n.type);
     }

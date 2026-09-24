@@ -786,3 +786,30 @@
     opacity: 0;
   }
 }
+
+/* ==========================================================================
+   Personalization Typography Overrides
+   ========================================================================== */
+html[data-font="mono"],
+html[data-font="mono"] body,
+html[data-font="mono"] .tiptap {
+  font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace !important;
+}
+
+html[data-font="serif"],
+html[data-font="serif"] body,
+html[data-font="serif"] .tiptap {
+  font-family: "Newsreader", "Charter", "Merriweather", "Georgia", "Times New Roman", Cambria, serif !important;
+}
+
+html[data-font="rounded"],
+html[data-font="rounded"] body,
+html[data-font="rounded"] .tiptap {
+  font-family: -apple-system-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif !important;
+}
+
+html[data-font="sans"],
+html[data-font="sans"] body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif !important;
+}
+

@@ -12,6 +12,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ColorPicker } from "@/components/shared/color-picker";
+import { useUIStore } from "@/stores/ui-store";
+import { formatDistanceToNow } from "date-fns";
 import {
   Check,
   CheckCircle2,
@@ -96,6 +98,28 @@ export const NoteCard: React.FC<NoteCardProps> = ({
   const fontPersona = FONT_PERSONAS.find((f) => f.id === font);
   const isToday = useMemo(() => isTodayTitle(note.title), [note.title]);
 
+  const {
+    cardDensity,
+    showWordCount,
+    showRelativeTime,
+    showColorRibbon,
+    showWidgetBadges,
+  } = useUIStore();
+
+  const displayDate = useMemo(() => {
+    if (!showRelativeTime) return formatNoteDate(note.updatedAt);
+    try {
+      const d = new Date(note.updatedAt);
+      const diffHours = (Date.now() - d.getTime()) / (1000 * 60 * 60);
+      if (diffHours < 24) {
+        return formatDistanceToNow(d, { addSuffix: true });
+      }
+      return formatNoteDate(note.updatedAt);
+    } catch {
+      return formatNoteDate(note.updatedAt);
+    }
+  }, [note.updatedAt, showRelativeTime]);
+
   const noteActionProps = {
     note,
     onOpenFloating,
@@ -123,7 +147,13 @@ export const NoteCard: React.FC<NoteCardProps> = ({
         onDoubleClick={() => onOpenFloating(note.id)}
           aria-selected={isSelected}
           className={cn(
-            "group relative flex min-h-[148px] cursor-pointer select-none flex-col justify-between rounded-lg border p-4 overflow-hidden",
+            "group relative flex cursor-pointer select-none flex-col justify-between rounded-lg border overflow-hidden",
+            cardDensity === "compact"
+              ? "min-h-[116px] p-3"
+              : cardDensity === "spacious"
+              ? "min-h-[180px] p-5"
+              : "min-h-[148px] p-4",
+            showColorRibbon && "border-l-[3.5px]",
             "transition-[transform,box-shadow,border-color] duration-200 ease-soft",
             colorClasses,
             getFrameStyleClass(frame),
@@ -213,7 +243,17 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                 )}
               </ul>
             ) : previewText ? (
-              <p className={cn("line-clamp-3 break-words text-2xs leading-relaxed opacity-70", fontPersona?.fontClass)}>
+              <p
+                className={cn(
+                  cardDensity === "compact"
+                    ? "line-clamp-1"
+                    : cardDensity === "spacious"
+                    ? "line-clamp-4"
+                    : "line-clamp-3",
+                  "break-words text-2xs leading-relaxed opacity-70",
+                  fontPersona?.fontClass
+                )}
+              >
                 {previewText}
               </p>
             ) : (
@@ -240,7 +280,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
             <div className="flex items-center justify-between border-t border-current/10 pt-2">
               <div className="flex min-w-0 items-center gap-1.5 overflow-hidden">
                 <span className="shrink-0 text-[10px] font-medium opacity-55">
-                  {formatNoteDate(note.updatedAt)}
+                  {displayDate}
                 </span>
                 {isToday && (
                   <span
@@ -253,7 +293,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                     </span>
                   </span>
                 )}
-                {dueDateStatus && (
+                {showWidgetBadges && dueDateStatus && (
                   <span
                     className={cn(
                       "shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-tight",
@@ -269,7 +309,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                     <span>{dueDateStatus.label}</span>
                   </span>
                 )}
-                {opacity < 100 && (
+                {showWidgetBadges && opacity < 100 && (
                   <span
                     className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-tight bg-primary/15 text-primary border border-primary/20"
                     title={`Ghost Mode (${opacity}%)`}
@@ -278,7 +318,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                     <span>{opacity}%</span>
                   </span>
                 )}
-                {wordCount > 0 && (
+                {showWordCount && wordCount > 0 && (
                   <span className="shrink-0 text-[10px] tabular-nums opacity-40">
                     {wordCount}w · {readMins}m
                   </span>

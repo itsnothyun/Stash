@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
   ChevronDown,
@@ -248,31 +248,37 @@ export const NoteWidgetsCanvas: React.FC<NoteWidgetsCanvasProps> = ({
 
       {/* Widgets Flow Shelf - each widget is ONE clean unified window card */}
       <div className="flex flex-wrap items-start gap-3">
-        {widgets.map((widget, index) => {
-          const currentWidth =
-            liveWidths[widget.id] ??
-            widget.width ??
-            DEFAULT_WIDTHS[widget.type];
+        <AnimatePresence mode="popLayout" initial={false}>
+          {widgets.map((widget, index) => {
+            const currentWidth =
+              liveWidths[widget.id] ??
+              widget.width ??
+              DEFAULT_WIDTHS[widget.type];
 
-          const widthStyle =
-            typeof currentWidth === "number" ? `${currentWidth}px` : currentWidth;
+            const widthStyle =
+              typeof currentWidth === "number" ? `${currentWidth}px` : currentWidth;
 
-          return (
-            <ContextMenu key={widget.id}>
-              <ContextMenuTrigger asChild>
-                <motion.div
-                  layout
-                  initial={{ scale: 0.95, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.95, opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-              style={{
-                width: widthStyle,
-                minWidth: widget.isCollapsed ? "180px" : "250px",
-                maxWidth: "100%",
-              }}
-              className={cn(
-                "relative flex flex-col rounded-2xl shadow-sm border border-border/80 bg-card overflow-hidden",
+            return (
+              <ContextMenu key={widget.id}>
+                <ContextMenuTrigger asChild>
+                  <motion.div
+                    layout
+                    initial={{ scale: 0.9, opacity: 0, y: 16 }}
+                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                    exit={{ scale: 0.88, opacity: 0, y: -16 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 28,
+                      mass: 0.75,
+                    }}
+                    style={{
+                      width: widthStyle,
+                      minWidth: widget.isCollapsed ? "180px" : "250px",
+                      maxWidth: "100%",
+                    }}
+                    className={cn(
+                      "relative flex flex-col rounded-2xl shadow-sm border border-border/80 bg-card overflow-hidden transition-shadow duration-200",
                 resizingId === widget.id ? "select-none ring-1 ring-primary/40" : ""
               )}
             >
@@ -636,7 +642,8 @@ export const NoteWidgetsCanvas: React.FC<NoteWidgetsCanvasProps> = ({
           </ContextMenuContent>
         </ContextMenu>
       );
-        })}
+    })}
+        </AnimatePresence>
       </div>
     </div>
   );

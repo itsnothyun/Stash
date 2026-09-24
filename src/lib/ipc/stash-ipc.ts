@@ -415,7 +415,7 @@ export const stashIpc = {
     if (isTauri()) {
       await invoke("open_floating_stash", { noteId });
     } else {
-      window.open(`/?window=stash&noteId=${noteId}`, `stash-${noteId}`, "width=500,height=580");
+      window.open(`/?window=stash&noteId=${noteId}`, `stash-${noteId}`, "width=580,height=640");
     }
   },
 
@@ -521,6 +521,22 @@ export const stashIpc = {
       await invoke("import_data", { data });
     } else {
       localMockNotes.push(...data.notes);
+    }
+  },
+
+  async openMicrophoneSettings(): Promise<void> {
+    if (isTauri()) {
+      try {
+        await invoke("open_microphone_settings");
+      } catch (err) {
+        console.error("Failed to open microphone settings via Tauri:", err);
+      }
+    } else {
+      try {
+        window.open("ms-settings:privacy-microphone", "_blank");
+      } catch {
+        // Ignore browser protocol navigation block
+      }
     }
   },
 
