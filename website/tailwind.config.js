@@ -1,7 +1,14 @@
+import path from "path";
+
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ["class"],
-  content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
+  content: [
+    path.resolve(__dirname, "./index.html"),
+    path.resolve(__dirname, "./src/**/*.{ts,tsx,js,jsx}"),
+    "./index.html",
+    "./src/**/*.{ts,tsx,js,jsx}",
+  ],
   theme: {
     extend: {
       colors: {
@@ -45,20 +52,6 @@ export default {
         "glow-emerald": "0 0 60px -15px rgba(16, 185, 129, 0.25)",
         "glow-amber": "0 0 60px -15px rgba(245, 158, 11, 0.25)",
         "window-chrome": "0 24px 70px -12px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.08)",
-      },
-      keyframes: {
-        "pulse-subtle": {
-          "0%, 100%": { opacity: 1 },
-          "50%": { opacity: 0.6 },
-        },
-        "float-slow": {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-6px)" },
-        },
-      },
-      animation: {
-        "pulse-subtle": "pulse-subtle 3s ease-in-out infinite",
-        "float-slow": "float-slow 6s ease-in-out infinite",
       },
     },
   },

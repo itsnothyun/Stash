@@ -5,12 +5,21 @@ import {
   Copy,
   Check,
   ChevronDown,
-  Sparkles,
+  Layers,
   ArrowUpDown,
-  Pin,
   CalendarClock,
+  Sparkles,
+  SlidersHorizontal,
+  ChevronRight,
+  ShieldCheck,
+  Flame,
+  Key,
+  Settings,
+  User,
+  Sliders,
+  AlertCircle,
+  Clock,
   ExternalLink,
-  Code2,
 } from "lucide-react";
 import {
   detectUserOS,
@@ -19,11 +28,12 @@ import {
   LATEST_VERSION,
   GITHUB_REPO,
 } from "../lib/os-detect";
+import stashLogoSrc from "../assets/logo.png";
 
 export const Hero: React.FC = () => {
   const [os, setOs] = useState<OperatingSystem>("windows");
-  const [copiedCli, setCopiedCli] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
+  const [activeFilter, setActiveFilter] = useState("all");
 
   useEffect(() => {
     setOs(detectUserOS());
@@ -31,253 +41,361 @@ export const Hero: React.FC = () => {
 
   const pkg = DOWNLOAD_PACKAGES[os] || DOWNLOAD_PACKAGES.windows;
 
-  const handleCopyCli = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedCli(true);
-    setTimeout(() => setCopiedCli(false), 2000);
+  const handleCopyPrompt = () => {
+    navigator.clipboard.writeText("npx create-stash-widget@latest");
+    setCopiedPrompt(true);
+    setTimeout(() => setCopiedPrompt(false), 2000);
   };
 
   return (
-    <section className="relative isolate overflow-hidden pt-12 pb-24 md:pt-20 md:pb-32">
-      {/* Top Ambient Radial Glow (Foglamp Style) */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-40 left-1/2 -z-10 h-[550px] w-[900px] -translate-x-1/2 opacity-35 blur-[120px] [background:radial-gradient(circle_at_center,#10b981_0%,#06b6d4_30%,#8b5cf6_60%,transparent_80%)]"
-      />
-
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        {/* Hero Header & Value Proposition */}
-        <div className="flex flex-col items-center text-center">
-          {/* Release Tag Pill */}
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3.5 py-1 text-xs font-medium text-emerald-400 backdrop-blur-md shadow-xs shadow-emerald-500/10">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>Stash v0.1.0 Released</span>
-            <span className="text-emerald-500/60">·</span>
-            <span className="text-emerald-300 font-mono text-[11px]">Tauri 2.0 & Rust</span>
-          </div>
-
-          {/* Main Headline */}
-          <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-foreground max-w-4xl text-balance leading-[1.08]">
-            Your desktop scratchpad, <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent">unbound.</span>
+    <section className="relative pt-12 pb-16 md:pt-20 md:pb-24">
+      <div className="mx-auto max-w-5xl px-6 sm:px-8">
+        {/* Left-Aligned Headline Block (Exact Foglamp Alignment & Typography) */}
+        <div className="text-left">
+          <h1 className="font-display text-4xl sm:text-5xl md:text-[56px] font-[450] tracking-tight text-white leading-[1.12] text-balance">
+            Know what your workspace is doing
           </h1>
 
-          {/* Subheading */}
-          <p className="mt-6 max-w-2xl text-base sm:text-lg text-muted-foreground leading-relaxed text-pretty">
-            Floating stickies with live currency conversions, countdown timers, habits, and Markdown notes that hover right where you work. Zero bloat, 100% offline, powered by Tauri and Rust.
+          <p className="mt-4 max-w-xl text-sm sm:text-base text-zinc-400 font-normal leading-relaxed text-pretty">
+            Live currency swaps, countdown timers, habits, and Markdown notes that float right where you work. Zero bloat, local SQLite, built for Windows and macOS.
           </p>
 
-          {/* CTA Buttons Group (Foglamp Luminous Prismatic Beam) */}
-          <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
-            {/* Primary Download Trigger */}
-            <div className="relative">
-              <div className="foglamp-beam-container">
-                <a
-                  href={pkg.primaryInstaller.url}
-                  download
-                  className="relative z-10 flex h-12 items-center gap-2.5 rounded-full bg-neutral-900 px-6 text-sm font-semibold text-white shadow-xl transition-all hover:bg-neutral-800 active:scale-[0.98]"
-                >
-                  <Download className="h-4 w-4 text-emerald-400" />
-                  <span>
-                    {os === "macos"
-                      ? "Download for macOS"
-                      : os === "windows"
-                      ? "Download for Windows"
-                      : "Download Stash"}
-                  </span>
-                  <span className="font-mono text-xs text-muted-foreground border-l border-white/20 pl-2">
-                    {pkg.primaryInstaller.ext}
-                  </span>
-                </a>
-                <div className="foglamp-beam-bloom" />
-              </div>
+          {/* CTA Row: Left Buttons + Right Brand Badge */}
+          <div className="mt-7 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              {/* White Pill Button */}
+              <a
+                href={pkg.primaryInstaller.url}
+                download
+                className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-medium text-black transition-colors hover:bg-neutral-200 shadow-sm"
+              >
+                <Download className="h-3.5 w-3.5 text-black" />
+                <span>
+                  {os === "macos"
+                    ? "Download for macOS (.dmg)"
+                    : os === "windows"
+                    ? "Download for Windows (.exe)"
+                    : "Download Stash"}
+                </span>
+              </a>
 
-              {/* Package Dropdown Selector */}
-              <div className="mt-2 text-center">
-                <button
-                  type="button"
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                >
-                  <span>Or select other platform ({pkg.primaryInstaller.arch})</span>
-                  <ChevronDown className="h-3 w-3" />
-                </button>
-
-                {dropdownOpen && (
-                  <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-64 rounded-xl border border-white/10 bg-neutral-950 p-2 shadow-2xl backdrop-blur-xl z-50 text-left">
-                    <div className="px-2 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                      Available Installers
-                    </div>
-                    {Object.entries(DOWNLOAD_PACKAGES)
-                      .filter(([key]) => key !== "unknown")
-                      .map(([key, item]) => (
-                        <a
-                          key={key}
-                          href={item.primaryInstaller.url}
-                          download
-                          onClick={() => setDropdownOpen(false)}
-                          className="flex items-center justify-between px-2 py-1.5 rounded-lg text-xs hover:bg-white/10 text-muted-foreground hover:text-white transition-colors"
-                        >
-                          <span className="font-medium text-foreground">{item.osName}</span>
-                          <span className="font-mono text-[11px] text-muted-foreground">
-                            {item.primaryInstaller.ext}
-                          </span>
-                        </a>
-                      ))}
-                    {pkg.secondaryInstaller && (
-                      <a
-                        href={pkg.secondaryInstaller.url}
-                        download
-                        onClick={() => setDropdownOpen(false)}
-                        className="flex items-center justify-between px-2 py-1.5 rounded-lg text-xs hover:bg-white/10 text-muted-foreground hover:text-white transition-colors border-t border-white/10 mt-1 pt-1.5"
-                      >
-                        <span className="font-medium text-emerald-400">Portable Version</span>
-                        <span className="font-mono text-[11px] text-muted-foreground">.exe</span>
-                      </a>
-                    )}
-                  </div>
-                )}
-              </div>
+              {/* Ghost Pill Button */}
+              <a
+                href={GITHUB_REPO}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-zinc-900/60 px-4 py-2 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white"
+              >
+                <span>Start free</span>
+              </a>
             </div>
 
-            {/* Quick Terminal Copy Pill */}
-            <div className="h-12 flex items-center">
-              <button
-                type="button"
-                onClick={() => handleCopyCli(pkg.cliCommand)}
-                className="group relative flex h-12 items-center gap-2.5 rounded-full border border-white/10 bg-neutral-900/60 px-5 text-xs font-mono text-muted-foreground transition-all hover:border-white/20 hover:bg-neutral-900 hover:text-foreground"
-              >
-                <Terminal className="h-3.5 w-3.5 text-cyan-400" />
-                <span>{pkg.cliCommand}</span>
-                {copiedCli ? (
-                  <Check className="h-3.5 w-3.5 text-emerald-400" />
-                ) : (
-                  <Copy className="h-3.5 w-3.5 text-muted-foreground/60 transition-transform group-hover:scale-110" />
-                )}
-              </button>
+            {/* Right: Built with Tauri & Rust */}
+            <div className="hidden sm:flex items-center gap-2 text-xs text-zinc-500 font-normal">
+              <span>Built for</span>
+              <div className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-zinc-900 px-2 py-0.5 text-[11px] font-medium text-zinc-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
+                <span>Tauri 2.0</span>
+                <span className="text-zinc-600">/</span>
+                <span className="text-orange-400 font-mono text-[10px]">Rust</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* 3D Perspective Desktop Showcase (Foglamp Signature Mockup) */}
-        <div className="relative mx-auto mt-16 sm:mt-24 max-w-5xl">
-          {/* Ambient Window Aura */}
-          <div className="pointer-events-none absolute -inset-4 rounded-3xl bg-gradient-to-tr from-emerald-500/10 via-cyan-500/10 to-indigo-500/10 blur-2xl" />
-
-          {/* Perspective Container */}
-          <div className="perspective-desktop">
-            <div className="perspective-window-tilt relative rounded-2xl border border-white/15 bg-neutral-950/90 p-3 sm:p-5 shadow-window-chrome">
-              {/* Fake Desktop Top Bar */}
-              <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4 text-xs text-muted-foreground px-2">
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-1.5">
-                    <span className="h-3 w-3 rounded-full bg-rose-500/80 inline-block" />
-                    <span className="h-3 w-3 rounded-full bg-amber-500/80 inline-block" />
-                    <span className="h-3 w-3 rounded-full bg-emerald-500/80 inline-block" />
+        {/* Hero Application Frame (Foglamp Software Mockup Window) */}
+        <div className="mt-10 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0c0c0e] shadow-2xl">
+          <div className="grid grid-cols-1 md:grid-cols-[210px_1fr]">
+            {/* Left App Sidebar */}
+            <div className="hidden md:flex flex-col justify-between border-r border-white/[0.06] bg-[#0a0a0c] p-3 text-xs">
+              <div>
+                {/* Workspace Switcher */}
+                <div className="flex items-center justify-between rounded-lg border border-white/[0.08] bg-zinc-900/80 px-2.5 py-1.5 text-xs font-medium text-white mb-4">
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={stashLogoSrc}
+                      alt="Stash"
+                      className="h-4 w-4 object-contain rounded"
+                    />
+                    <span className="tracking-tight">Personal Vault</span>
                   </div>
-                  <span className="text-2xs font-mono text-muted-foreground/80 ml-2">
-                    Stash Desktop Workspace
-                  </span>
+                  <ChevronDown className="h-3 w-3 text-zinc-500" />
                 </div>
-                <div className="flex items-center gap-3 text-2xs font-mono">
-                  <span className="rounded bg-white/5 px-2 py-0.5 border border-white/10 text-emerald-400">
-                    Always On Top: ON
-                  </span>
-                  <span>v0.1.0</span>
+
+                {/* Sidebar Navigation Items with Squircle Colored Badges */}
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-zinc-400 hover:text-white hover:bg-white/[0.03] transition-colors cursor-pointer">
+                    <div className="flex h-4 w-4 items-center justify-center rounded-[5px] bg-rose-500/20 text-rose-400 text-[10px]">
+                      ●
+                    </div>
+                    <span>Overview</span>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-zinc-400 hover:text-white hover:bg-white/[0.03] transition-colors cursor-pointer">
+                    <div className="flex h-4 w-4 items-center justify-center rounded-[5px] bg-cyan-500/20 text-cyan-400 text-[10px]">
+                      ▲
+                    </div>
+                    <span>Workflows</span>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-zinc-400 hover:text-white hover:bg-white/[0.03] transition-colors cursor-pointer">
+                    <div className="flex h-4 w-4 items-center justify-center rounded-[5px] bg-purple-500/20 text-purple-400 text-[10px]">
+                      ■
+                    </div>
+                    <span>Widgets</span>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-zinc-400 hover:text-white hover:bg-white/[0.03] transition-colors cursor-pointer">
+                    <div className="flex h-4 w-4 items-center justify-center rounded-[5px] bg-blue-500/20 text-blue-400 text-[10px]">
+                      ◆
+                    </div>
+                    <span>Sessions</span>
+                  </div>
+
+                  {/* Active Selected Item (Traces / Stickies) */}
+                  <div className="flex items-center gap-2.5 rounded-md bg-white/[0.06] px-2.5 py-1.5 font-medium text-white shadow-xs">
+                    <div className="flex h-4 w-4 items-center justify-center rounded-[5px] bg-amber-500/20 text-amber-400 text-[10px]">
+                      ★
+                    </div>
+                    <span>Traces</span>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-zinc-400 hover:text-white hover:bg-white/[0.03] transition-colors cursor-pointer">
+                    <div className="flex h-4 w-4 items-center justify-center rounded-[5px] bg-pink-500/20 text-pink-400 text-[10px]">
+                      ♥
+                    </div>
+                    <span>Evals</span>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-zinc-400 hover:text-white hover:bg-white/[0.03] transition-colors cursor-pointer">
+                    <div className="flex h-4 w-4 items-center justify-center rounded-[5px] bg-yellow-500/20 text-yellow-400 text-[10px]">
+                      ▲
+                    </div>
+                    <span>Alerts</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Three Layered Authentic Stash Windows */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                {/* Window 1: Main Note with Blueprint Pattern & Tasks */}
-                <div className="md:col-span-7 flex flex-col rounded-xl border border-amber-500/25 bg-amber-950/15 paper-pattern-blueprint p-4 shadow-lg">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-3 text-xs">
-                    <div className="flex items-center gap-1.5 font-semibold text-foreground">
-                      <span className="h-2 w-2 rounded-full bg-amber-400" />
-                      <span>Sprint Planning & Architecture</span>
-                    </div>
-                    <Pin className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
+              {/* Bottom Sidebar Items */}
+              <div className="border-t border-white/[0.06] pt-3 space-y-1">
+                <div className="flex items-center gap-2 px-2 py-1 text-zinc-400 hover:text-white transition-colors cursor-pointer">
+                  <Key className="h-3.5 w-3.5" />
+                  <span>API Keys</span>
+                </div>
+                <div className="flex items-center gap-2 px-2 py-1 text-zinc-400 hover:text-white transition-colors cursor-pointer">
+                  <Settings className="h-3.5 w-3.5" />
+                  <span>Settings</span>
+                </div>
+                <div className="flex items-center gap-2 px-2 py-1.5 text-zinc-300 font-medium pt-1">
+                  <div className="h-5 w-5 rounded-full bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center text-[10px] text-white font-bold">
+                    G
+                  </div>
+                  <span>Gustavo</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Main Workspace Table Viewport */}
+            <div className="flex flex-col bg-[#0c0c0e]">
+              {/* Header Bar with Filter Chips & Time Segmented Control */}
+              <div className="flex flex-wrap items-center justify-between border-b border-white/[0.06] px-4 py-3 gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 font-medium text-white text-xs">
+                    <span className="text-amber-400">★</span>
+                    <span>Traces</span>
                   </div>
 
-                  <div className="space-y-2 text-xs text-foreground/90">
-                    <p className="font-medium text-amber-300">
-                      # Key Architecture Priorities
-                    </p>
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2 text-muted-foreground line-through">
-                        <Check className="h-3.5 w-3.5 text-emerald-400 stroke-[2.5]" />
-                        <span>Build local SQLite revision checkpoints</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-muted-foreground line-through">
-                        <Check className="h-3.5 w-3.5 text-emerald-400 stroke-[2.5]" />
-                        <span>Implement Currency & Token Swap micro-widget</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-foreground font-medium">
-                        <span className="h-3.5 w-3.5 rounded border border-white/30 flex items-center justify-center bg-white/5" />
-                        <span>Publish native Windows .exe and macOS .dmg</span>
-                      </div>
-                    </div>
-
-                    <div className="mt-3 rounded-lg bg-black/40 border border-white/10 p-2.5 font-mono text-[11px] text-cyan-300">
-                      <code>cargo tauri build --bundles app,dmg,msi,nsis</code>
-                    </div>
+                  {/* Filter chips */}
+                  <div className="flex items-center gap-1.5 ml-2">
+                    <button className="flex items-center gap-1 rounded-md border border-white/[0.08] bg-white/[0.02] px-2 py-1 text-[11px] text-zinc-400 hover:text-white transition-colors">
+                      <span>Any agent</span>
+                      <ChevronDown className="h-2.5 w-2.5 opacity-60" />
+                    </button>
+                    <button className="flex items-center gap-1 rounded-md border border-white/[0.08] bg-white/[0.02] px-2 py-1 text-[11px] text-zinc-400 hover:text-white transition-colors">
+                      <span>Any model</span>
+                      <ChevronDown className="h-2.5 w-2.5 opacity-60" />
+                    </button>
+                    <button className="hidden sm:flex items-center gap-1 rounded-md border border-white/[0.08] bg-white/[0.02] px-2 py-1 text-[11px] text-zinc-400 hover:text-white transition-colors">
+                      <AlertCircle className="h-2.5 w-2.5 text-amber-400" />
+                      <span>Errors only</span>
+                    </button>
+                    <button className="p-1 rounded-md border border-white/[0.08] bg-white/[0.02] text-zinc-400 hover:text-white">
+                      <Sliders className="h-3 w-3" />
+                    </button>
                   </div>
                 </div>
 
-                {/* Window 2 & 3: Currency Swap Widget & 36px Window Shade */}
-                <div className="md:col-span-5 flex flex-col gap-4">
-                  {/* Minimized Window Shade (36px high) */}
-                  <div className="flex items-center justify-between rounded-xl border border-cyan-500/30 bg-cyan-950/20 px-3 py-2 text-xs text-cyan-200 shadow-md">
-                    <div className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
-                      <span className="font-semibold truncate">API Keys & Tokens (Shaded)</span>
-                    </div>
-                    <span className="rounded bg-cyan-500/20 px-1.5 py-0.5 font-mono text-[10px] text-cyan-300">
-                      Double-click to expand
-                    </span>
-                  </div>
+                {/* Right: Time Range Selector */}
+                <div className="flex items-center rounded-lg border border-white/[0.08] bg-black/40 p-0.5 text-[11px] text-zinc-400">
+                  <span className="rounded bg-white/[0.08] px-2 py-0.5 font-medium text-white">24h</span>
+                  <span className="px-2 py-0.5 hover:text-white cursor-pointer">3d</span>
+                  <span className="px-2 py-0.5 hover:text-white cursor-pointer">7d</span>
+                  <span className="px-1.5 py-0.5 text-zinc-500">📅</span>
+                </div>
+              </div>
 
-                  {/* Currency Swap Attached Widget */}
-                  <div className="flex flex-col rounded-xl border border-emerald-500/30 bg-neutral-900/90 p-3.5 shadow-xl">
-                    <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-3 text-xs">
-                      <div className="flex items-center gap-1.5 font-medium text-foreground">
-                        <ArrowUpDown className="h-3.5 w-3.5 text-emerald-400" />
-                        <span>Currency Converter</span>
-                        <span className="flex items-center gap-1 text-[10px] text-emerald-400 font-mono ml-1">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                          <span>Live</span>
-                        </span>
-                      </div>
-                      <span className="text-[10px] text-muted-foreground font-mono">1.5 ETH</span>
-                    </div>
-
-                    {/* Swap Wells Preview */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between rounded-lg bg-black/40 border border-white/10 px-3 py-2">
-                        <div>
-                          <span className="text-[10px] text-muted-foreground block">You Pay</span>
-                          <span className="text-sm font-semibold font-mono text-white">1.50</span>
+              {/* Data Table */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-white/[0.06] text-[11px] font-medium text-zinc-500">
+                      <th className="py-2.5 px-4 font-normal">Trace</th>
+                      <th className="py-2.5 px-3 font-normal text-right">Spans</th>
+                      <th className="py-2.5 px-3 font-normal text-right">Tokens</th>
+                      <th className="py-2.5 px-3 font-normal text-right">Duration</th>
+                      <th className="py-2.5 px-3 font-normal text-right">Cost</th>
+                      <th className="py-2.5 px-4 font-normal text-right">When</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/[0.04]">
+                    {/* Row 1 */}
+                    <tr className="hover:bg-white/[0.02] transition-colors">
+                      <td className="py-3 px-4">
+                        <div className="font-medium text-zinc-200 truncate max-w-xs sm:max-w-md">
+                          Hey, my order #48213 still says "processing" after 5 days. Can you chec...
                         </div>
-                        <span className="rounded-full bg-indigo-500/20 px-2 py-0.5 text-xs font-semibold text-indigo-300 border border-indigo-500/30">
-                          ETH
-                        </span>
-                      </div>
-
-                      <div className="flex justify-center -my-1">
-                        <span className="rounded-full bg-neutral-800 p-1 border border-white/20 text-muted-foreground">
-                          <ArrowUpDown className="h-3 w-3" />
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between rounded-lg bg-black/40 border border-white/10 px-3 py-2">
-                        <div>
-                          <span className="text-[10px] text-muted-foreground block">You Receive</span>
-                          <span className="text-sm font-semibold font-mono text-emerald-400">3,945.20</span>
+                        <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] text-zinc-500">
+                          <span className="text-zinc-400">🤖 GPT-5.6 Sol</span>
+                          <span>•</span>
+                          <span>Session</span>
+                          <span>•</span>
+                          <span className="text-purple-400">👤 support-triage</span>
+                          <span>•</span>
+                          <span className="text-cyan-400">👤 onboard-customer</span>
+                          <span>•</span>
+                          <span>🏢 Acme Inc</span>
                         </div>
-                        <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-300 border border-emerald-500/30">
-                          USDC
-                        </span>
-                      </div>
-                    </div>
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono text-zinc-400">8</td>
+                      <td className="py-3 px-3 text-right font-mono text-zinc-400">4.2K</td>
+                      <td className="py-3 px-3 text-right font-mono text-emerald-400 font-medium">5.84s</td>
+                      <td className="py-3 px-3 text-right font-mono text-amber-300">$0.041800</td>
+                      <td className="py-3 px-4 text-right text-zinc-500 font-mono text-[11px]">12s ago</td>
+                    </tr>
+
+                    {/* Row 2 */}
+                    <tr className="hover:bg-white/[0.02] transition-colors">
+                      <td className="py-3 px-4">
+                        <div className="font-medium text-zinc-200 truncate max-w-xs sm:max-w-md">
+                          Compare vector DB options for a 50M-embedding workload
+                        </div>
+                        <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] text-zinc-500">
+                          <span className="text-zinc-400">🤖 Claude Fable 5</span>
+                          <span>•</span>
+                          <span className="text-orange-400">👤 research-planner</span>
+                          <span>•</span>
+                          <span>🏢 Globex</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono text-zinc-400">14</td>
+                      <td className="py-3 px-3 text-right font-mono text-zinc-400">12K</td>
+                      <td className="py-3 px-3 text-right font-mono text-emerald-400 font-medium">9.12s</td>
+                      <td className="py-3 px-3 text-right font-mono text-amber-300">$0.124000</td>
+                      <td className="py-3 px-4 text-right text-zinc-500 font-mono text-[11px]">48s ago</td>
+                    </tr>
+
+                    {/* Row 3 */}
+                    <tr className="hover:bg-white/[0.02] transition-colors">
+                      <td className="py-3 px-4">
+                        <div className="font-medium text-zinc-200 truncate max-w-xs sm:max-w-md">
+                          Draft a renewal reminder for dormant workspaces
+                        </div>
+                        <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] text-zinc-500">
+                          <span className="text-zinc-400">🤖 Gemini 3.5 Flash</span>
+                          <span>•</span>
+                          <span className="text-rose-400">👤 email-drafter</span>
+                          <span>•</span>
+                          <span>🏢 Initech</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono text-zinc-400">3</td>
+                      <td className="py-3 px-3 text-right font-mono text-zinc-400">1.9K</td>
+                      <td className="py-3 px-3 text-right font-mono text-cyan-400 font-medium">1.58s</td>
+                      <td className="py-3 px-3 text-right font-mono text-emerald-400">$0.009400</td>
+                      <td className="py-3 px-4 text-right text-zinc-500 font-mono text-[11px]">3m ago</td>
+                    </tr>
+
+                    {/* Row 4 */}
+                    <tr className="hover:bg-white/[0.02] transition-colors">
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-1.5 font-medium text-zinc-200 truncate max-w-xs sm:max-w-md">
+                          <span>Which accounts drove the Q3 revenue dip? Break it down by plan t...</span>
+                          <span className="inline-flex items-center gap-0.5 rounded px-1 text-[10px] font-mono text-rose-400 bg-rose-500/10">
+                            ⚠ 2
+                          </span>
+                        </div>
+                        <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] text-zinc-500">
+                          <span className="text-zinc-400">🤖 Claude Fable 5</span>
+                          <span>•</span>
+                          <span>Session</span>
+                          <span>•</span>
+                          <span className="text-blue-400">👤 sql-analyst</span>
+                          <span>•</span>
+                          <span>🏢 Globex</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono text-zinc-400">17</td>
+                      <td className="py-3 px-3 text-right font-mono text-zinc-400">15K</td>
+                      <td className="py-3 px-3 text-right font-mono text-rose-400 font-medium">12.68s</td>
+                      <td className="py-3 px-3 text-right font-mono text-amber-300">$0.162000</td>
+                      <td className="py-3 px-4 text-right text-zinc-500 font-mono text-[11px]">8m ago</td>
+                    </tr>
+
+                    {/* Row 5 */}
+                    <tr className="hover:bg-white/[0.02] transition-colors">
+                      <td className="py-3 px-4">
+                        <div className="font-medium text-zinc-200 truncate max-w-xs sm:max-w-md">
+                          Translate the onboarding guide to Japanese, keep the code blocks
+                        </div>
+                        <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] text-zinc-500">
+                          <span className="text-zinc-400">🤖 GLM 5</span>
+                          <span>•</span>
+                          <span className="text-cyan-400">👤 doc-translator</span>
+                          <span>•</span>
+                          <span>🏢 Initech</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono text-zinc-400">5</td>
+                      <td className="py-3 px-3 text-right font-mono text-zinc-400">9.8K</td>
+                      <td className="py-3 px-3 text-right font-mono text-emerald-400 font-medium">2.14s</td>
+                      <td className="py-3 px-3 text-right font-mono text-amber-300">$0.012100</td>
+                      <td className="py-3 px-4 text-right text-zinc-500 font-mono text-[11px]">14m ago</td>
+                    </tr>
+
+                    {/* Row 6 */}
+                    <tr className="hover:bg-white/[0.02] transition-colors">
+                      <td className="py-3 px-4">
+                        <div className="font-medium text-zinc-200 truncate max-w-xs sm:max-w-md">
+                          Reconcile the Stripe payout against invoices for July
+                        </div>
+                        <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] text-zinc-500">
+                          <span className="text-zinc-400">🤖 MiniMax M2.5</span>
+                          <span>•</span>
+                          <span className="text-purple-400">👤 billing-reconciler</span>
+                          <span>•</span>
+                          <span className="text-yellow-400">👤 weekly-digest</span>
+                          <span>•</span>
+                          <span>🏢 Hooli</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono text-zinc-400">4</td>
+                      <td className="py-3 px-3 text-right font-mono text-zinc-400">1.4K</td>
+                      <td className="py-3 px-3 text-right font-mono text-cyan-400 font-medium">920ms</td>
+                      <td className="py-3 px-3 text-right font-mono text-emerald-400">$0.003800</td>
+                      <td className="py-3 px-4 text-right text-zinc-500 font-mono text-[11px]">19m ago</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Table Footer */}
+              <div className="flex items-center justify-between border-t border-white/[0.06] px-4 py-2.5 text-[11px] text-zinc-500">
+                <span>6 traces</span>
+                <div className="flex items-center gap-3">
+                  <span>1 to 6 ↕</span>
+                  <div className="flex items-center gap-1">
+                    <button className="p-0.5 rounded hover:bg-white/10">&lt;</button>
+                    <button className="p-0.5 rounded hover:bg-white/10">&gt;</button>
                   </div>
                 </div>
               </div>

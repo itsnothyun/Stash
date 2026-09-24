@@ -1,301 +1,192 @@
-import React, { useState } from "react";
-import {
-  ArrowUpDown,
-  CalendarClock,
-  Kanban,
-  Check,
-  TrendingUp,
-  Globe,
-  Sparkles,
-  ArrowRight,
-  Plus,
-} from "lucide-react";
+import React from "react";
+import { ArrowUpDown, TrendingUp, Calculator, Bell } from "lucide-react";
 
 export const FeatureWidgets: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<"swap" | "timer" | "kanban">("swap");
-
-  // Currency Converter playground state
-  const [payAmount, setPayAmount] = useState("1000");
-  const [fromCurrency, setFromCurrency] = useState<"USD" | "EUR" | "ETH" | "PHP">("USD");
-  const [toCurrency, setToCurrency] = useState<"EUR" | "USD" | "PHP" | "ETH">("EUR");
-  const [insertedFeedback, setInsertedFeedback] = useState(false);
-
-  const rates: Record<string, number> = {
-    USD: 1.0,
-    EUR: 1.09,
-    ETH: 2630.0,
-    PHP: 0.0175,
-  };
-
-  const payUsd = (parseFloat(payAmount) || 0) * rates[fromCurrency];
-  const receiveAmount = rates[toCurrency] > 0 ? (payUsd / rates[toCurrency]).toFixed(2) : "0.00";
-
-  const handleFlip = () => {
-    const temp = fromCurrency;
-    setFromCurrency(toCurrency as any);
-    setToCurrency(temp as any);
-  };
-
-  const handleInsert = () => {
-    setInsertedFeedback(true);
-    setTimeout(() => setInsertedFeedback(false), 2000);
-  };
-
-  // Timer state
-  const [timerRunning, setTimerRunning] = useState(false);
-  const [secondsLeft, setSecondsLeft] = useState(1500); // 25 mins
-
   return (
-    <section id="widgets" className="py-20 sm:py-28 border-b border-white/10 bg-neutral-950/40">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.8fr] lg:gap-16">
-          {/* Left Column */}
-          <div className="max-w-md">
-            <ul className="mb-5 flex flex-wrap gap-2 text-[12px] font-medium text-muted-foreground list-none p-0">
-              <li className="flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-emerald-300">
-                <ArrowUpDown className="h-3 w-3" />
-                <span>Live Rates</span>
-              </li>
-              <li className="flex items-center gap-1.5 rounded-full border border-orange-500/20 bg-orange-500/10 px-2.5 py-1 text-orange-300">
-                <CalendarClock className="h-3 w-3" />
-                <span>Countdown & Focus</span>
-              </li>
-              <li className="flex items-center gap-1.5 rounded-full border border-blue-500/20 bg-blue-500/10 px-2.5 py-1 text-blue-300">
-                <Kanban className="h-3 w-3" />
-                <span>Kanban & Tasks</span>
-              </li>
-            </ul>
+    <section id="widgets" className="py-20 sm:py-28 border-t border-white/[0.06]">
+      <div className="mx-auto max-w-5xl px-6 sm:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
+          {/* Left Column: Category Pills, Title, Description, Dark Pill Button */}
+          <div className="text-left">
+            {/* Row of squircle pill badges (Exact Foglamp styling) */}
+            <div className="mb-5 flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] px-2.5 py-1 text-xs text-zinc-300">
+                <div className="flex h-3.5 w-3.5 items-center justify-center rounded-[4px] bg-amber-500/20 text-amber-400 text-[10px]">
+                  ●
+                </div>
+                <span>Agents</span>
+              </div>
 
-            <h2 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-foreground text-balance">
-              Mini apps inside your notes.
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] px-2.5 py-1 text-xs text-zinc-300">
+                <div className="flex h-3.5 w-3.5 items-center justify-center rounded-[4px] bg-cyan-500/20 text-cyan-400 text-[10px]">
+                  ▲
+                </div>
+                <span>Workflows</span>
+              </div>
+
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] px-2.5 py-1 text-xs text-zinc-300">
+                <div className="flex h-3.5 w-3.5 items-center justify-center rounded-[4px] bg-purple-500/20 text-purple-400 text-[10px]">
+                  ■
+                </div>
+                <span>Customers</span>
+              </div>
+
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] px-2.5 py-1 text-xs text-zinc-300">
+                <div className="flex h-3.5 w-3.5 items-center justify-center rounded-[4px] bg-yellow-500/20 text-yellow-400 text-[10px]">
+                  ★
+                </div>
+                <span>Alerts</span>
+              </div>
+            </div>
+
+            {/* Headline */}
+            <h2 className="font-display text-3xl sm:text-4xl font-[450] tracking-tight text-white leading-tight">
+              Know where your money goes
             </h2>
 
-            <p className="mt-4 text-base text-muted-foreground leading-relaxed text-pretty">
-              Stop opening browser tabs for currency calculations, countdown timers, or habit checklists. Attach lightweight micro-widgets directly to any note and insert live outputs with one click.
+            {/* Subtitle */}
+            <p className="mt-3 text-sm text-zinc-400 leading-relaxed font-normal max-w-sm">
+              Track spending by model, agent, and customer. Get alerted when costs rise.
             </p>
 
-            <div className="mt-8 flex items-center gap-3">
+            {/* Dark Pill Button */}
+            <div className="mt-6">
               <a
                 href="#download"
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2 text-xs font-semibold text-foreground transition-all hover:bg-white/10"
+                className="inline-flex items-center rounded-full border border-white/10 bg-zinc-900/80 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-zinc-800"
               >
-                <span>Download Stash</span>
-                <ArrowRight className="h-3.5 w-3.5" />
+                Explore costs
               </a>
             </div>
           </div>
 
-          {/* Right Column: Live Interactive Widget Playground */}
-          <div className="rounded-2xl border border-white/15 bg-neutral-950 p-4 sm:p-6 shadow-2xl">
-            {/* Widget Category Tabs */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-5">
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("swap")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                    activeTab === "swap"
-                      ? "bg-emerald-500/20 border border-emerald-500/40 text-emerald-300"
-                      : "text-muted-foreground hover:text-white"
-                  }`}
-                >
-                  <ArrowUpDown className="h-3.5 w-3.5" />
-                  <span>Currency Swap</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("timer")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                    activeTab === "timer"
-                      ? "bg-orange-500/20 border border-orange-500/40 text-orange-300"
-                      : "text-muted-foreground hover:text-white"
-                  }`}
-                >
-                  <CalendarClock className="h-3.5 w-3.5" />
-                  <span>Countdown & Focus</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("kanban")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                    activeTab === "kanban"
-                      ? "bg-blue-500/20 border border-blue-500/40 text-blue-300"
-                      : "text-muted-foreground hover:text-white"
-                  }`}
-                >
-                  <Kanban className="h-3.5 w-3.5" />
-                  <span>Kanban Board</span>
-                </button>
+          {/* Right Column: Chart Card + Floating Overlay Pills (Exact Foglamp Visual) */}
+          <div className="relative rounded-2xl border border-white/[0.08] bg-[#0c0c0e] p-6 shadow-2xl">
+            {/* Chart Header */}
+            <div className="flex items-center justify-between text-xs text-zinc-400 mb-6">
+              <span className="font-medium text-zinc-200">Cost over time</span>
+              <div className="flex items-center gap-3 text-[11px]">
+                <span className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-cyan-400" />
+                  <span>gpt-5.6-sol</span>
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-purple-400" />
+                  <span>claude...</span>
+                </span>
               </div>
-              <span className="text-[10px] font-mono text-muted-foreground hidden sm:inline">
-                Interactive preview
-              </span>
             </div>
 
-            {/* Tab 1: Currency Converter Playground */}
-            {activeTab === "swap" && (
-              <div className="space-y-3.5 animate-fadeIn">
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span className="font-semibold text-foreground flex items-center gap-1.5">
-                    <ArrowUpDown className="h-3.5 w-3.5 text-emerald-400" />
-                    Currency & Token Converter
-                  </span>
-                  <span className="flex items-center gap-1 text-[11px] text-emerald-400 font-mono">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    Live ECB & CoinGecko rates
-                  </span>
-                </div>
-
-                {/* From Input Well */}
-                <div className="flex items-center justify-between rounded-xl bg-black/50 border border-white/10 p-3">
-                  <div>
-                    <label className="text-[10px] uppercase font-mono tracking-wider text-muted-foreground block">
-                      Pay
-                    </label>
-                    <input
-                      type="text"
-                      value={payAmount}
-                      onChange={(e) => setPayAmount(e.target.value)}
-                      className="bg-transparent font-mono text-lg font-bold text-white outline-none w-32"
-                    />
-                  </div>
-                  <select
-                    value={fromCurrency}
-                    onChange={(e) => setFromCurrency(e.target.value as any)}
-                    className="bg-neutral-800 border border-white/20 rounded-lg px-2.5 py-1 text-xs font-semibold text-white cursor-pointer outline-none"
-                  >
-                    <option value="USD">USD ($)</option>
-                    <option value="EUR">EUR (€)</option>
-                    <option value="ETH">ETH (Ξ)</option>
-                    <option value="PHP">PHP (₱)</option>
-                  </select>
-                </div>
-
-                {/* Flip Button */}
-                <div className="flex justify-center -my-2 relative z-10">
-                  <button
-                    type="button"
-                    onClick={handleFlip}
-                    className="rounded-full bg-neutral-800 p-1.5 border border-white/20 text-muted-foreground hover:text-white transition-colors cursor-pointer"
-                    title="Flip currencies"
-                  >
-                    <ArrowUpDown className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-
-                {/* To Input Well */}
-                <div className="flex items-center justify-between rounded-xl bg-black/50 border border-white/10 p-3">
-                  <div>
-                    <label className="text-[10px] uppercase font-mono tracking-wider text-muted-foreground block">
-                      Receive (Calculated)
-                    </label>
-                    <span className="font-mono text-lg font-bold text-emerald-400">
-                      {receiveAmount}
-                    </span>
-                  </div>
-                  <select
-                    value={toCurrency}
-                    onChange={(e) => setToCurrency(e.target.value as any)}
-                    className="bg-neutral-800 border border-white/20 rounded-lg px-2.5 py-1 text-xs font-semibold text-white cursor-pointer outline-none"
-                  >
-                    <option value="EUR">EUR (€)</option>
-                    <option value="USD">USD ($)</option>
-                    <option value="PHP">PHP (₱)</option>
-                    <option value="ETH">ETH (Ξ)</option>
-                  </select>
-                </div>
-
-                {/* Insert into Note Button */}
-                <button
-                  type="button"
-                  onClick={handleInsert}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 py-2.5 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/25 transition-all cursor-pointer"
-                >
-                  {insertedFeedback ? (
-                    <>
-                      <Check className="h-3.5 w-3.5" />
-                      <span>Copied to note doc!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Plus className="h-3.5 w-3.5" />
-                      <span>Insert 1-Click Summary into Note</span>
-                    </>
-                  )}
-                </button>
+            {/* Vertical Bar Chart with Y-axis */}
+            <div className="relative h-44 flex items-end justify-between pl-8 pb-6 border-b border-white/[0.06]">
+              {/* Y-axis labels */}
+              <div className="absolute left-0 top-0 bottom-6 flex flex-col justify-between text-[10px] font-mono text-zinc-500">
+                <span>$60</span>
+                <span>$45</span>
+                <span>$30</span>
+                <span>$15</span>
+                <span>$0</span>
               </div>
-            )}
 
-            {/* Tab 2: Countdown Timer */}
-            {activeTab === "timer" && (
-              <div className="space-y-4 animate-fadeIn">
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span className="font-semibold text-foreground flex items-center gap-1.5">
-                    <CalendarClock className="h-3.5 w-3.5 text-orange-400" />
-                    Product Launch Countdown
-                  </span>
-                  <span className="font-mono text-orange-400 text-xs">25:00 Remaining</span>
+              {/* Chart Grid Lines */}
+              <div className="absolute inset-x-8 top-0 border-b border-dashed border-white/[0.04]" />
+              <div className="absolute inset-x-8 top-1/4 border-b border-dashed border-white/[0.04]" />
+              <div className="absolute inset-x-8 top-2/4 border-b border-dashed border-white/[0.04]" />
+              <div className="absolute inset-x-8 top-3/4 border-b border-dashed border-white/[0.04]" />
+
+              {/* 18 Vertical Bars with varying heights */}
+              {[
+                { h: "35%", c: "bg-cyan-500/70" },
+                { h: "60%", c: "bg-orange-500/70" },
+                { h: "45%", c: "bg-purple-500/70" },
+                { h: "80%", c: "bg-cyan-400" },
+                { h: "50%", c: "bg-orange-400" },
+                { h: "70%", c: "bg-purple-400" },
+                { h: "40%", c: "bg-cyan-500/70" },
+                { h: "65%", c: "bg-orange-500/70" },
+                { h: "55%", c: "bg-purple-500/70" },
+                { h: "90%", c: "bg-cyan-400" },
+                { h: "45%", c: "bg-orange-400" },
+                { h: "75%", c: "bg-purple-400" },
+                { h: "30%", c: "bg-cyan-500/70" },
+                { h: "85%", c: "bg-orange-500/70" },
+                { h: "50%", c: "bg-purple-500/70" },
+                { h: "70%", c: "bg-cyan-400" },
+                { h: "60%", c: "bg-orange-400" },
+                { h: "80%", c: "bg-purple-400" },
+              ].map((bar, idx) => (
+                <div key={idx} className="relative z-0 w-2.5 rounded-t-sm flex flex-col justify-end h-full">
+                  <div
+                    style={{ height: bar.h }}
+                    className={`w-full rounded-t-sm ${bar.c} transition-all duration-500 hover:brightness-125`}
+                  />
                 </div>
+              ))}
+            </div>
 
-                <div className="grid grid-cols-4 gap-2 text-center">
-                  {[
-                    { label: "Days", val: "14" },
-                    { label: "Hours", val: "08" },
-                    { label: "Mins", val: "42" },
-                    { label: "Secs", val: "19" },
-                  ].map((unit, idx) => (
-                    <div
-                      key={idx}
-                      className="rounded-xl border border-white/10 bg-black/40 p-3 flex flex-col items-center"
-                    >
-                      <span className="font-mono text-2xl font-bold text-white">{unit.val}</span>
-                      <span className="text-[10px] text-muted-foreground uppercase">{unit.label}</span>
-                    </div>
-                  ))}
+            {/* X-axis timestamps */}
+            <div className="flex justify-between pl-8 pt-2 text-[10px] font-mono text-zinc-500">
+              <span>00:00</span>
+              <span>04:00</span>
+              <span>08:00</span>
+              <span>12:00</span>
+              <span>16:00</span>
+              <span>20:00</span>
+            </div>
+
+            {/* Overlay Floating Card 1 (Top Right) */}
+            <div className="absolute right-4 top-4 z-10 w-44 rounded-xl border border-white/[0.1] bg-[#141418]/95 p-2.5 shadow-2xl backdrop-blur-md">
+              <div className="space-y-1.5 text-[11px]">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
+                    <span className="text-zinc-300 truncate max-w-[90px]">research-planner</span>
+                  </div>
+                  <span className="font-mono text-zinc-200 font-medium">$318.20</span>
                 </div>
-
-                <div className="rounded-lg bg-orange-500/10 border border-orange-500/25 p-3 text-xs text-orange-200">
-                  ⚡ Native sound alerts & system notifications trigger even when Stash is minimized.
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-purple-400" />
+                    <span className="text-zinc-300 truncate max-w-[90px]">support-triage</span>
+                  </div>
+                  <span className="font-mono text-zinc-200 font-medium">$214.80</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
+                    <span className="text-zinc-300 truncate max-w-[90px]">code-reviewer</span>
+                  </div>
+                  <span className="font-mono text-zinc-200 font-medium">$196.40</span>
                 </div>
               </div>
-            )}
+            </div>
 
-            {/* Tab 3: Kanban Board */}
-            {activeTab === "kanban" && (
-              <div className="space-y-3 animate-fadeIn">
-                <div className="grid grid-cols-3 gap-2 text-xs">
-                  <div className="rounded-lg border border-white/10 bg-black/30 p-2.5">
-                    <span className="font-semibold text-foreground block mb-2 text-[11px] uppercase tracking-wider text-muted-foreground">
-                      To Do (2)
-                    </span>
-                    <div className="rounded bg-neutral-800/80 p-2 border border-white/5 text-2xs mb-1.5">
-                      Fix macOS notarization
-                    </div>
-                    <div className="rounded bg-neutral-800/80 p-2 border border-white/5 text-2xs">
-                      Update release checksums
-                    </div>
+            {/* Overlay Floating Card 2 (Bottom Right) */}
+            <div className="absolute right-6 bottom-5 z-10 w-40 rounded-xl border border-white/[0.1] bg-[#141418]/95 p-2.5 shadow-2xl backdrop-blur-md">
+              <div className="space-y-1.5 text-[11px]">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                    <span className="text-zinc-300">Acme Inc</span>
                   </div>
-
-                  <div className="rounded-lg border border-white/10 bg-black/30 p-2.5">
-                    <span className="font-semibold text-foreground block mb-2 text-[11px] uppercase tracking-wider text-cyan-400">
-                      Doing (1)
-                    </span>
-                    <div className="rounded bg-cyan-950/40 p-2 border border-cyan-500/30 text-2xs text-cyan-200">
-                      Marketing website build
-                    </div>
+                  <span className="font-mono text-zinc-200 font-medium">$241.60</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-purple-400" />
+                    <span className="text-zinc-300">Globex</span>
                   </div>
-
-                  <div className="rounded-lg border border-white/10 bg-black/30 p-2.5">
-                    <span className="font-semibold text-foreground block mb-2 text-[11px] uppercase tracking-wider text-emerald-400">
-                      Done (3)
-                    </span>
-                    <div className="rounded bg-emerald-950/40 p-2 border border-emerald-500/30 text-2xs text-emerald-200">
-                      Tauri 2.0 migration
-                    </div>
+                  <span className="font-mono text-zinc-200 font-medium">$188.30</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+                    <span className="text-zinc-300">Umbrella</span>
                   </div>
+                  <span className="font-mono text-zinc-200 font-medium">$74.20</span>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>

@@ -1,160 +1,167 @@
-import React, { useState } from "react";
-import { Lock, Unlock, Database, KeyRound, ShieldCheck, ArrowRight, Check } from "lucide-react";
+import React from "react";
+import { AlertTriangle, CheckCircle2, Heart } from "lucide-react";
 
 export const FeatureSecurity: React.FC = () => {
-  const [pin, setPin] = useState("");
-  const [isUnlocked, setIsUnlocked] = useState(false);
-  const [error, setError] = useState(false);
-
-  const CORRECT_PIN = "1234";
-
-  const handleDigit = (digit: string) => {
-    if (pin.length < 4) {
-      const next = pin + digit;
-      setPin(next);
-      if (next.length === 4) {
-        if (next === CORRECT_PIN) {
-          setIsUnlocked(true);
-          setError(false);
-        } else {
-          setError(true);
-          setTimeout(() => {
-            setPin("");
-            setError(false);
-          }, 800);
-        }
-      }
-    }
-  };
-
-  const handleLockAgain = () => {
-    setIsUnlocked(false);
-    setPin("");
-  };
-
   return (
-    <section id="security" className="py-20 sm:py-28 border-b border-white/10">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.8fr] lg:gap-16">
-          {/* Left Column */}
-          <div className="max-w-md">
-            <ul className="mb-5 flex flex-wrap gap-2 text-[12px] font-medium text-muted-foreground list-none p-0">
-              <li className="flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-emerald-300">
-                <Database className="h-3 w-3" />
-                <span>Local SQLite</span>
-              </li>
-              <li className="flex items-center gap-1.5 rounded-full border border-rose-500/20 bg-rose-500/10 px-2.5 py-1 text-rose-300">
-                <Lock className="h-3 w-3" />
-                <span>4-Digit PIN Vault</span>
-              </li>
-              <li className="flex items-center gap-1.5 rounded-full border border-purple-500/20 bg-purple-500/10 px-2.5 py-1 text-purple-300">
-                <ShieldCheck className="h-3 w-3" />
-                <span>Zero Telemetry</span>
-              </li>
-            </ul>
+    <section id="security" className="py-20 sm:py-28 border-t border-white/[0.06]">
+      <div className="mx-auto max-w-5xl px-6 sm:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
+          {/* Left Column: Category Pills, Title, Description, Dark Pill Button */}
+          <div className="text-left">
+            {/* Squircle Badges */}
+            <div className="mb-5 flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] px-2.5 py-1 text-xs text-zinc-300">
+                <div className="flex h-3.5 w-3.5 items-center justify-center rounded-[4px] bg-pink-500/20 text-pink-400 text-[10px]">
+                  ♥
+                </div>
+                <span>Evals</span>
+              </div>
 
-            <h2 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-foreground text-balance">
-              No accounts. No cloud lock-in. Your thoughts stay local.
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] px-2.5 py-1 text-xs text-zinc-300">
+                <div className="flex h-3.5 w-3.5 items-center justify-center rounded-[4px] bg-yellow-500/20 text-yellow-400 text-[10px]">
+                  ▲
+                </div>
+                <span>Alerts</span>
+              </div>
+            </div>
+
+            {/* Headline */}
+            <h2 className="font-display text-3xl sm:text-4xl font-[450] tracking-tight text-white leading-tight">
+              Catch bad answers
             </h2>
 
-            <p className="mt-4 text-base text-muted-foreground leading-relaxed text-pretty">
-              Every note, task, and revision checkpoint is stored in a local SQLite database directly on your hard drive. Protect confidential client stashes behind a per-note 4-digit PIN with session timeouts.
+            {/* Subtitle */}
+            <p className="mt-3 text-sm text-zinc-400 leading-relaxed font-normal max-w-sm">
+              Check your agents' responses and get alerted when quality drops.
             </p>
 
-            <div className="mt-8 flex items-center gap-3">
+            {/* Dark Pill Button */}
+            <div className="mt-6">
               <a
                 href="#download"
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2 text-xs font-semibold text-foreground transition-all hover:bg-white/10"
+                className="inline-flex items-center rounded-full border border-white/10 bg-zinc-900/80 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-zinc-800"
               >
-                <span>Get Stash free</span>
-                <ArrowRight className="h-3.5 w-3.5" />
+                Explore evals
               </a>
             </div>
           </div>
 
-          {/* Right Column: Interactive PIN Vault Simulator */}
-          <div className="rounded-2xl border border-white/15 bg-neutral-950 p-6 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-5 text-xs text-muted-foreground">
-              <span className="font-mono text-xs font-semibold text-foreground flex items-center gap-1.5">
-                <KeyRound className="h-3.5 w-3.5 text-rose-400" />
-                Interactive Security Vault (Try PIN: 1234)
-              </span>
-              {isUnlocked && (
-                <button
-                  type="button"
-                  onClick={handleLockAgain}
-                  className="rounded bg-rose-500/20 text-rose-300 px-2 py-0.5 text-2xs font-semibold hover:bg-rose-500/30 transition-colors cursor-pointer"
-                >
-                  Lock Again
-                </button>
-              )}
-            </div>
+          {/* Right Column: Scatter Plot Chart + Overlaid Judge Fail Card */}
+          <div className="relative">
+            {/* Background Scatter Plot Card */}
+            <div className="rounded-2xl border border-white/[0.08] bg-[#0c0c0e] p-6 shadow-2xl">
+              {/* Header */}
+              <div className="flex items-center justify-between text-xs mb-6">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-pink-400" />
+                  <span className="font-medium text-zinc-200">Helpfulness</span>
+                </div>
+                <div className="text-[11px] text-zinc-400">
+                  <span className="font-mono text-zinc-300">56</span> scored{" "}
+                  <span className="font-mono text-emerald-400 font-medium">84% pass</span>
+                </div>
+              </div>
 
-            {!isUnlocked ? (
-              <div className="flex flex-col items-center justify-center p-6 space-y-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-400 shadow-lg">
-                  <Lock className="h-6 w-6" />
+              {/* Scatter Plot Chart */}
+              <div className="relative h-44 pl-8 pb-6 border-b border-white/[0.06]">
+                {/* Y-axis labels */}
+                <div className="absolute left-0 top-0 bottom-6 flex flex-col justify-between text-[10px] font-mono text-zinc-500">
+                  <span>1.0</span>
+                  <span>0.5</span>
+                  <span>0.0</span>
                 </div>
 
-                <div className="text-center">
-                  <h4 className="text-sm font-semibold text-foreground">
-                    This Stash is PIN Protected
-                  </h4>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Enter 4-digit PIN to decrypt session:
-                  </p>
+                {/* Threshold line at 0.70 */}
+                <div className="absolute inset-x-8 top-[30%] border-b border-dashed border-rose-500/40 z-0">
+                  <span className="absolute right-0 -top-4 text-[9px] font-mono text-rose-400">
+                    0.70
+                  </span>
                 </div>
 
-                {/* PIN Dots */}
-                <div className="flex gap-3 my-2">
-                  {[0, 1, 2, 3].map((idx) => (
-                    <div
-                      key={idx}
-                      className={`h-3 w-3 rounded-full border transition-all ${
-                        error
-                          ? "bg-rose-500 border-rose-500 animate-shake"
-                          : pin.length > idx
-                          ? "bg-emerald-400 border-emerald-400 shadow-sm shadow-emerald-400/50"
-                          : "border-white/20 bg-white/5"
-                      }`}
+                {/* Plot Points Area */}
+                <div className="relative h-full w-full">
+                  {/* Passing Green Points (Clustered > 0.7) */}
+                  {[
+                    { left: "5%", top: "15%" },
+                    { left: "8%", top: "22%" },
+                    { left: "12%", top: "12%" },
+                    { left: "16%", top: "18%" },
+                    { left: "20%", top: "25%" },
+                    { left: "24%", top: "10%" },
+                    { left: "28%", top: "14%" },
+                    { left: "32%", top: "28%" },
+                    { left: "50%", top: "16%" },
+                    { left: "54%", top: "12%" },
+                    { left: "58%", top: "22%" },
+                    { left: "62%", top: "15%" },
+                    { left: "66%", top: "18%" },
+                    { left: "70%", top: "24%" },
+                    { left: "74%", top: "10%" },
+                    { left: "78%", top: "15%" },
+                    { left: "82%", top: "20%" },
+                    { left: "86%", top: "14%" },
+                    { left: "90%", top: "22%" },
+                  ].map((pt, i) => (
+                    <span
+                      key={i}
+                      style={{ left: pt.left, top: pt.top }}
+                      className="absolute h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)]"
+                    />
+                  ))}
+
+                  {/* Failing Red Points (Below 0.7) */}
+                  {[
+                    { left: "36%", top: "45%" },
+                    { left: "40%", top: "40%" },
+                    { left: "44%", top: "48%" },
+                    { left: "48%", top: "42%" },
+                  ].map((pt, i) => (
+                    <span
+                      key={i}
+                      style={{ left: pt.left, top: pt.top }}
+                      className="absolute h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]"
                     />
                   ))}
                 </div>
+              </div>
 
-                {/* Numeric Keypad */}
-                <div className="grid grid-cols-3 gap-2 w-48 mt-2">
-                  {["1", "2", "3", "4", "5", "6", "7", "8", "9", "C", "0", "←"].map((key) => (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={() => {
-                        if (key === "C") setPin("");
-                        else if (key === "←") setPin(pin.slice(0, -1));
-                        else handleDigit(key);
-                      }}
-                      className="flex h-10 items-center justify-center rounded-lg border border-white/10 bg-neutral-900 text-xs font-mono font-semibold text-foreground hover:bg-white/10 active:scale-95 transition-all cursor-pointer"
-                    >
-                      {key}
-                    </button>
-                  ))}
+              {/* X-axis timestamps */}
+              <div className="flex justify-between pl-8 pt-2 text-[10px] font-mono text-zinc-500">
+                <span>00:00</span>
+                <span>06:00</span>
+                <span>12:00</span>
+              </div>
+            </div>
+
+            {/* Overlaid Floating Judge Fail Card (Bottom Right, exact Foglamp position) */}
+            <div className="absolute -bottom-8 -right-3 sm:-right-6 z-10 w-72 sm:w-80 rounded-2xl border border-white/[0.12] bg-[#141418]/95 p-4 shadow-2xl backdrop-blur-xl">
+              {/* Header */}
+              <div className="flex items-center justify-between pb-2 border-b border-white/[0.06] mb-2.5">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-white">
+                  <span className="text-pink-400 text-xs">♥</span>
+                  <span>Judge</span>
+                </div>
+                <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 text-[10px] font-mono font-medium text-rose-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+                  <span>Fail</span>
+                </span>
+              </div>
+
+              {/* Reason */}
+              <div className="space-y-2 text-xs">
+                <div className="text-[11px] text-zinc-400">
+                  <span className="font-semibold text-zinc-300 block mb-0.5">Judge's reason</span>
+                  <p className="leading-relaxed">
+                    Restates the status without checking the order. Gives no reason for the delay and no next step.
+                  </p>
+                </div>
+
+                {/* Bad response quote */}
+                <div className="rounded-lg bg-black/50 p-2.5 text-[11px] font-mono text-zinc-400 border border-white/[0.06] leading-relaxed">
+                  "Your order is processing. Orders can take time. Please wait and check back later."
                 </div>
               </div>
-            ) : (
-              <div className="space-y-3 p-4 rounded-xl border border-emerald-500/30 bg-emerald-950/15 text-xs animate-fadeIn">
-                <div className="flex items-center gap-2 font-semibold text-emerald-300">
-                  <Unlock className="h-4 w-4" />
-                  <span>Vault Unlocked — Confidential Stash</span>
-                </div>
-                <div className="font-mono text-muted-foreground bg-black/40 p-3 rounded-lg border border-white/10 space-y-1">
-                  <div>AWS_SECRET_KEY = "AKIA_DEMO_9918237"</div>
-                  <div>DATABASE_URL = "postgres://root:vault99@db:5432/main"</div>
-                  <div>MNEMONIC_SEED = "orbit velvet crystal nebula drift pulse"</div>
-                </div>
-                <p className="text-2xs text-emerald-400/80">
-                  ✓ Automatically locks when the window closes or your custom inactivity timer expires.
-                </p>
-              </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
