@@ -189,3 +189,24 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.25);
 }
+
+/* ========================================================
+   HARDWARE-ACCELERATED MARQUEE LOOP
+   ======================================================== */
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee-scroll 32s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-hover-pause:hover .animate-marquee {
+  animation-play-state: paused;
+}
