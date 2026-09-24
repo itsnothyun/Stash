@@ -444,21 +444,22 @@ export const Hero: React.FC = () => {
               {/* View Container: Animate switch between Gallery & Table with Seamless Height Resizing */}
               <motion.div
                 layout
-                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                className="w-full overflow-hidden"
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                className="w-full overflow-hidden relative"
               >
-                <AnimatePresence mode="wait" initial={false}>
+                <AnimatePresence mode="popLayout" initial={false}>
                   {viewMode === "gallery" ? (
                   /* ========================================================
                      GALLERY MODE VIEW (Default: Authentic Stash Stickies & Widgets)
                      ======================================================== */
                   <motion.div
                     key="gallery"
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.98 }}
-                    transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                    className="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 bg-radial-pattern"
+                    layout
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                    className="w-full p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 bg-radial-pattern min-h-[440px]"
                   >
                     {/* GALLERY CARD 1: Currency Swap Widget */}
                     <motion.div
@@ -757,57 +758,58 @@ export const Hero: React.FC = () => {
                      ======================================================== */
                   <motion.div
                     key="table"
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.98 }}
-                    transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                    className="overflow-x-auto"
+                    layout
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                    className="w-full overflow-x-auto min-h-[440px] flex flex-col justify-between"
                   >
-                    <table className="w-full text-left text-xs">
+                    <table className="w-full text-left text-xs min-w-[620px]">
                       <thead>
-                        <tr className="border-b border-white/[0.06] text-[11px] font-medium text-zinc-500">
-                          <th className="py-2.5 px-4 font-normal">Stash & Attached Widget</th>
-                          <th className="py-2.5 px-3 font-normal text-right">Widgets</th>
-                          <th className="py-2.5 px-3 font-normal text-right">Memory</th>
-                          <th className="py-2.5 px-3 font-normal text-right">Latency</th>
-                          <th className="py-2.5 px-3 font-normal text-right">State</th>
-                          <th className="py-2.5 px-4 font-normal text-right">Updated</th>
+                        <tr className="border-b border-white/[0.06] text-[11px] font-medium text-zinc-500 bg-white/[0.01]">
+                          <th className="py-3 px-4 font-normal">Stash & Attached Widget</th>
+                          <th className="py-3 px-3 font-normal text-right">Widgets</th>
+                          <th className="py-3 px-3 font-normal text-right">Memory</th>
+                          <th className="py-3 px-3 font-normal text-right">Latency</th>
+                          <th className="py-3 px-3 font-normal text-right">State</th>
+                          <th className="py-3 px-4 font-normal text-right">Updated</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/[0.04]">
                         {filteredItems.map((item, idx) => (
                           <tr
                             key={idx}
-                            className="hover:bg-white/[0.02] transition-colors group cursor-pointer"
+                            className="hover:bg-white/[0.03] transition-colors group cursor-pointer"
                           >
-                            <td className="py-3 px-4">
-                              <div className="flex items-center gap-1.5 font-medium text-zinc-200 group-hover:text-white transition-colors truncate max-w-xs sm:max-w-md">
+                            <td className="py-3.5 px-4">
+                              <div className="flex items-center gap-1.5 font-medium text-zinc-200 group-hover:text-white transition-colors">
                                 {item.pinned && (
                                   <Pin className="h-3 w-3 text-amber-400 fill-amber-400/30 shrink-0" />
                                 )}
-                                <span className="truncate">{item.title}</span>
+                                <span className="truncate max-w-xs sm:max-w-md">{item.title}</span>
                               </div>
                               <div className="mt-1 text-[10px] text-zinc-500 truncate max-w-xs sm:max-w-md">
                                 {item.subtitle}
                               </div>
                             </td>
-                            <td className="py-3 px-3 text-right font-mono text-zinc-400">
+                            <td className="py-3.5 px-3 text-right font-mono text-zinc-400 whitespace-nowrap">
                               {item.widgets}
                             </td>
-                            <td className="py-3 px-3 text-right font-mono text-zinc-400">
+                            <td className="py-3.5 px-3 text-right font-mono text-zinc-400 whitespace-nowrap">
                               {item.memory}
                             </td>
-                            <td className={`py-3 px-3 text-right font-mono font-medium ${item.latencyColor}`}>
+                            <td className={`py-3.5 px-3 text-right font-mono font-medium whitespace-nowrap ${item.latencyColor}`}>
                               {item.latency}
                             </td>
-                            <td className="py-3 px-3 text-right">
+                            <td className="py-3.5 px-3 text-right whitespace-nowrap">
                               <span
                                 className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-mono font-medium ${item.stateColor}`}
                               >
                                 {item.state}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-right text-zinc-500 font-mono text-[11px]">
+                            <td className="py-3.5 px-4 text-right text-zinc-500 font-mono text-[11px] whitespace-nowrap">
                               {item.when}
                             </td>
                           </tr>
