@@ -168,7 +168,7 @@ export function BounceSidebar({
                 data-active={isActive}
                 onClick={(e) => {
                   if (href.startsWith("#")) {
-                    // Smooth local selection
+                    e.preventDefault();
                   }
                   select(index);
                 }}

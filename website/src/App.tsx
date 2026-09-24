@@ -16,13 +16,33 @@ import { TemplatesPage } from "./components/templates-page";
 import { ChangelogPage } from "./components/changelog-page";
 import { ShortcutsPage } from "./components/shortcuts-page";
 
+const DOCS_SECTION_IDS = [
+  "overview",
+  "installation",
+  "quickstart",
+  "window-shade",
+  "always-on-top",
+  "markdown-editor",
+  "currency-swap",
+  "countdown-timer",
+  "habit-tracker",
+  "sqlite-storage",
+  "pin-vault",
+  "zero-telemetry",
+  "shortcuts-ref",
+  "tauri-core",
+  "build-source",
+];
+
 export const App: React.FC = () => {
   const getInitialView = (): NavigationView => {
-    const hash = window.location.hash.toLowerCase();
-    if (hash.startsWith("#docs")) return "docs";
-    if (hash.startsWith("#templates")) return "templates";
-    if (hash.startsWith("#changelog")) return "changelog";
-    if (hash.startsWith("#shortcuts")) return "shortcuts";
+    const hash = window.location.hash.toLowerCase().replace("#", "");
+    if (hash.startsWith("docs") || DOCS_SECTION_IDS.some((id) => hash.startsWith(id))) {
+      return "docs";
+    }
+    if (hash.startsWith("templates")) return "templates";
+    if (hash.startsWith("changelog")) return "changelog";
+    if (hash.startsWith("shortcuts")) return "shortcuts";
     return "home";
   };
 
@@ -30,14 +50,14 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     const handleHashChange = () => {
-      const hash = window.location.hash.toLowerCase();
-      if (hash.startsWith("#docs")) {
+      const hash = window.location.hash.toLowerCase().replace("#", "");
+      if (hash.startsWith("docs") || DOCS_SECTION_IDS.some((id) => hash.startsWith(id))) {
         setCurrentView("docs");
-      } else if (hash.startsWith("#templates")) {
+      } else if (hash.startsWith("templates")) {
         setCurrentView("templates");
-      } else if (hash.startsWith("#changelog")) {
+      } else if (hash.startsWith("changelog")) {
         setCurrentView("changelog");
-      } else if (hash.startsWith("#shortcuts")) {
+      } else if (hash.startsWith("shortcuts")) {
         setCurrentView("shortcuts");
       } else {
         setCurrentView("home");

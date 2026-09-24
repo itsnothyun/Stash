@@ -577,43 +577,70 @@ export const DOCS_SECTIONS: {
 ];
 
 export const DocsPage: React.FC<DocsPageProps> = ({ onBackToHome }) => {
-  const [activeSectionId, setActiveSectionId] = useState<string>("overview");
+  // Helper to extract active section from window.location.hash
+  const getSectionIdFromHash = (): string => {
+    const raw = window.location.hash
+      .toLowerCase()
+      .replace("#docs/", "")
+      .replace("#docs", "")
+      .replace("#", "");
+    if (raw && DOCS_SECTIONS.some((s) => s.id === raw)) {
+      return raw;
+    }
+    return "overview";
+  };
+
+  const [activeSectionId, setActiveSectionId] = useState<string>(getSectionIdFromHash);
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedCode, setCopiedCode] = useState(false);
+
+  // Sync active section when hash changes (e.g. browser back/forward)
+  useEffect(() => {
+    const handleHashSync = () => {
+      const hash = window.location.hash.toLowerCase();
+      if (hash.startsWith("#docs") || DOCS_SECTIONS.some((s) => `#${s.id}` === hash)) {
+        setActiveSectionId(getSectionIdFromHash());
+      }
+    };
+
+    window.addEventListener("hashchange", handleHashSync);
+    return () => window.removeEventListener("hashchange", handleHashSync);
+  }, []);
 
   // Construct BounceSidebar items matching swamimalode07/rare-ui/bounce-sidebar spec
   const sidebarItems: BounceSidebarItem[] = [
     { label: "GETTING STARTED", heading: true },
-    { label: "Overview & Vision", href: "#overview" },
-    { label: "Installation & Setup", href: "#installation" },
-    { label: "Quickstart Guide", href: "#quickstart" },
+    { label: "Overview & Vision", href: "#docs/overview" },
+    { label: "Installation & Setup", href: "#docs/installation" },
+    { label: "Quickstart Guide", href: "#docs/quickstart" },
 
     { label: "CORE FEATURES", heading: true },
-    { label: "36px Window Shade", href: "#window-shade" },
-    { label: "Always-On-Top & Pinning", href: "#always-on-top" },
-    { label: "Markdown Scratchpad", href: "#markdown-editor" },
+    { label: "36px Window Shade", href: "#docs/window-shade" },
+    { label: "Always-On-Top & Pinning", href: "#docs/always-on-top" },
+    { label: "Markdown Scratchpad", href: "#docs/markdown-editor" },
 
     { label: "MODULAR WIDGETS", heading: true },
-    { label: "Currency & Crypto Swap", href: "#currency-swap" },
-    { label: "Countdown & Pomodoro", href: "#countdown-timer" },
-    { label: "Streak Habit Tracker", href: "#habit-tracker" },
+    { label: "Currency & Crypto Swap", href: "#docs/currency-swap" },
+    { label: "Countdown & Pomodoro", href: "#docs/countdown-timer" },
+    { label: "Streak Habit Tracker", href: "#docs/habit-tracker" },
 
     { label: "SECURITY & STORAGE", heading: true },
-    { label: "Local SQLite Database", href: "#sqlite-storage" },
-    { label: "4-Digit PIN Vault", href: "#pin-vault" },
-    { label: "Zero Telemetry Guarantee", href: "#zero-telemetry" },
+    { label: "Local SQLite Database", href: "#docs/sqlite-storage" },
+    { label: "4-Digit PIN Vault", href: "#docs/pin-vault" },
+    { label: "Zero Telemetry Guarantee", href: "#docs/zero-telemetry" },
 
     { label: "DEVELOPER REFERENCE", heading: true },
-    { label: "Global Hotkeys & Shortcuts", href: "#shortcuts-ref" },
-    { label: "Tauri 2.0 & Rust Core", href: "#tauri-core" },
-    { label: "Building from Source", href: "#build-source" },
+    { label: "Global Hotkeys & Shortcuts", href: "#docs/shortcuts-ref" },
+    { label: "Tauri 2.0 & Rust Core", href: "#docs/tauri-core" },
+    { label: "Building from Source", href: "#docs/build-source" },
   ];
 
   // Map section IDs to sidebar indices (skipping heading items)
   const nonHeadingMap: { id: string; index: number }[] = [];
   sidebarItems.forEach((item, index) => {
     if (typeof item !== "string" && !("heading" in item) && item.href) {
-      nonHeadingMap.push({ id: item.href.replace("#", ""), index });
+      const id = item.href.replace("#docs/", "").replace("#", "");
+      nonHeadingMap.push({ id, index });
     }
   });
 
