@@ -639,57 +639,37 @@ export const DocsPage: React.FC<DocsPageProps> = ({ onBackToHome }) => {
       : null;
 
   return (
-    <div className="min-h-screen bg-[#121215] text-white">
-      {/* Top Fixed Documentation Navigation Bar */}
-      <header className="sticky top-0 z-40 border-b border-white/[0.08] bg-[#121215]/90 backdrop-blur-xl px-4 sm:px-8 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <div className="min-h-screen bg-[#121215] text-white pt-24 pb-16">
+      {/* Sub-Header: Breadcrumb & Search */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-8 pb-6 mb-8 border-b border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={onBackToHome}
             className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-[#18181d] px-3 py-1.5 text-xs text-zinc-300 hover:text-white hover:bg-[#22222a] shadow-[0_2px_8px_rgba(0,0,0,0.5)] active:translate-y-0.5 transition-all cursor-pointer"
           >
             <ArrowLeft className="h-3.5 w-3.5 text-cyan-400" />
-            <span>Back to Home</span>
+            <span>Home</span>
           </button>
-
-          <div className="flex items-center gap-2 pl-2 border-l border-white/[0.08]">
-            <img
-              src={stashLogoSrc}
-              alt="Stash Logo"
-              className="h-6 w-6 object-contain"
-            />
-            <span className="font-semibold text-sm tracking-tight text-white">
-              Stash Docs
-            </span>
-            <span className="rounded bg-white/[0.06] border border-white/[0.08] px-2 py-0.5 text-[10px] font-mono text-zinc-400">
-              {LATEST_VERSION}
-            </span>
-          </div>
+          <span className="text-zinc-600">/</span>
+          <span className="text-sm font-semibold text-white">Documentation</span>
+          <span className="rounded bg-white/[0.06] border border-white/[0.08] px-2 py-0.5 text-[10px] font-mono text-cyan-300">
+            {LATEST_VERSION}
+          </span>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Quick Search */}
-          <div className="relative hidden sm:block">
-            <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-zinc-500" />
-            <input
-              type="text"
-              placeholder="Search documentation..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-8 w-56 rounded-full border border-white/[0.08] bg-[#161619] pl-8 pr-3 text-xs text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-cyan-500/50"
-            />
-          </div>
-
-          <a
-            href={GITHUB_REPO}
-            target="_blank"
-            rel="noreferrer"
-            className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors"
-          >
-            <Github className="h-4 w-4" />
-          </a>
+        {/* Quick Search */}
+        <div className="relative w-full sm:w-64">
+          <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-zinc-500" />
+          <input
+            type="text"
+            placeholder="Search documentation..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-8 w-full rounded-full border border-white/[0.08] bg-[#161619] pl-8 pr-3 text-xs text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-cyan-500/50"
+          />
         </div>
-      </header>
+      </div>
 
       {/* Main Documentation Grid */}
       <div className="mx-auto max-w-7xl px-4 sm:px-8 py-8">

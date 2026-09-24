@@ -24,7 +24,7 @@ export interface PlatformDownloadInfo {
   cliLabel: string;
 }
 
-export const GITHUB_REPO = "https://github.com/prexc/stash";
+export const GITHUB_REPO = "https://github.com/itsnothyun/Stash";
 export const LATEST_VERSION = "v0.1.0";
 
 export const DOWNLOAD_PACKAGES: Record<OperatingSystem, PlatformDownloadInfo> = {

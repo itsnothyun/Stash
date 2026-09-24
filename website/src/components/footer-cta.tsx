@@ -3,11 +3,14 @@ import { Download, Github, Monitor, Moon, Sun } from "lucide-react";
 import { detectUserOS, DOWNLOAD_PACKAGES, OperatingSystem, LATEST_VERSION, GITHUB_REPO } from "../lib/os-detect";
 import stashLogoSrc from "../assets/logo.png";
 
+import { NavigationView } from "./navbar";
+
 interface FooterCtaProps {
+  onNavigate?: (view: NavigationView) => void;
   onNavigateToDocs?: () => void;
 }
 
-export const FooterCta: React.FC<FooterCtaProps> = ({ onNavigateToDocs }) => {
+export const FooterCta: React.FC<FooterCtaProps> = ({ onNavigate, onNavigateToDocs }) => {
   const [os, setOs] = useState<OperatingSystem>("windows");
 
   useEffect(() => {
@@ -15,6 +18,17 @@ export const FooterCta: React.FC<FooterCtaProps> = ({ onNavigateToDocs }) => {
   }, []);
 
   const pkg = DOWNLOAD_PACKAGES[os] || DOWNLOAD_PACKAGES.windows;
+
+  const handleLink = (e: React.MouseEvent, view: NavigationView) => {
+    e.preventDefault();
+    if (onNavigate) {
+      onNavigate(view);
+    } else if (view === "docs" && onNavigateToDocs) {
+      onNavigateToDocs();
+    } else {
+      window.location.hash = `#${view}`;
+    }
+  };
 
   return (
     <footer className="relative overflow-hidden pt-28 pb-16">
@@ -96,11 +110,11 @@ export const FooterCta: React.FC<FooterCtaProps> = ({ onNavigateToDocs }) => {
           <div className="space-y-2.5">
             <h4 className="text-xs font-medium text-white">Resources</h4>
             <ul className="space-y-2 text-zinc-400 list-none p-0">
-              <li><a href="#docs" onClick={(e) => { e.preventDefault(); onNavigateToDocs?.(); }} className="hover:text-white transition-colors cursor-pointer">Docs</a></li>
-              <li><a href="#docs/quickstart" onClick={(e) => { e.preventDefault(); onNavigateToDocs?.(); }} className="hover:text-white transition-colors cursor-pointer">Quickstart</a></li>
-              <li><a href="#docs/sqlite-storage" onClick={(e) => { e.preventDefault(); onNavigateToDocs?.(); }} className="hover:text-white transition-colors cursor-pointer">Offline Architecture</a></li>
-              <li><a href="#shortcuts" className="hover:text-white transition-colors">Shortcuts</a></li>
-              <li><a href={`${GITHUB_REPO}/releases`} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Changelog</a></li>
+              <li><a href="#docs" onClick={(e) => handleLink(e, "docs")} className="hover:text-white transition-colors cursor-pointer">Docs & API</a></li>
+              <li><a href="#templates" onClick={(e) => handleLink(e, "templates")} className="hover:text-white transition-colors cursor-pointer">Note Templates</a></li>
+              <li><a href="#shortcuts" onClick={(e) => handleLink(e, "shortcuts")} className="hover:text-white transition-colors cursor-pointer">Keyboard Shortcuts</a></li>
+              <li><a href="#changelog" onClick={(e) => handleLink(e, "changelog")} className="hover:text-white transition-colors cursor-pointer">Changelog & Releases</a></li>
+              <li><a href={GITHUB_REPO} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">GitHub Repository</a></li>
             </ul>
           </div>
 
