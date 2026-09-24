@@ -113,8 +113,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { toast } from "@/components/ui/toast";
-import { SHORTCUTS, useShortcuts } from "@/lib/keyboard/shortcuts";
+import { formatShortcut, SHORTCUTS, useShortcuts } from "@/lib/keyboard/shortcuts";
 import {
   closeCurrentWindow,
   isTauri,
@@ -141,6 +147,29 @@ export const POPULAR_SWAP_PAIRS = [
 interface FloatingStashViewProps {
   noteId: string;
 }
+
+const HeaderTooltip: React.FC<{
+  label: React.ReactNode;
+  shortcut?: string;
+  side?: "bottom" | "top";
+  children: React.ReactNode;
+}> = ({ label, shortcut, side = "bottom", children }) => (
+  <Tooltip>
+    <TooltipTrigger asChild>{children}</TooltipTrigger>
+    <TooltipContent
+      side={side}
+      sideOffset={6}
+      className="flex items-center gap-1.5 py-1 px-2 text-[11px] font-medium shadow-xl select-none z-50 pointer-events-none"
+    >
+      <span>{label}</span>
+      {shortcut && (
+        <kbd className="rounded bg-white/20 dark:bg-white/15 px-1 py-0.2 text-[9px] font-mono tracking-tighter opacity-90">
+          {shortcut}
+        </kbd>
+      )}
+    </TooltipContent>
+  </Tooltip>
+);
 
 /**
  * A detached stash.
@@ -294,7 +323,10 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
             const curWidth = Math.round(outer.width / factor);
             if (next) {
               preShadeHeightRef.current = Math.max(Math.round(outer.height / factor), 220);
-              await win.setSize(new LogicalSize(curWidth, 38));
+              // Wait 130ms so the aesthetic blur and roll-up transition begins smoothly
+              setTimeout(async () => {
+                await win.setSize(new LogicalSize(curWidth, 38));
+              }, 130);
             } else {
               const targetH = Math.max(preShadeHeightRef.current || 360, 220);
               await win.setSize(new LogicalSize(curWidth, targetH));
@@ -709,140 +741,173 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
   const currentFontPersona = FONT_PERSONAS.find((f) => f.id === noteFont);
 
   return (
-    <div
-      onMouseEnter={() => setChromeVisible(true)}
-      onMouseLeave={() => setChromeVisible(false)}
-      onFocus={() => setChromeVisible(true)}
-      className={cn(
-        "relative flex select-none flex-col overflow-hidden border",
-        isShaded ? "h-9 min-h-[36px] max-h-[36px]" : "h-screen w-screen",
-        getColorClass(note.color),
-        getFrameStyleClass(noteFrame)
-      )}
-    >
-      {/* Compact titlebar (36px) with custom right-click card */}
-      <ContextMenu>
-        <ContextMenuTrigger asChild>
-          <div
-            data-tauri-drag-region
-        onDoubleClick={(e) => {
-          if (
-            (e.target as HTMLElement).closest(
-              "button, input, textarea, select, [data-no-drag], .no-drag-region"
-            )
-          ) {
-            return;
-          }
-          void handleToggleShade();
-        }}
-        onMouseDown={(e) => {
-          if (
-            (e.target as HTMLElement).closest(
-              "button, input, textarea, select, [data-no-drag], .no-drag-region"
-            )
-          ) {
-            return;
-          }
-          if (e.button === 0 && isTauri()) {
-            getCurrentWebviewWindow().startDragging().catch(() => {});
-          }
-        }}
-        className="drag-region flex h-9 shrink-0 cursor-grab items-center justify-between border-b border-current/10 pl-2.5 pr-1 active:cursor-grabbing select-none"
+    <TooltipProvider delayDuration={120} skipDelayDuration={100}>
+      <div
+        onMouseEnter={() => setChromeVisible(true)}
+        onMouseLeave={() => setChromeVisible(false)}
+        onFocus={() => setChromeVisible(true)}
+        className={cn(
+          "relative flex select-none flex-col overflow-hidden border transition-all duration-300 ease-out",
+          isShaded
+            ? "h-9 min-h-[36px] max-h-[36px] shadow-2xl backdrop-blur-2xl ring-1 ring-current/15"
+            : "h-screen w-screen",
+          getColorClass(note.color),
+          getFrameStyleClass(noteFrame)
+        )}
       >
-        {/* Left: Color Picker + Title Input + Save indicator + Drag spacer */}
-        <div
-          data-tauri-drag-region
-          className="drag-region flex items-center gap-1.5 flex-1 min-w-0 mr-2 cursor-grab active:cursor-grabbing"
-        >
-          <div className="no-drag-region shrink-0">
-            <ColorPicker
-              currentColor={note.color}
-              onSelectColor={handleColorChange}
-            />
-          </div>
-          {/* Note Emoji Persona button / trigger */}
-          <button
-            type="button"
-            onClick={() => setPersonaModalOpen(true)}
-            title={
-              noteEmoji
-                ? `Note icon: ${noteEmoji} (Click to customize persona)`
-                : "Personalize note icon & style"
-            }
-            aria-label="Customize note persona"
-            className={cn(
-              "no-drag-region shrink-0 flex items-center justify-center h-6 w-6 rounded-md hover:bg-current/10 transition-transform active:scale-95 text-xs cursor-pointer",
-              noteEmoji
-                ? "text-base leading-none"
-                : "text-current/45 hover:text-current"
-            )}
-          >
-            {noteEmoji ? (
-              <span>{noteEmoji}</span>
-            ) : (
-              <Smile className="h-3.5 w-3.5" />
-            )}
-          </button>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => handleTitleChange(e.target.value)}
-            placeholder="Untitled note"
-            aria-label="Note title"
-            className="no-drag-region bg-transparent font-semibold text-xs tracking-tight text-foreground placeholder:text-current/30 focus:outline-none focus:ring-1 focus:ring-primary/40 rounded px-1.5 py-0.5 min-w-[70px] max-w-[200px] truncate select-text transition-all cursor-text"
-            title="Click to rename note"
-          />
-          <span
-            data-tauri-drag-region
-            aria-live="polite"
-            className={cn(
-              "drag-region text-[10px] font-medium transition-opacity duration-200 shrink-0 pointer-events-none",
-              saveStatus === "idle" ? "opacity-0" : "opacity-50"
-            )}
-          >
-            {saveStatus === "saving" ? "Saving…" : "Saved"}
-          </span>
-
-          {/* Due Date Indicator Badge */}
-          {dueDateStatus && (
-            <button
-              type="button"
-              onClick={() => setDueDateDialogOpen(true)}
-              title={`Due date: ${dueDateStatus.label}. Click to manage.`}
+        {/* Compact titlebar (36px) with custom right-click card */}
+        <ContextMenu>
+          <ContextMenuTrigger asChild>
+            <div
+              data-tauri-drag-region
+              onDoubleClick={(e) => {
+                if (
+                  (e.target as HTMLElement).closest(
+                    "button, input, textarea, select, [data-no-drag], .no-drag-region"
+                  )
+                ) {
+                  return;
+                }
+                void handleToggleShade();
+              }}
+              onMouseDown={(e) => {
+                if (
+                  (e.target as HTMLElement).closest(
+                    "button, input, textarea, select, [data-no-drag], .no-drag-region"
+                  )
+                ) {
+                  return;
+                }
+                if (e.button === 0 && isTauri()) {
+                  getCurrentWebviewWindow().startDragging().catch(() => {});
+                }
+              }}
               className={cn(
-                "no-drag-region flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium transition-colors shrink-0",
-                dueDateStatus.isOverdue
-                  ? "bg-destructive/15 text-destructive border border-destructive/30"
-                  : dueDateStatus.isToday
-                  ? "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
-                  : "bg-primary/10 text-primary border border-primary/20"
+                "drag-region flex h-9 shrink-0 cursor-grab items-center justify-between border-b border-current/10 pl-2.5 pr-1 active:cursor-grabbing select-none transition-colors duration-200",
+                isShaded && "border-b-0 backdrop-blur-xl bg-background/60 shadow-xs"
               )}
             >
-              <CalendarClock className="h-3 w-3" />
-              <span>{dueDateStatus.label}</span>
-            </button>
-          )}
+              {/* Left: Color Picker + Title Input + Save indicator + Drag spacer */}
+              <div
+                data-tauri-drag-region
+                className="drag-region flex items-center gap-1.5 flex-1 min-w-0 mr-2 cursor-grab active:cursor-grabbing"
+              >
+                <div className="no-drag-region shrink-0">
+                  <HeaderTooltip label="Note Color">
+                    <div>
+                      <ColorPicker
+                        currentColor={note.color}
+                        onSelectColor={handleColorChange}
+                      />
+                    </div>
+                  </HeaderTooltip>
+                </div>
 
-          {/* PIN Lock indicator */}
-          {hasPin && (
-            <span
-              title={
-                isSessionUnlocked
-                  ? "PIN protection active (unlocked in this session)"
-                  : "PIN protected"
-              }
-              className="no-drag-region p-0.5 text-current/70"
-            >
-              <Lock className="h-3 w-3" />
-            </span>
-          )}
+                {/* Note Emoji Persona button / trigger */}
+                <HeaderTooltip
+                  label={
+                    noteEmoji
+                      ? `Icon: ${noteEmoji} (Click to customize)`
+                      : "Customize Note Persona & Icon"
+                  }
+                >
+                  <button
+                    type="button"
+                    onClick={() => setPersonaModalOpen(true)}
+                    aria-label="Customize note persona"
+                    className={cn(
+                      "no-drag-region shrink-0 flex items-center justify-center h-6 w-6 rounded-md hover:bg-current/10 transition-transform active:scale-95 text-xs cursor-pointer",
+                      noteEmoji
+                        ? "text-base leading-none"
+                        : "text-current/45 hover:text-current"
+                    )}
+                  >
+                    {noteEmoji ? (
+                      <span>{noteEmoji}</span>
+                    ) : (
+                      <Smile className="h-3.5 w-3.5" />
+                    )}
+                  </button>
+                </HeaderTooltip>
 
-          {/* Draggable stretch area between title and action buttons */}
-          <div
-            data-tauri-drag-region
-            className="drag-region flex-1 h-full min-w-[20px] cursor-grab active:cursor-grabbing"
-          />
-        </div>
+                <HeaderTooltip label="Rename Note">
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => handleTitleChange(e.target.value)}
+                    placeholder="Untitled note"
+                    aria-label="Note title"
+                    className="no-drag-region bg-transparent font-semibold text-xs tracking-tight text-foreground placeholder:text-current/30 focus:outline-none focus:ring-1 focus:ring-primary/40 rounded px-1.5 py-0.5 min-w-[70px] max-w-[200px] truncate select-text transition-all cursor-text"
+                  />
+                </HeaderTooltip>
+
+                <span
+                  data-tauri-drag-region
+                  aria-live="polite"
+                  className={cn(
+                    "drag-region text-[10px] font-medium transition-opacity duration-200 shrink-0 pointer-events-none",
+                    saveStatus === "idle" ? "opacity-0" : "opacity-50"
+                  )}
+                >
+                  {saveStatus === "saving" ? "Saving…" : "Saved"}
+                </span>
+
+                {/* Due Date Indicator Badge */}
+                {dueDateStatus && (
+                  <HeaderTooltip label={`Due: ${dueDateStatus.label} (Click to manage)`}>
+                    <button
+                      type="button"
+                      onClick={() => setDueDateDialogOpen(true)}
+                      className={cn(
+                        "no-drag-region flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium transition-colors shrink-0",
+                        dueDateStatus.isOverdue
+                          ? "bg-destructive/15 text-destructive border border-destructive/30"
+                          : dueDateStatus.isToday
+                          ? "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
+                          : "bg-primary/10 text-primary border border-primary/20"
+                      )}
+                    >
+                      <CalendarClock className="h-3 w-3" />
+                      <span>{dueDateStatus.label}</span>
+                    </button>
+                  </HeaderTooltip>
+                )}
+
+                {/* PIN Lock indicator */}
+                {hasPin && (
+                  <HeaderTooltip
+                    label={
+                      isSessionUnlocked
+                        ? "PIN Protected (Unlocked)"
+                        : "PIN Protected (Locked)"
+                    }
+                  >
+                    <span className="no-drag-region p-0.5 text-current/70">
+                      <Lock className="h-3 w-3" />
+                    </span>
+                  </HeaderTooltip>
+                )}
+
+                {/* Draggable stretch area between title and action buttons */}
+                <div
+                  data-tauri-drag-region
+                  className="drag-region flex-1 h-full min-w-[20px] cursor-grab active:cursor-grabbing flex items-center justify-center px-1"
+                >
+                  {isShaded && (
+                    <HeaderTooltip label="Double-click header or click to unshade note">
+                      <button
+                        type="button"
+                        onClick={() => void handleToggleShade()}
+                        className="no-drag-region flex items-center gap-1 px-2 py-0.5 rounded-full bg-current/10 hover:bg-current/15 text-current text-[10px] font-medium border border-current/20 shadow-2xs backdrop-blur-md animate-in fade-in zoom-in-95 duration-200 cursor-pointer"
+                      >
+                        <ChevronDown className="h-3 w-3 animate-pulse text-primary" />
+                        <span className="font-semibold text-primary">Shaded</span>
+                        <span className="opacity-60 hidden sm:inline">— click to expand</span>
+                      </button>
+                    </HeaderTooltip>
+                  )}
+                </div>
+              </div>
 
         <div
           className={cn(
@@ -852,18 +917,20 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
         >
           {/* Add Widget Dropdown */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className={cn(
-                  iconButton,
-                  "w-auto px-1.5 gap-1 text-[11px] font-medium text-current/80 hover:text-current hover:bg-current/10"
-                )}
-                title="Add interactive widget to this note"
-              >
-                <Plus className="h-3 w-3" />
-                <span>Widget</span>
-              </button>
-            </DropdownMenuTrigger>
+            <HeaderTooltip label="Attach Interactive Widget">
+              <DropdownMenuTrigger asChild>
+                <button
+                  className={cn(
+                    iconButton,
+                    "w-auto px-1.5 gap-1 text-[11px] font-medium text-current/80 hover:text-current hover:bg-current/10"
+                  )}
+                  aria-label="Add interactive widget"
+                >
+                  <Plus className="h-3 w-3" />
+                  <span>Widget</span>
+                </button>
+              </DropdownMenuTrigger>
+            </HeaderTooltip>
             <DropdownMenuContent align="end" className="w-56 text-xs">
               <DropdownMenuItem onClick={() => handleAddWidget("swap")}>
                 <ArrowUpDown className="mr-2 h-3.5 w-3.5 text-emerald-500" />
@@ -953,62 +1020,83 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
           </DropdownMenu>
 
           {/* Formatting dock toggle: minimize or maximize the dock */}
-          <button
-            onClick={() => handleToggleDock()}
-            aria-pressed={!isDockMinimized}
-            title={
+          <HeaderTooltip
+            label={
               isDockMinimized
-                ? "Maximize formatting dock"
-                : "Minimize formatting dock"
+                ? "Maximize Formatting Dock"
+                : "Minimize Formatting Dock"
             }
-            className={cn(
-              iconButton,
-              !isDockMinimized &&
-                "bg-current/15 text-current opacity-100 hover:bg-current/20"
-            )}
           >
-            <Type className="h-3.5 w-3.5" />
-          </button>
+            <button
+              onClick={() => handleToggleDock()}
+              aria-pressed={!isDockMinimized}
+              aria-label={
+                isDockMinimized
+                  ? "Maximize formatting dock"
+                  : "Minimize formatting dock"
+              }
+              className={cn(
+                iconButton,
+                !isDockMinimized &&
+                  "bg-current/15 text-current opacity-100 hover:bg-current/20"
+              )}
+            >
+              <Type className="h-3.5 w-3.5" />
+            </button>
+          </HeaderTooltip>
 
-          <button
-            onClick={handleTogglePin}
-            aria-pressed={alwaysOnTopState}
-            title={alwaysOnTopState ? "Stop keeping on top" : "Keep on top"}
-            className={cn(
-              iconButton,
-              alwaysOnTopState &&
-                "bg-current/15 text-current opacity-100 hover:bg-current/20"
-            )}
+          {/* Always-on-top toggle */}
+          <HeaderTooltip
+            label={alwaysOnTopState ? "Stop Keeping on Top" : "Keep on Top"}
+            shortcut={formatShortcut(SHORTCUTS.alwaysOnTop)}
           >
-            {alwaysOnTopState ? (
-              <Pin className="h-3.5 w-3.5 fill-current" />
-            ) : (
-              <PinOff className="h-3.5 w-3.5" />
-            )}
-          </button>
+            <button
+              onClick={handleTogglePin}
+              aria-pressed={alwaysOnTopState}
+              aria-label={alwaysOnTopState ? "Stop keeping on top" : "Keep on top"}
+              className={cn(
+                iconButton,
+                alwaysOnTopState &&
+                  "bg-current/15 text-current opacity-100 hover:bg-current/20"
+              )}
+            >
+              {alwaysOnTopState ? (
+                <Pin className="h-3.5 w-3.5 fill-current" />
+              ) : (
+                <PinOff className="h-3.5 w-3.5" />
+              )}
+            </button>
+          </HeaderTooltip>
 
           {/* Share as Image Button */}
-          <button
-            onClick={() => setExportImageOpen(true)}
-            title="Share note as beautiful image / PNG"
-            aria-label="Share as Image"
-            className={iconButton}
-          >
-            <Camera className="h-3.5 w-3.5" />
-          </button>
+          <HeaderTooltip label="Share as Beautiful Image">
+            <button
+              onClick={() => setExportImageOpen(true)}
+              aria-label="Share as Image"
+              className={iconButton}
+            >
+              <Camera className="h-3.5 w-3.5" />
+            </button>
+          </HeaderTooltip>
 
           {/* Voice to Stash Dictation */}
-          <VoiceDictationButton
-            onInsertText={handleInsertTextToNote}
-            iconButtonClass={iconButton}
-          />
+          <HeaderTooltip label="Voice Dictation (Speech-to-Text)">
+            <div className="no-drag-region">
+              <VoiceDictationButton
+                onInsertText={handleInsertTextToNote}
+                iconButtonClass={iconButton}
+              />
+            </div>
+          </HeaderTooltip>
 
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className={iconButton} aria-label="More actions">
-                <MoreHorizontal className="h-3.5 w-3.5" />
-              </button>
-            </DropdownMenuTrigger>
+            <HeaderTooltip label="More Actions & Options">
+              <DropdownMenuTrigger asChild>
+                <button className={iconButton} aria-label="More actions">
+                  <MoreHorizontal className="h-3.5 w-3.5" />
+                </button>
+              </DropdownMenuTrigger>
+            </HeaderTooltip>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuItem onClick={() => setExportImageOpen(true)}>
                 <Camera className="mr-2 h-3.5 w-3.5 text-primary" />
@@ -1164,45 +1252,54 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
           </DropdownMenu>
 
           {/* Window Shade / Roll-Up Button */}
-          <button
-            type="button"
-            onClick={handleToggleShade}
-            aria-label={isShaded ? "Unshade note" : "Roll up note to titlebar"}
-            title={
+          <HeaderTooltip
+            label={
               isShaded
-                ? "Expand note (Unshade)"
-                : "Roll up note to titlebar (Shade mode)"
+                ? "Unshade Note (Expand)"
+                : "Roll Up to Titlebar (Shade Mode)"
             }
-            className={cn(
-              iconButton,
-              isShaded && "bg-current/15 text-current opacity-100"
-            )}
           >
-            {isShaded ? (
-              <ChevronDown className="h-3.5 w-3.5" />
-            ) : (
-              <ChevronUp className="h-3.5 w-3.5" />
-            )}
-          </button>
+            <button
+              type="button"
+              onClick={handleToggleShade}
+              aria-label={isShaded ? "Unshade note" : "Roll up note to titlebar"}
+              className={cn(
+                iconButton,
+                isShaded && "bg-current/15 text-current opacity-100 ring-1 ring-current/20"
+              )}
+            >
+              {isShaded ? (
+                <ChevronDown className="h-3.5 w-3.5" />
+              ) : (
+                <ChevronUp className="h-3.5 w-3.5" />
+              )}
+            </button>
+          </HeaderTooltip>
 
-          <button
-            onClick={() => minimizeCurrentWindow()}
-            aria-label="Minimize"
-            className={iconButton}
-          >
-            <Minus className="h-3.5 w-3.5" />
-          </button>
+          {/* Minimize Button */}
+          <HeaderTooltip label="Minimize Window">
+            <button
+              onClick={() => minimizeCurrentWindow()}
+              aria-label="Minimize"
+              className={iconButton}
+            >
+              <Minus className="h-3.5 w-3.5" />
+            </button>
+          </HeaderTooltip>
 
-          <button
-            onClick={handleClose}
-            aria-label="Close"
-            className={cn(
-              iconButton,
-              "hover:bg-destructive hover:text-destructive-foreground"
-            )}
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
+          {/* Close Button */}
+          <HeaderTooltip label="Close Stash" shortcut="Esc">
+            <button
+              onClick={handleClose}
+              aria-label="Close"
+              className={cn(
+                iconButton,
+                "hover:bg-destructive hover:text-destructive-foreground"
+              )}
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </HeaderTooltip>
         </div>
       </div>
     </ContextMenuTrigger>
@@ -1418,129 +1515,145 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
     </ContextMenuContent>
   </ContextMenu>
 
-      {/* Surface (only rendered if not shaded) */}
-      {!isShaded && (
-        <>
-          {/* Task Carryover Banner for Today's Note */}
-          {carryoverTasks.length > 0 && (!hasPin || isSessionUnlocked) && (
-            <div className="relative z-20 flex items-center justify-between gap-2 border-b border-border/40 bg-primary/10 px-3 py-1.5 text-xs text-foreground backdrop-blur-xs select-none shrink-0">
-              <div className="flex items-center gap-2 min-w-0">
-                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
-                  <ListTodo className="h-3 w-3" />
-                </div>
-                <span className="truncate text-[11px] font-medium">
-                  <strong>{carryoverTasks.length}</strong> unfinished task{carryoverTasks.length > 1 ? "s" : ""} from last daily note
-                </span>
+      {/* Surface with premium aesthetic blur & roll-up transition */}
+      <div
+        className={cn(
+          "relative flex flex-1 flex-col overflow-hidden transition-all duration-300 ease-out",
+          isShaded
+            ? "opacity-0 blur-xl scale-[0.98] -translate-y-4 pointer-events-none invisible max-h-0"
+            : "opacity-100 blur-0 scale-100 translate-y-0 visible max-h-full"
+        )}
+      >
+        {/* Task Carryover Banner for Today's Note */}
+        {carryoverTasks.length > 0 && (!hasPin || isSessionUnlocked) && (
+          <div className="relative z-20 flex items-center justify-between gap-2 border-b border-border/40 bg-primary/10 px-3 py-1.5 text-xs text-foreground backdrop-blur-xs select-none shrink-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
+                <ListTodo className="h-3 w-3" />
               </div>
-              <div className="flex items-center gap-1.5 shrink-0">
-                <button
-                  type="button"
-                  onClick={handleAcceptCarryover}
-                  className="flex items-center gap-1 rounded bg-primary px-2 py-0.5 text-[10px] font-medium text-primary-foreground shadow-2xs hover:bg-primary/90 transition-colors"
-                >
-                  <span>Carry Over</span>
-                  <ArrowRight className="h-2.5 w-2.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={handleDismissCarryover}
-                  aria-label="Dismiss task carryover"
-                  className="flex h-5 w-5 items-center justify-center rounded text-muted-foreground hover:bg-current/10 hover:text-foreground transition-colors"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </div>
+              <span className="truncate text-[11px] font-medium">
+                <strong>{carryoverTasks.length}</strong> unfinished task{carryoverTasks.length > 1 ? "s" : ""} from last daily note
+              </span>
             </div>
-          )}
-
-          {hasPin && !isSessionUnlocked ? (
-            <div className="flex flex-1 flex-col items-center justify-center p-6 text-center select-none">
-              <div className="p-3 bg-primary/10 text-primary rounded-full mb-3 shadow-inner">
-                <Lock className="h-6 w-6 stroke-[2.2]" />
-              </div>
-              <h3 className="text-sm font-semibold mb-1">Protected Stash</h3>
-              <p className="text-xs text-muted-foreground mb-4 max-w-[220px]">
-                This note is PIN locked. Enter your PIN to view and edit.
-              </p>
-              <form
-                onSubmit={handleUnlockSubmit}
-                className="flex flex-col items-center gap-2 w-full max-w-[220px]"
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                onClick={handleAcceptCarryover}
+                className="flex items-center gap-1 rounded bg-primary px-2 py-0.5 text-[10px] font-medium text-primary-foreground shadow-2xs hover:bg-primary/90 transition-colors"
               >
-                <input
-                  type="password"
-                  value={enteredPin}
-                  onChange={(e) => {
-                    setEnteredPin(e.target.value);
-                    setPinError(false);
-                  }}
-                  placeholder="Enter PIN"
-                  autoFocus
-                  maxLength={16}
-                  className={cn(
-                    "w-full px-3 py-1.5 text-center text-sm rounded-md border bg-background/80 focus:outline-none focus:ring-2 focus:ring-primary shadow-xs tracking-widest",
-                    pinError
-                      ? "border-destructive ring-1 ring-destructive"
-                      : "border-border"
-                  )}
-                />
-                {pinError && (
-                  <span className="text-[11px] text-destructive font-medium">
-                    Incorrect PIN
-                  </span>
+                <span>Carry Over</span>
+                <ArrowRight className="h-2.5 w-2.5" />
+              </button>
+              <button
+                type="button"
+                onClick={handleDismissCarryover}
+                aria-label="Dismiss task carryover"
+                className="flex h-5 w-5 items-center justify-center rounded text-muted-foreground hover:bg-current/10 hover:text-foreground transition-colors"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {hasPin && !isSessionUnlocked ? (
+          <div className="flex flex-1 flex-col items-center justify-center p-6 text-center select-none">
+            <div className="p-3 bg-primary/10 text-primary rounded-full mb-3 shadow-inner">
+              <Lock className="h-6 w-6 stroke-[2.2]" />
+            </div>
+            <h3 className="text-sm font-semibold mb-1">Protected Stash</h3>
+            <p className="text-xs text-muted-foreground mb-4 max-w-[220px]">
+              This note is PIN locked. Enter your PIN to view and edit.
+            </p>
+            <form
+              onSubmit={handleUnlockSubmit}
+              className="flex flex-col items-center gap-2 w-full max-w-[220px]"
+            >
+              <input
+                type="password"
+                value={enteredPin}
+                onChange={(e) => {
+                  setEnteredPin(e.target.value);
+                  setPinError(false);
+                }}
+                placeholder="Enter PIN"
+                autoFocus
+                maxLength={16}
+                className={cn(
+                  "w-full px-3 py-1.5 text-center text-sm rounded-md border bg-background/80 focus:outline-none focus:ring-2 focus:ring-primary shadow-xs tracking-widest",
+                  pinError
+                    ? "border-destructive ring-1 ring-destructive"
+                    : "border-border"
                 )}
-                <button
-                  type="submit"
-                  className="w-full mt-1 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors shadow-xs"
-                >
-                  Unlock Stash
-                </button>
-              </form>
-            </div>
-          ) : (
-            <div className="relative flex flex-1 cursor-text flex-col overflow-y-auto px-4 pb-20 pt-3">
-              {/* Tactile Paper Pattern Texture Backdrop */}
-              {notePaper !== "plain" && (
-                <div
-                  className="pointer-events-none absolute inset-0 select-none text-foreground z-0"
-                  style={getPaperPatternStyle(notePaper)}
-                  aria-hidden="true"
-                />
+              />
+              {pinError && (
+                <span className="text-[11px] text-destructive font-medium">
+                  Incorrect PIN
+                </span>
               )}
+              <button
+                type="submit"
+                className="w-full mt-1 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors shadow-xs"
+              >
+                Unlock Stash
+              </button>
+            </form>
+          </div>
+        ) : (
+          <div className="relative flex flex-1 cursor-text flex-col overflow-y-auto px-4 pb-20 pt-3">
+            {/* Tactile Paper Pattern Texture Backdrop */}
+            {notePaper !== "plain" && (
+              <div
+                className="pointer-events-none absolute inset-0 select-none text-foreground z-0"
+                style={getPaperPatternStyle(notePaper)}
+                aria-hidden="true"
+              />
+            )}
 
-              {/* Draggable Note Widgets Canvas */}
-              {widgets.length > 0 && (
-                <div className="relative z-10">
-                  <NoteWidgetsCanvas
-                    widgets={widgets}
-                    noteId={noteId}
-                    onUpdateWidgets={handleUpdateWidgets}
-                    onInsertToNote={handleInsertTextToNote}
-                  />
-                </div>
-              )}
-
-              <div className={cn("relative z-10 flex-1 select-text", currentFontPersona?.fontClass)}>
-                <TiptapEditor
-                  key={`${note.id}-${contentToken}`}
-                  initialContent={note.contentJson}
-                  initialPlainText={note.plainText}
-                  autoFocus={widgets.length === 0}
-                  onUpdate={handleContentUpdate}
-                  flushRef={flushRef}
-                  isDockMinimized={isDockMinimized}
-                  onToggleDock={handleToggleDock}
-                  className={currentFontPersona?.fontClass}
+            {/* Draggable Note Widgets Canvas */}
+            {widgets.length > 0 && (
+              <div className="relative z-10">
+                <NoteWidgetsCanvas
+                  widgets={widgets}
+                  noteId={noteId}
+                  onUpdateWidgets={handleUpdateWidgets}
+                  onInsertToNote={handleInsertTextToNote}
                 />
               </div>
+            )}
 
-              {/* Interactive Note Statistics HUD */}
-              <div className="fixed bottom-2.5 right-3 z-30 pointer-events-auto">
-                <NoteStatsHud plainText={note.plainText || ""} />
-              </div>
+            <div className={cn("relative z-10 flex-1 select-text", currentFontPersona?.fontClass)}>
+              <TiptapEditor
+                key={`${note.id}-${contentToken}`}
+                initialContent={note.contentJson}
+                initialPlainText={note.plainText}
+                autoFocus={widgets.length === 0}
+                onUpdate={handleContentUpdate}
+                flushRef={flushRef}
+                isDockMinimized={isDockMinimized}
+                onToggleDock={handleToggleDock}
+                className={currentFontPersona?.fontClass}
+              />
             </div>
-          )}
-        </>
-      )}
+
+            {/* Interactive Note Statistics HUD */}
+            <div className="fixed bottom-2.5 right-3 z-30 pointer-events-auto">
+              <NoteStatsHud plainText={note.plainText || ""} />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Aesthetic frosted blur transition layer during shade mode */}
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-x-0 bottom-0 top-9 z-40 transition-all duration-300 ease-out",
+          isShaded
+            ? "opacity-100 backdrop-blur-2xl bg-background/40"
+            : "opacity-0 backdrop-blur-none bg-transparent pointer-events-none"
+        )}
+        aria-hidden="true"
+      />
 
       {/* Revision history */}
       <Dialog open={revisionsOpen} onOpenChange={setRevisionsOpen}>
@@ -1787,5 +1900,6 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
         noteFrame={noteFrame}
       />
     </div>
-  );
+  </TooltipProvider>
+);
 };

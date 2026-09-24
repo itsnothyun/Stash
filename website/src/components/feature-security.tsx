@@ -1,166 +1,209 @@
-import React from "react";
-import { AlertTriangle, CheckCircle2, Heart } from "lucide-react";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Lock,
+  Unlock,
+  KeyRound,
+  ShieldCheck,
+  Database,
+  ArrowRight,
+  Check,
+  AlertTriangle,
+  RotateCcw,
+} from "lucide-react";
 
 export const FeatureSecurity: React.FC = () => {
+  const [pin, setPin] = useState("");
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [error, setError] = useState(false);
+
+  const CORRECT_PIN = "1234";
+
+  const handleDigit = (digit: string) => {
+    if (pin.length < 4) {
+      const next = pin + digit;
+      setPin(next);
+      if (next.length === 4) {
+        if (next === CORRECT_PIN) {
+          setIsUnlocked(true);
+          setError(false);
+        } else {
+          setError(true);
+          setTimeout(() => {
+            setPin("");
+            setError(false);
+          }, 700);
+        }
+      }
+    }
+  };
+
+  const handleLockAgain = () => {
+    setIsUnlocked(false);
+    setPin("");
+  };
+
   return (
-    <section id="security" className="py-20 sm:py-28 border-t border-white/[0.06]">
+    <section id="security" className="py-20 sm:py-28 border-t border-white/[0.06] relative">
       <div className="mx-auto max-w-5xl px-6 sm:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
-          {/* Left Column: Category Pills, Title, Description, Dark Pill Button */}
+          {/* Left Column */}
           <div className="text-left">
-            {/* Squircle Badges */}
             <div className="mb-5 flex flex-wrap items-center gap-2">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] px-2.5 py-1 text-xs text-zinc-300">
-                <div className="flex h-3.5 w-3.5 items-center justify-center rounded-[4px] bg-pink-500/20 text-pink-400 text-[10px]">
-                  ♥
+                <div className="flex h-3.5 w-3.5 items-center justify-center rounded-[4px] bg-emerald-500/20 text-emerald-400 text-[10px]">
+                  ●
                 </div>
-                <span>Evals</span>
+                <span>Local SQLite</span>
               </div>
 
               <div className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] px-2.5 py-1 text-xs text-zinc-300">
-                <div className="flex h-3.5 w-3.5 items-center justify-center rounded-[4px] bg-yellow-500/20 text-yellow-400 text-[10px]">
+                <div className="flex h-3.5 w-3.5 items-center justify-center rounded-[4px] bg-rose-500/20 text-rose-400 text-[10px]">
                   ▲
                 </div>
-                <span>Alerts</span>
+                <span>4-Digit PIN Vault</span>
+              </div>
+
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] px-2.5 py-1 text-xs text-zinc-300">
+                <div className="flex h-3.5 w-3.5 items-center justify-center rounded-[4px] bg-purple-500/20 text-purple-400 text-[10px]">
+                  ■
+                </div>
+                <span>Zero Telemetry</span>
               </div>
             </div>
 
-            {/* Headline */}
             <h2 className="font-display text-3xl sm:text-4xl font-[450] tracking-tight text-white leading-tight">
-              Catch bad answers
+              Your thoughts stay on your machine. Period.
             </h2>
 
-            {/* Subtitle */}
             <p className="mt-3 text-sm text-zinc-400 leading-relaxed font-normal max-w-sm">
-              Check your agents' responses and get alerted when quality drops.
+              No accounts, no cloud sync, no tracking. Every note, token, and widget state is stored in an encrypted local SQLite database directly on your hard drive. Protect confidential notes with a per-note 4-digit PIN.
             </p>
 
-            {/* Dark Pill Button */}
-            <div className="mt-6">
+            <div className="mt-6 flex items-center gap-3">
               <a
-                href="#download"
-                className="inline-flex items-center rounded-full border border-white/10 bg-zinc-900/80 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-zinc-800"
+                href="#downloads"
+                className="inline-flex items-center rounded-full border border-white/10 bg-zinc-900/80 px-4 py-2 text-xs font-medium text-white transition-all hover:bg-zinc-800 hover:border-white/20 active:scale-95 shadow-xs"
               >
-                Explore evals
+                Get Stash Free
               </a>
             </div>
           </div>
 
-          {/* Right Column: Scatter Plot Chart + Overlaid Judge Fail Card */}
-          <div className="relative">
-            {/* Background Scatter Plot Card */}
-            <div className="rounded-2xl border border-white/[0.08] bg-[#0c0c0e] p-6 shadow-2xl">
-              {/* Header */}
-              <div className="flex items-center justify-between text-xs mb-6">
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-pink-400" />
-                  <span className="font-medium text-zinc-200">Helpfulness</span>
-                </div>
-                <div className="text-[11px] text-zinc-400">
-                  <span className="font-mono text-zinc-300">56</span> scored{" "}
-                  <span className="font-mono text-emerald-400 font-medium">84% pass</span>
-                </div>
-              </div>
-
-              {/* Scatter Plot Chart */}
-              <div className="relative h-44 pl-8 pb-6 border-b border-white/[0.06]">
-                {/* Y-axis labels */}
-                <div className="absolute left-0 top-0 bottom-6 flex flex-col justify-between text-[10px] font-mono text-zinc-500">
-                  <span>1.0</span>
-                  <span>0.5</span>
-                  <span>0.0</span>
-                </div>
-
-                {/* Threshold line at 0.70 */}
-                <div className="absolute inset-x-8 top-[30%] border-b border-dashed border-rose-500/40 z-0">
-                  <span className="absolute right-0 -top-4 text-[9px] font-mono text-rose-400">
-                    0.70
-                  </span>
-                </div>
-
-                {/* Plot Points Area */}
-                <div className="relative h-full w-full">
-                  {/* Passing Green Points (Clustered > 0.7) */}
-                  {[
-                    { left: "5%", top: "15%" },
-                    { left: "8%", top: "22%" },
-                    { left: "12%", top: "12%" },
-                    { left: "16%", top: "18%" },
-                    { left: "20%", top: "25%" },
-                    { left: "24%", top: "10%" },
-                    { left: "28%", top: "14%" },
-                    { left: "32%", top: "28%" },
-                    { left: "50%", top: "16%" },
-                    { left: "54%", top: "12%" },
-                    { left: "58%", top: "22%" },
-                    { left: "62%", top: "15%" },
-                    { left: "66%", top: "18%" },
-                    { left: "70%", top: "24%" },
-                    { left: "74%", top: "10%" },
-                    { left: "78%", top: "15%" },
-                    { left: "82%", top: "20%" },
-                    { left: "86%", top: "14%" },
-                    { left: "90%", top: "22%" },
-                  ].map((pt, i) => (
-                    <span
-                      key={i}
-                      style={{ left: pt.left, top: pt.top }}
-                      className="absolute h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)]"
-                    />
-                  ))}
-
-                  {/* Failing Red Points (Below 0.7) */}
-                  {[
-                    { left: "36%", top: "45%" },
-                    { left: "40%", top: "40%" },
-                    { left: "44%", top: "48%" },
-                    { left: "48%", top: "42%" },
-                  ].map((pt, i) => (
-                    <span
-                      key={i}
-                      style={{ left: pt.left, top: pt.top }}
-                      className="absolute h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]"
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* X-axis timestamps */}
-              <div className="flex justify-between pl-8 pt-2 text-[10px] font-mono text-zinc-500">
-                <span>00:00</span>
-                <span>06:00</span>
-                <span>12:00</span>
-              </div>
+          {/* Right Column: Interactive PIN Vault Simulator */}
+          <div className="relative rounded-2xl border border-white/[0.08] bg-[#0c0c0e] p-6 shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between text-xs text-zinc-400 pb-3 border-b border-white/[0.06] mb-5">
+              <span className="font-medium text-zinc-200 flex items-center gap-1.5">
+                <KeyRound className="h-3.5 w-3.5 text-rose-400" />
+                <span>Interactive Vault Simulator (Try PIN: 1234)</span>
+              </span>
+              {isUnlocked && (
+                <button
+                  type="button"
+                  onClick={handleLockAgain}
+                  className="flex items-center gap-1 rounded bg-rose-500/20 text-rose-300 px-2 py-0.5 text-[11px] font-medium hover:bg-rose-500/30 transition-colors cursor-pointer"
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  <span>Lock Again</span>
+                </button>
+              )}
             </div>
 
-            {/* Overlaid Floating Judge Fail Card (Bottom Right, exact Foglamp position) */}
-            <div className="absolute -bottom-8 -right-3 sm:-right-6 z-10 w-72 sm:w-80 rounded-2xl border border-white/[0.12] bg-[#141418]/95 p-4 shadow-2xl backdrop-blur-xl">
-              {/* Header */}
-              <div className="flex items-center justify-between pb-2 border-b border-white/[0.06] mb-2.5">
-                <div className="flex items-center gap-1.5 text-xs font-medium text-white">
-                  <span className="text-pink-400 text-xs">♥</span>
-                  <span>Judge</span>
-                </div>
-                <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 text-[10px] font-mono font-medium text-rose-400">
-                  <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
-                  <span>Fail</span>
-                </span>
-              </div>
+            {/* Unlocked View vs Locked Keypad */}
+            <AnimatePresence mode="wait">
+              {!isUnlocked ? (
+                <motion.div
+                  key="locked"
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  className="flex flex-col items-center justify-center py-4 space-y-4"
+                >
+                  {/* Glowing Lock Ring */}
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-400 shadow-lg shadow-rose-500/10">
+                    <Lock className="h-5 w-5" />
+                  </div>
 
-              {/* Reason */}
-              <div className="space-y-2 text-xs">
-                <div className="text-[11px] text-zinc-400">
-                  <span className="font-semibold text-zinc-300 block mb-0.5">Judge's reason</span>
-                  <p className="leading-relaxed">
-                    Restates the status without checking the order. Gives no reason for the delay and no next step.
-                  </p>
-                </div>
+                  <div className="text-center">
+                    <h4 className="text-sm font-medium text-white">
+                      Confidential Note is Locked
+                    </h4>
+                    <p className="text-[11px] text-zinc-500 mt-0.5">
+                      Enter 4-digit PIN to decrypt local session:
+                    </p>
+                  </div>
 
-                {/* Bad response quote */}
-                <div className="rounded-lg bg-black/50 p-2.5 text-[11px] font-mono text-zinc-400 border border-white/[0.06] leading-relaxed">
-                  "Your order is processing. Orders can take time. Please wait and check back later."
-                </div>
-              </div>
+                  {/* 4 PIN Dots */}
+                  <motion.div
+                    animate={error ? { x: [-10, 10, -8, 8, -4, 4, 0] } : {}}
+                    transition={{ duration: 0.4 }}
+                    className="flex gap-3 my-1"
+                  >
+                    {[0, 1, 2, 3].map((idx) => (
+                      <div
+                        key={idx}
+                        className={`h-3 w-3 rounded-full border transition-all ${
+                          error
+                            ? "bg-rose-500 border-rose-500 shadow-sm shadow-rose-500"
+                            : pin.length > idx
+                            ? "bg-emerald-400 border-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]"
+                            : "border-white/20 bg-white/5"
+                        }`}
+                      />
+                    ))}
+                  </motion.div>
+
+                  {/* Numeric Keypad */}
+                  <div className="grid grid-cols-3 gap-2 w-48 mt-2">
+                    {["1", "2", "3", "4", "5", "6", "7", "8", "9", "C", "0", "←"].map((key) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => {
+                          if (key === "C") setPin("");
+                          else if (key === "←") setPin(pin.slice(0, -1));
+                          else handleDigit(key);
+                        }}
+                        className="flex h-9 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.02] text-xs font-mono font-medium text-white hover:bg-white/[0.08] active:scale-95 transition-all cursor-pointer"
+                      >
+                        {key}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="unlocked"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="space-y-3 p-4 rounded-xl border border-emerald-500/30 bg-emerald-950/15 text-xs"
+                >
+                  <div className="flex items-center gap-2 font-medium text-emerald-300">
+                    <Unlock className="h-4 w-4" />
+                    <span>Decrypted Local Stash Session</span>
+                  </div>
+
+                  <div className="font-mono text-zinc-300 bg-black/60 p-3 rounded-lg border border-white/[0.08] space-y-1.5 text-[11px]">
+                    <div className="text-zinc-500">// AES-256 GCM hardware decrypted:</div>
+                    <div><span className="text-purple-400">AWS_ACCESS_KEY</span> = <span className="text-emerald-300">"AKIA_STASH_LIVE_7729"</span></div>
+                    <div><span className="text-purple-400">DATABASE_URL</span> = <span className="text-cyan-300">"postgres://root:vault@127.0.0.1:5432"</span></div>
+                    <div><span className="text-purple-400">SEED_PHRASE</span> = <span className="text-amber-300">"orbit velvet crystal nebula drift pulse"</span></div>
+                  </div>
+
+                  <div className="pt-2 flex items-center justify-between text-[10px] text-zinc-500 font-mono border-t border-white/[0.06]">
+                    <span>Hardware key derivation</span>
+                    <span className="text-emerald-400">Zero cloud telemetry</span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Performance Comparison Bar */}
+            <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[10px] font-mono text-zinc-500">
+              <span>Local Read Latency: &lt; 0.2ms</span>
+              <span className="text-emerald-400 font-medium">100% Offline</span>
             </div>
           </div>
         </div>

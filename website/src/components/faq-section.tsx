@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { ChevronDown, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown, ArrowRight, Check } from "lucide-react";
 
 interface FAQItem {
   q: string;
@@ -60,7 +61,7 @@ export const FaqSection: React.FC = () => {
             </p>
           </div>
 
-          {/* Right Column: Minimal Accordion */}
+          {/* Right Column: Minimal Accordion with Framer Motion Height Spring */}
           <div className="divide-y divide-white/[0.06] border-y border-white/[0.06]">
             {FAQS.map((item, idx) => {
               const isOpen = openIdx === idx;
@@ -72,17 +73,30 @@ export const FaqSection: React.FC = () => {
                     className="flex w-full items-center justify-between text-left text-xs sm:text-sm font-normal text-zinc-200 hover:text-white transition-colors cursor-pointer gap-4"
                   >
                     <span>{item.q}</span>
-                    <ChevronDown
-                      className={`h-3.5 w-3.5 shrink-0 text-zinc-500 transition-transform duration-200 ${
-                        isOpen ? "rotate-180 text-white" : ""
-                      }`}
-                    />
+                    <motion.span
+                      animate={{ rotate: isOpen ? 180 : 0 }}
+                      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                      className="shrink-0 text-zinc-500"
+                    >
+                      <ChevronDown className="h-3.5 w-3.5" />
+                    </motion.span>
                   </button>
-                  {isOpen && (
-                    <div className="mt-2 text-xs text-zinc-400 leading-relaxed pr-6 animate-fadeIn">
-                      {item.a}
-                    </div>
-                  )}
+
+                  <AnimatePresence>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pt-2 text-xs text-zinc-400 leading-relaxed pr-6">
+                          {item.a}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               );
             })}
@@ -90,16 +104,23 @@ export const FaqSection: React.FC = () => {
             {/* Bottom Row: Ask anything else */}
             <div className="py-4">
               {!showInput ? (
-                <button
+                <motion.button
+                  whileHover={{ x: 2 }}
+                  whileTap={{ scale: 0.98 }}
                   type="button"
                   onClick={() => setShowInput(true)}
                   className="flex items-center gap-2 text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer"
                 >
                   <span>Ask anything else</span>
                   <ArrowRight className="h-3 w-3" />
-                </button>
+                </motion.button>
               ) : (
-                <form onSubmit={handleSubmit} className="flex items-center gap-2 pt-1">
+                <motion.form
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  onSubmit={handleSubmit}
+                  className="flex items-center gap-2 pt-1"
+                >
                   <input
                     type="text"
                     value={inquiry}
@@ -108,13 +129,14 @@ export const FaqSection: React.FC = () => {
                     autoFocus
                     className="flex-1 bg-transparent text-xs text-white placeholder:text-zinc-600 outline-none border-b border-white/20 pb-1"
                   />
-                  <button
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
                     type="submit"
                     className="text-xs text-zinc-400 hover:text-white font-medium cursor-pointer"
                   >
                     {submitted ? "Sent!" : "Submit"}
-                  </button>
-                </form>
+                  </motion.button>
+                </motion.form>
               )}
             </div>
           </div>
