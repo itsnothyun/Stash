@@ -1,7 +1,8 @@
 import { stashIpc } from "@/lib/ipc/stash-ipc";
 import { Note } from "@/features/stash/types/note";
 import { NoteColor } from "@/features/stash/types/color";
-import { stashContentFromPlainText } from "@/features/editor/stash-content";
+import { NoteWidgetData } from "@/features/widgets/types";
+import { emptyDoc, serializeStashContent, stashContentFromPlainText } from "@/features/editor/stash-content";
 import { setNoteEmoji, setNotePaper, PaperPattern } from "@/features/stash/note-meta";
 
 export interface CaptureRequest {
@@ -14,6 +15,7 @@ export interface CaptureRequest {
   isFavorite?: boolean;
   emoji?: string | null;
   paper?: PaperPattern;
+  widgets?: NoteWidgetData[];
 }
 
 /**
@@ -33,7 +35,9 @@ export async function createAndOpenStash(
   // library card showing content the note itself could never display.
   const contentJson =
     seedText && seedText.length > 0
-      ? stashContentFromPlainText(seedText)
+      ? stashContentFromPlainText(seedText, request.widgets || [])
+      : request.widgets && request.widgets.length > 0
+      ? serializeStashContent(emptyDoc(), request.widgets)
       : undefined;
 
   const note = await stashIpc.createNote({

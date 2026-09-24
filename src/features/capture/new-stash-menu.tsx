@@ -43,6 +43,7 @@ export const NewStashMenu: React.FC<NewStashMenuProps> = ({
       tagNames: tmpl.tagNames,
       emoji: tmpl.emoji,
       paper: tmpl.paper,
+      widgets: tmpl.widgets,
     });
     toast.show({ message: `Created ${tmpl.name}` });
   };

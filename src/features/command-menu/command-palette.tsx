@@ -170,6 +170,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                       tagNames: tmpl.tagNames,
                       emoji: tmpl.emoji,
                       paper: tmpl.paper,
+                      widgets: tmpl.widgets,
                     });
                   })
                 }

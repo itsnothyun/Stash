@@ -8,9 +8,11 @@ import {
   Lightbulb,
   BookOpen,
   LucideIcon,
+  Kanban,
 } from "lucide-react";
 import { NoteColor } from "./types/color";
 import { PaperPattern } from "./note-meta";
+import { NoteWidgetData } from "@/features/widgets/types";
 
 export interface NoteTemplate {
   id: string;
@@ -25,13 +27,14 @@ export interface NoteTemplate {
   title: string;
   plainText: string;
   tagNames?: string[];
+  widgets?: NoteWidgetData[];
 }
 
 export const NOTE_TEMPLATES: NoteTemplate[] = [
   {
     id: "scratchpad",
     name: "Daily Scratchpad",
-    description: "Priorities, fleeting thoughts, and daily log",
+    description: "Priorities, fleeting thoughts, and daily log with focus timer",
     color: "Lemon",
     icon: Sun,
     iconColor: "text-amber-500",
@@ -50,11 +53,21 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
 ## 📝 Daily Log
 - `,
     tagNames: ["daily", "scratchpad"],
+    widgets: [
+      {
+        id: "widget-timer-focus",
+        type: "timer",
+        title: "Focus Pomodoro",
+        x: 0,
+        y: 0,
+        config: { focusDuration: 25 },
+      },
+    ],
   },
   {
     id: "meeting",
     name: "Meeting Minutes",
-    description: "Attendees, discussion agenda, and action items",
+    description: "Attendees, discussion agenda, and action items with 30m countdown",
     color: "Mint",
     icon: Users,
     iconColor: "text-emerald-500",
@@ -71,11 +84,21 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
 ### ⚡ Action Items
 - [ ] `,
     tagNames: ["meeting", "work"],
+    widgets: [
+      {
+        id: "widget-meeting-countdown",
+        type: "countdown",
+        title: "Meeting Timer (30m)",
+        x: 0,
+        y: 0,
+        config: { minutes: 30 },
+      },
+    ],
   },
   {
     id: "bug_report",
     name: "Bug & Issue Report",
-    description: "Repro steps, expected vs actual, and fix notes",
+    description: "Repro steps, expected vs actual, and repro run counter",
     color: "Rose",
     icon: Bug,
     iconColor: "text-rose-500",
@@ -98,11 +121,21 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
 ### 🔧 Fix Notes
 - `,
     tagNames: ["bug", "dev"],
+    widgets: [
+      {
+        id: "widget-repro-counter",
+        type: "counter",
+        title: "Repro Test Runs",
+        x: 0,
+        y: 0,
+        config: { initialCount: 0 },
+      },
+    ],
   },
   {
     id: "weekly_review",
     name: "Weekly Review & Goals",
-    description: "Highlights, blockers, and next week focus",
+    description: "Highlights, blockers, and weekly habit consistency",
     color: "Lavender",
     icon: Target,
     iconColor: "text-purple-500",
@@ -119,6 +152,15 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
 - [ ] 
 - [ ] `,
     tagNames: ["review", "planning"],
+    widgets: [
+      {
+        id: "widget-habits-weekly",
+        type: "habits",
+        title: "Weekly Habit Consistency",
+        x: 0,
+        y: 0,
+      },
+    ],
   },
   {
     id: "brainstorm",
@@ -145,11 +187,48 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
 ### 🏁 Immediate Next Action
 - [ ] `,
     tagNames: ["ideas", "brainstorm"],
+    widgets: [
+      {
+        id: "widget-palette-ideas",
+        type: "palette",
+        title: "Idea Color Theme",
+        x: 0,
+        y: 0,
+      },
+    ],
+  },
+  {
+    id: "sprint_kanban",
+    name: "Project Sprint Kanban",
+    description: "Interactive visual board with To Do, In Flight, and Done columns",
+    color: "Sky",
+    icon: Kanban,
+    iconColor: "text-blue-500",
+    iconBg: "bg-blue-500/15",
+    emoji: "📋",
+    paper: "grid",
+    title: "Sprint Board",
+    plainText: `## 🚀 Sprint Goal
+Deliver component-driven templates and interactive widgets for v0.4 release.
+
+### 📌 Milestone Notes
+- Focus on zero context switching
+- Real-time updates across floating windows`,
+    tagNames: ["sprint", "kanban", "dev"],
+    widgets: [
+      {
+        id: "widget-sprint-kanban",
+        type: "kanban",
+        title: "Sprint Tasks",
+        x: 0,
+        y: 0,
+      },
+    ],
   },
   {
     id: "code_snippet",
     name: "Code & Tech Scratchpad",
-    description: "Syntax snippet, implementation context, and edge cases",
+    description: "Syntax snippet, implementation context, and bitwise calculator",
     color: "Sky",
     icon: Code2,
     iconColor: "text-blue-500",
@@ -170,6 +249,15 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
 - [ ] Boundary condition
 - [ ] Error handling`,
     tagNames: ["code", "dev"],
+    widgets: [
+      {
+        id: "widget-code-calc",
+        type: "calculator",
+        title: "Math & Bitwise Calc",
+        x: 0,
+        y: 0,
+      },
+    ],
   },
   {
     id: "crypto_watchlist",
@@ -181,9 +269,7 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
     iconBg: "bg-cyan-500/15",
     emoji: "📈",
     title: "Crypto Watchlist",
-    plainText: `[swap-widget]
-
-### 📊 Watchlist & Key Levels
+    plainText: `### 📊 Watchlist & Key Levels
 - **BTC:** Support $____ | Target $____
 - **ETH:** Support $____ | Target $____
 - **SOL:** Support $____ | Target $____
@@ -191,11 +277,20 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
 ### ⚡ Trade Notes
 - `,
     tagNames: ["crypto", "trading"],
+    widgets: [
+      {
+        id: "widget-crypto-swap",
+        type: "swap",
+        title: "Live Currency Converter",
+        x: 0,
+        y: 0,
+      },
+    ],
   },
   {
     id: "summary",
     name: "Book & Article Summary",
-    description: "Core premise, standout quotes, and actionable takeaways",
+    description: "Core premise, standout quotes, and countdown focus session",
     color: "Sand",
     icon: BookOpen,
     iconColor: "text-indigo-500",
@@ -216,5 +311,15 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
 ### 🛠️ Actionable Takeaways
 - [ ] `,
     tagNames: ["reading", "notes"],
+    widgets: [
+      {
+        id: "widget-reading-timer",
+        type: "timer",
+        title: "Reading Deep Session",
+        x: 0,
+        y: 0,
+        config: { focusDuration: 30 },
+      },
+    ],
   },
 ];

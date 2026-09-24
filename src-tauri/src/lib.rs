@@ -200,6 +200,10 @@ pub fn run() {
             commands::import_data,
             commands::open_pip_browser_window,
             commands::close_pip_browser_window,
+            commands::minimize_current_window,
+            commands::toggle_maximize_current_window,
+            commands::toggle_fullscreen_current_window,
+            commands::close_current_window_cmd,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Stash application");

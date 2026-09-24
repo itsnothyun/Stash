@@ -978,6 +978,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                           tagNames: tmpl.tagNames,
                           emoji: tmpl.emoji,
                           paper: tmpl.paper,
+                          widgets: tmpl.widgets,
                         });
                         toast.show({ message: `Created ${tmpl.name}` });
                       }}

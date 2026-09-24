@@ -557,5 +557,40 @@ pub async fn close_pip_browser_window(app: AppHandle) -> AppResult<()> {
     Ok(())
 }
 
+/// Minimizes the window that called this command.
+#[tauri::command]
+pub async fn minimize_current_window(window: tauri::Window) -> AppResult<()> {
+    window.minimize().map_err(|e| AppError::Window(e.to_string()))?;
+    Ok(())
+}
+
+/// Toggles maximize state of the window that called this command.
+#[tauri::command]
+pub async fn toggle_maximize_current_window(window: tauri::Window) -> AppResult<bool> {
+    let is_max = window.is_maximized().map_err(|e| AppError::Window(e.to_string()))?;
+    if is_max {
+        window.unmaximize().map_err(|e| AppError::Window(e.to_string()))?;
+        Ok(false)
+    } else {
+        window.maximize().map_err(|e| AppError::Window(e.to_string()))?;
+        Ok(true)
+    }
+}
+
+/// Toggles fullscreen state of the window that called this command.
+#[tauri::command]
+pub async fn toggle_fullscreen_current_window(window: tauri::Window) -> AppResult<bool> {
+    let is_full = window.is_fullscreen().map_err(|e| AppError::Window(e.to_string()))?;
+    window.set_fullscreen(!is_full).map_err(|e| AppError::Window(e.to_string()))?;
+    Ok(!is_full)
+}
+
+/// Closes the window that called this command.
+#[tauri::command]
+pub async fn close_current_window_cmd(window: tauri::Window) -> AppResult<()> {
+    window.close().map_err(|e| AppError::Window(e.to_string()))?;
+    Ok(())
+}
+
 
 
