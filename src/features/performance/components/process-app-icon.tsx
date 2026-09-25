@@ -30,13 +30,13 @@ export const ProcessAppIcon: React.FC<ProcessAppIconProps> = ({
         width={size}
         height={size}
         className={cn(
-          "object-contain select-none shrink-0 pointer-events-none drop-shadow-xs",
+          "object-contain select-none shrink-0 pointer-events-none bg-transparent",
           className
         )}
         style={{ width: size, height: size }}
         loading="lazy"
         onError={(e) => {
-          // If the extracted BMP has an issue rendering, hide it and fall back
+          // If the extracted icon PNG has an issue rendering, hide it and fall back
           (e.currentTarget as HTMLElement).style.display = "none";
         }}
       />
@@ -76,11 +76,11 @@ export const ProcessAppIcon: React.FC<ProcessAppIconProps> = ({
         <svg viewBox="0 0 32 32" width={size} height={size} fill="none">
           <path
             d="M26 9c-2.5 0-5.8 2.2-8.5 5.5-2.4-3.5-5.5-5-8.5-5C4.5 9.5 2 13 2 17.5c0 6.5 6.5 10 14 10s14-3.5 14-10c0-4.5-2-8.5-4-8.5z"
-            fill={isColorful ? "#0f2b3c" : "currentColor"}
+            fill={isColorful ? "#0284c7" : "currentColor"}
           />
           <path
             d="M16 4c-1.5 3-3 7-2 10.5 1.5-1 3.5-1.5 5.5-1.5 1 0 1.5-.2 2-.5C20.5 8 18 5 16 4z"
-            fill={isColorful ? "#00b4d8" : "currentColor"}
+            fill={isColorful ? "#38bdf8" : "currentColor"}
           />
           <ellipse
             cx="21.5"

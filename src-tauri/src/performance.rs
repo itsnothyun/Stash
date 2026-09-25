@@ -356,32 +356,42 @@ mod win32_icon {
             }
             DestroyIcon(sfi.h_icon);
 
-            let image_size = (w * h * 4) as usize;
-            let file_size = 54 + image_size;
-            let mut bmp_data = Vec::with_capacity(file_size);
+            // Convert Windows bottom-up BGRA to standard top-down RGBA pixels
+            let row_bytes = (w * 4) as usize;
+            let mut rgba = vec![0u8; (w * h * 4) as usize];
+            for y in 0..h as usize {
+                let src_y = (h as usize - 1) - y;
+                let src_offset = src_y * row_bytes;
+                let dst_offset = y * row_bytes;
+                for x in 0..w as usize {
+                    let b = pixels[src_offset + x * 4];
+                    let g = pixels[src_offset + x * 4 + 1];
+                    let r = pixels[src_offset + x * 4 + 2];
+                    let a = pixels[src_offset + x * 4 + 3];
+                    rgba[dst_offset + x * 4] = r;
+                    rgba[dst_offset + x * 4 + 1] = g;
+                    rgba[dst_offset + x * 4 + 2] = b;
+                    rgba[dst_offset + x * 4 + 3] = a;
+                }
+            }
 
-            bmp_data.extend_from_slice(&0x4D42u16.to_le_bytes());
-            bmp_data.extend_from_slice(&(file_size as u32).to_le_bytes());
-            bmp_data.extend_from_slice(&0u16.to_le_bytes());
-            bmp_data.extend_from_slice(&0u16.to_le_bytes());
-            bmp_data.extend_from_slice(&54u32.to_le_bytes());
+            // Encode to transparent 32-bit PNG (eliminates all black square containers)
+            let mut png_bytes = Vec::new();
+            let encode_success = {
+                let mut encoder = png::Encoder::new(&mut png_bytes, w as u32, h as u32);
+                encoder.set_color(png::ColorType::Rgba);
+                encoder.set_depth(png::BitDepth::Eight);
+                match encoder.write_header() {
+                    Ok(mut writer) => writer.write_image_data(&rgba).is_ok(),
+                    Err(_) => false,
+                }
+            };
 
-            bmp_data.extend_from_slice(&40u32.to_le_bytes());
-            bmp_data.extend_from_slice(&(w as i32).to_le_bytes());
-            bmp_data.extend_from_slice(&(h as i32).to_le_bytes());
-            bmp_data.extend_from_slice(&1u16.to_le_bytes());
-            bmp_data.extend_from_slice(&32u16.to_le_bytes());
-            bmp_data.extend_from_slice(&0u32.to_le_bytes());
-            bmp_data.extend_from_slice(&(image_size as u32).to_le_bytes());
-            bmp_data.extend_from_slice(&0i32.to_le_bytes());
-            bmp_data.extend_from_slice(&0i32.to_le_bytes());
-            bmp_data.extend_from_slice(&0u32.to_le_bytes());
-            bmp_data.extend_from_slice(&0u32.to_le_bytes());
-
-            bmp_data.extend_from_slice(&pixels);
-
-            let base64_str = to_base64(&bmp_data);
-            Some(format!("data:image/bmp;base64,{}", base64_str))
+            if encode_success && !png_bytes.is_empty() {
+                let base64_str = to_base64(&png_bytes);
+                return Some(format!("data:image/png;base64,{}", base64_str));
+            }
+            None
         }
     }
 }
