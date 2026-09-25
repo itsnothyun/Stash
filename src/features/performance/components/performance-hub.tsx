@@ -14,7 +14,6 @@ import {
   ShieldCheck,
   Desktop,
   Pulse,
-  Sparkle as Sparkles,
   CaretRight,
   Globe,
   Thermometer,
@@ -22,9 +21,7 @@ import {
   StopCircle,
   ArrowDown,
   ArrowUp,
-  SlidersHorizontal,
   AppWindow,
-  Warning,
   Flame,
   X,
   Clock,
@@ -46,6 +43,8 @@ import {
   formatDuration,
 } from "../hardware-detect";
 import { toast } from "@/components/ui/toast";
+import { PremiumSelect } from "@/components/ui/premium-select";
+import { ProcessAppIcon } from "./process-app-icon";
 import { useUIStore } from "@/stores/ui-store";
 import { cn } from "@/lib/utils/cn";
 
@@ -70,7 +69,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
   // Active view tab
   const [activeTab, setActiveTab] = useState<PerformanceTab>("apps");
 
-  // Polling settings: 1500ms, 2500ms, 5000ms, or 0 (paused)
+  // Polling settings: 1500ms, 2000ms, 5000ms, or 0 (paused)
   const [refreshInterval, setRefreshInterval] = useState<number>(2000);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -171,7 +170,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
     return () => clearInterval(timer);
   }, [fetchMetrics, isPaused, refreshInterval]);
 
-  // Stash Turbo Optimization execution
+  // Stash Turbo Optimization execution (No emoji stars)
   const handleOptimizeStash = async () => {
     setIsOptimizing(true);
     try {
@@ -180,7 +179,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
 
       const freedMb = (result.memory_freed_estimate_bytes / (1024 * 1024)).toFixed(2);
       toast.show({
-        message: `⚡ Stash Turbo Compaction Complete · ${result.message} (${freedMb} MB reclaimed)`,
+        message: `Stash Turbo Compaction Complete: ${freedMb} MB memory reclaimed.`,
       });
     } catch (err) {
       toast.error("Optimization failed", String(err));
@@ -221,7 +220,6 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
     if (!snapshot || !snapshot.processes) return [];
     let list = [...snapshot.processes];
 
-    // Filter by search query
     if (processSearch.trim()) {
       const q = processSearch.toLowerCase().trim();
       list = list.filter(
@@ -229,7 +227,6 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
       );
     }
 
-    // Filter mode
     if (processFilterMode === "heavy") {
       list = list.filter(
         (p) => p.cpu_usage >= 3.0 || p.memory_bytes >= 200 * 1024 * 1024
@@ -238,7 +235,6 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
       list = list.filter((p) => !p.name.startsWith("svchost") && !p.name.startsWith("System"));
     }
 
-    // Sort
     list.sort((a, b) => {
       let result = 0;
       if (processSort === "cpu") {
@@ -266,7 +262,6 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
     });
   }, [analysis, activeAlertCategory]);
 
-  // Top Resource Consumers
   const topCpu = snapshot?.top_cpu_consumer;
   const topRam = snapshot?.top_ram_consumer;
 
@@ -280,36 +275,33 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
   }
 
   return (
-    <div className={cn("flex flex-col gap-6 p-6 max-w-7xl mx-auto w-full", className)}>
+    <div className={cn("flex flex-col gap-5 p-6 max-w-7xl mx-auto w-full", className)}>
       {/* ========================================================================= */}
       {/* 1. TOP HEADER & VITAL SIGNS COCKPIT BAR                                    */}
       {/* ========================================================================= */}
       <div className="flex flex-col gap-4 p-5 rounded-2xl bg-card/85 backdrop-blur-xl border border-border/80 shadow-sm relative overflow-hidden">
-        {/* Glow ambient background */}
-        <div className="absolute -top-16 -right-16 w-80 h-80 bg-primary/8 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
             <div
               className={cn(
-                "h-12 w-12 rounded-xl flex items-center justify-center shrink-0 border shadow-xs transition-colors",
+                "h-11 w-11 rounded-xl flex items-center justify-center shrink-0 border shadow-xs transition-colors",
                 isColorful
                   ? "bg-amber-500/15 text-amber-500 border-amber-500/30"
                   : "bg-muted text-foreground border-border"
               )}
             >
-              <Gauge className="h-6 w-6" weight="bold" />
+              <Gauge className="h-5 w-5" weight="bold" />
             </div>
 
             <div className="flex flex-col">
-              <div className="flex items-center gap-2.5 flex-wrap">
-                <h1 className="text-xl font-bold tracking-tight text-foreground">
-                  PC Performance & Process Inspector
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-lg font-bold tracking-tight text-foreground">
+                  Performance & Process Monitor
                 </h1>
                 {analysis && (
                   <span
                     className={cn(
-                      "px-2.5 py-0.5 rounded-full text-xs font-semibold border flex items-center gap-1.5 shadow-2xs",
+                      "px-2.5 py-0.5 rounded-full text-[11px] font-semibold border flex items-center gap-1.5 shadow-2xs",
                       analysis.statusColor
                     )}
                   >
@@ -319,18 +311,18 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                 )}
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Real-time active processes, resource hog detection, hardware telemetry, and zero-drag engine.
+                Live system telemetry, process inspector, and resource monitor.
               </p>
             </div>
           </div>
 
-          {/* Action Toolbar */}
+          {/* Action Toolbar: Custom Premium Dropdowns & Actions */}
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
             {/* Live Polling Toggle */}
             <button
               type="button"
               onClick={() => setIsPaused((p) => !p)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-border/70 bg-background/60 hover:bg-muted text-foreground transition-all cursor-pointer shadow-2xs"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-border/70 bg-background/80 hover:bg-muted text-foreground transition-all cursor-pointer shadow-2xs"
               title={isPaused ? "Resume live polling" : "Pause live polling"}
             >
               {isPaused ? (
@@ -346,48 +338,48 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
               )}
             </button>
 
-            {/* Polling Interval Selector */}
-            <select
+            {/* Premium Polling Interval Selector */}
+            <PremiumSelect<number>
               value={refreshInterval}
-              onChange={(e) => setRefreshInterval(Number(e.target.value))}
-              className="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-border/70 bg-background/60 text-foreground focus:outline-none focus:border-primary cursor-pointer shadow-2xs"
-              title="Telemetry refresh frequency"
-            >
-              <option value={1500}>1.5s (Fast)</option>
-              <option value={2000}>2.0s (Balanced)</option>
-              <option value={5000}>5.0s (Eco)</option>
-            </select>
+              onChange={setRefreshInterval}
+              options={[
+                { value: 1500, label: "1.5s (Fast)" },
+                { value: 2000, label: "2.0s (Balanced)" },
+                { value: 5000, label: "5.0s (Eco)" },
+              ]}
+              align="end"
+            />
 
-            {/* Refresh Manual Button */}
+            {/* Manual Refresh */}
             <button
               type="button"
               onClick={() => void fetchMetrics(true)}
               disabled={isRefreshing}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-border/70 bg-background/60 hover:bg-muted text-foreground transition-all cursor-pointer shadow-2xs disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-border/70 bg-background/80 hover:bg-muted text-foreground transition-all cursor-pointer shadow-2xs disabled:opacity-50"
             >
               <ArrowClockwise className={cn("h-3.5 w-3.5", isRefreshing && "animate-spin")} />
               <span>Refresh</span>
             </button>
 
-            {/* Turbo Optimize Button */}
+            {/* Turbo Optimize Button (No emoji stars) */}
             <button
               type="button"
               onClick={handleOptimizeStash}
               disabled={isOptimizing}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-all cursor-pointer shadow-sm shadow-primary/20",
+                "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white transition-all cursor-pointer shadow-xs shadow-primary/20",
                 "bg-primary hover:bg-primary/90 active:scale-95 disabled:opacity-50"
               )}
             >
-              <Sparkles className={cn("h-3.5 w-3.5", isOptimizing && "animate-spin")} weight="bold" />
-              <span>{isOptimizing ? "Compacting…" : "⚡ Turbo Optimize Stash"}</span>
+              <Lightning className={cn("h-3.5 w-3.5", isOptimizing && "animate-spin")} weight="fill" />
+              <span>{isOptimizing ? "Compacting…" : "Turbo Optimize Stash"}</span>
             </button>
           </div>
         </div>
 
         {/* Vital Signs Ribbon Bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-3 border-t border-border/50 text-xs">
-          {/* Item 1: CPU Global */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pt-3 border-t border-border/50 text-xs">
+          {/* CPU Global */}
           <div className="flex flex-col p-2.5 rounded-xl bg-background/50 border border-border/50">
             <span className="text-[10px] text-muted-foreground uppercase font-semibold flex items-center gap-1">
               <Cpu className={cn("h-3 w-3", isColorful ? "text-blue-500" : "text-foreground")} />
@@ -397,11 +389,11 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
               {snapshot ? `${snapshot.global_cpu_usage.toFixed(1)}%` : "0%"}
             </span>
             <span className="text-[10px] text-muted-foreground truncate">
-              {snapshot ? `${snapshot.physical_core_count}P / ${snapshot.logical_core_count}T` : ""}
+              {snapshot ? `${snapshot.physical_core_count} Cores / ${snapshot.logical_core_count} Threads` : ""}
             </span>
           </div>
 
-          {/* Item 2: RAM Memory */}
+          {/* RAM Memory */}
           <div className="flex flex-col p-2.5 rounded-xl bg-background/50 border border-border/50">
             <span className="text-[10px] text-muted-foreground uppercase font-semibold flex items-center gap-1">
               <Pulse className={cn("h-3 w-3", isColorful ? "text-emerald-500" : "text-foreground")} />
@@ -415,21 +407,28 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
             </span>
           </div>
 
-          {/* Item 3: Network Throughput */}
+          {/* Network Throughput */}
           <div className="flex flex-col p-2.5 rounded-xl bg-background/50 border border-border/50">
             <span className="text-[10px] text-muted-foreground uppercase font-semibold flex items-center gap-1">
               <Globe className={cn("h-3 w-3", isColorful ? "text-cyan-500" : "text-foreground")} />
-              <span>Network I/O</span>
+              <span>Network</span>
             </span>
-            <span className="font-mono text-xs font-bold text-foreground mt-0.5 flex items-center gap-1.5">
-              <span className="text-emerald-500 flex items-center">↓ {snapshot?.network ? formatSpeed(snapshot.network.rx_rate_bytes_per_sec) : "0 KB/s"}</span>
-            </span>
-            <span className="font-mono text-[10px] text-blue-500 flex items-center">
-              ↑ {snapshot?.network ? formatSpeed(snapshot.network.tx_rate_bytes_per_sec) : "0 KB/s"}
+            <div className="flex items-center gap-2 mt-0.5 font-mono text-xs font-bold">
+              <span className="text-emerald-500 flex items-center gap-0.5">
+                <ArrowDown className="h-3 w-3 shrink-0" />
+                <span>{snapshot?.network ? formatSpeed(snapshot.network.rx_rate_bytes_per_sec) : "0 KB/s"}</span>
+              </span>
+              <span className="text-blue-500 flex items-center gap-0.5">
+                <ArrowUp className="h-3 w-3 shrink-0" />
+                <span>{snapshot?.network ? formatSpeed(snapshot.network.tx_rate_bytes_per_sec) : "0 KB/s"}</span>
+              </span>
+            </div>
+            <span className="text-[10px] text-muted-foreground">
+              {snapshot?.network?.active_interfaces || 1} Interfaces
             </span>
           </div>
 
-          {/* Item 4: Thermal Temp */}
+          {/* Thermal Temp */}
           <div className="flex flex-col p-2.5 rounded-xl bg-background/50 border border-border/50">
             <span className="text-[10px] text-muted-foreground uppercase font-semibold flex items-center gap-1">
               <Thermometer className={cn("h-3 w-3", isColorful ? "text-rose-500" : "text-foreground")} />
@@ -447,10 +446,10 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
             </span>
           </div>
 
-          {/* Item 5: Stash Footprint */}
+          {/* Stash Footprint */}
           <div className="flex flex-col p-2.5 rounded-xl bg-background/50 border border-border/50">
             <span className="text-[10px] text-muted-foreground uppercase font-semibold flex items-center gap-1">
-              <Lightning className="h-3 w-3 text-amber-500" weight="fill" />
+              <Lightning className="h-3 w-3 text-primary" weight="fill" />
               <span>Stash Memory</span>
             </span>
             <span className="font-mono text-sm font-bold text-emerald-500 mt-0.5">
@@ -461,72 +460,72 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
             </span>
           </div>
 
-          {/* Item 6: Engine Latency */}
+          {/* Engine Latency */}
           <div className="flex flex-col p-2.5 rounded-xl bg-background/50 border border-border/50">
             <span className="text-[10px] text-muted-foreground uppercase font-semibold flex items-center gap-1">
               <Database className="h-3 w-3 text-primary" />
-              <span>IPC / SQLite</span>
+              <span>SQLite IPC</span>
             </span>
             <span className="font-mono text-sm font-bold text-foreground mt-0.5">
               {dbPingMs !== null ? `${dbPingMs} ms` : "0.2 ms"}
             </span>
             <span className="text-[10px] text-muted-foreground">
-              {fps} FPS Smooth UI
+              {fps} FPS Render
             </span>
           </div>
         </div>
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. "TOP RESOURCE CONSUMERS" SPOTLIGHT (Directly answers user request)     */}
+      {/* 2. TOP RESOURCE CONSUMERS SPOTLIGHT (With Actual App Icons)               */}
       {/* ========================================================================= */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2.5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Flame className="h-4 w-4 text-rose-500" weight="fill" />
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-              Top PC Resource Consumers · Active Bottleneck Culprits
-            </h2>
+          <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <Flame className="h-4 w-4 text-rose-500" weight="bold" />
+            <span>Top Resource Consumers</span>
           </div>
-          <span className="text-[11px] text-muted-foreground">
-            Instantly answers what application is using the most of your machine right now
+          <span className="text-[11px] text-muted-foreground font-mono">
+            {snapshot?.total_processes_count || 0} active processes
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
           {/* Card A: Highest CPU Consumer */}
-          <div className="p-4 rounded-xl bg-gradient-to-br from-rose-500/10 via-card to-card border border-rose-500/25 shadow-xs relative overflow-hidden flex flex-col justify-between">
+          <div className="p-4 rounded-xl bg-card border border-border/80 shadow-xs flex flex-col justify-between gap-3">
             <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-500 flex items-center justify-center shrink-0">
-                  <Cpu className="h-5 w-5" weight="bold" />
-                </div>
-                <div>
+              <div className="flex items-center gap-3 min-w-0">
+                <ProcessAppIcon
+                  processName={topCpu?.name || "App"}
+                  isStash={topCpu?.is_stash}
+                  size={24}
+                />
+                <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-bold uppercase px-2 py-0.2 rounded-full bg-rose-500/20 text-rose-500 border border-rose-500/30">
-                      ⚡ Peak CPU Hog
+                    <span className="text-[10px] font-semibold uppercase px-1.5 py-0.2 rounded bg-rose-500/15 text-rose-500 border border-rose-500/25">
+                      Highest CPU
                     </span>
                     <span className="text-[11px] font-mono text-muted-foreground">
                       PID: {topCpu?.pid || "—"}
                     </span>
                   </div>
-                  <h3 className="text-base font-bold text-foreground mt-0.5 truncate" title={topCpu?.name}>
+                  <h3 className="text-sm font-bold text-foreground mt-0.5 truncate" title={topCpu?.name}>
                     {topCpu?.name || "System Idle"}
                   </h3>
                 </div>
               </div>
 
-              <div className="text-right">
-                <span className="font-mono text-xl font-black text-rose-500">
+              <div className="text-right shrink-0">
+                <span className="font-mono text-lg font-bold text-rose-500">
                   {topCpu ? `${topCpu.cpu_usage.toFixed(1)}%` : "0%"}
                 </span>
-                <p className="text-[10px] text-muted-foreground">of CPU Capacity</p>
+                <p className="text-[10px] text-muted-foreground">CPU Load</p>
               </div>
             </div>
 
             {/* Meter Bar */}
-            <div className="mt-3 space-y-1.5">
-              <div className="h-2 w-full rounded-full bg-muted/60 overflow-hidden">
+            <div className="space-y-1.5">
+              <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                 <motion.div
                   className="h-full rounded-full bg-rose-500"
                   animate={{ width: `${Math.min(100, Math.max(8, topCpu?.cpu_usage || 0))}%` }}
@@ -537,7 +536,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
               <div className="flex items-center justify-between text-[11px] text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  <span>Uptime: {topCpu ? formatDuration(topCpu.run_time_secs) : "—"}</span>
+                  <span>{topCpu ? formatDuration(topCpu.run_time_secs) : "—"}</span>
                 </span>
                 <span>RAM: {topCpu ? formatBytes(topCpu.memory_bytes) : "—"}</span>
                 {topCpu && (
@@ -555,29 +554,31 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
           </div>
 
           {/* Card B: Highest RAM Consumer */}
-          <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-500/10 via-card to-card border border-emerald-500/25 shadow-xs relative overflow-hidden flex flex-col justify-between">
+          <div className="p-4 rounded-xl bg-card border border-border/80 shadow-xs flex flex-col justify-between gap-3">
             <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-500 flex items-center justify-center shrink-0">
-                  <Pulse className="h-5 w-5" weight="bold" />
-                </div>
-                <div>
+              <div className="flex items-center gap-3 min-w-0">
+                <ProcessAppIcon
+                  processName={topRam?.name || "App"}
+                  isStash={topRam?.is_stash}
+                  size={24}
+                />
+                <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-bold uppercase px-2 py-0.2 rounded-full bg-emerald-500/20 text-emerald-500 border border-emerald-500/30">
-                      🧠 Peak Memory Hog
+                    <span className="text-[10px] font-semibold uppercase px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-500 border border-emerald-500/25">
+                      Highest Memory
                     </span>
                     <span className="text-[11px] font-mono text-muted-foreground">
                       PID: {topRam?.pid || "—"}
                     </span>
                   </div>
-                  <h3 className="text-base font-bold text-foreground mt-0.5 truncate" title={topRam?.name}>
+                  <h3 className="text-sm font-bold text-foreground mt-0.5 truncate" title={topRam?.name}>
                     {topRam?.name || "System Idle"}
                   </h3>
                 </div>
               </div>
 
-              <div className="text-right">
-                <span className="font-mono text-xl font-black text-emerald-500">
+              <div className="text-right shrink-0">
+                <span className="font-mono text-lg font-bold text-emerald-500">
                   {topRam ? formatBytes(topRam.memory_bytes) : "0 MB"}
                 </span>
                 <p className="text-[10px] text-muted-foreground">
@@ -589,7 +590,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
             </div>
 
             {/* Meter Bar */}
-            <div className="mt-3 space-y-1.5">
+            <div className="space-y-1.5">
               {(() => {
                 const memPct =
                   topRam && snapshot && snapshot.total_memory > 0
@@ -597,7 +598,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                     : 0;
                 return (
                   <>
-                    <div className="h-2 w-full rounded-full bg-muted/60 overflow-hidden">
+                    <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                       <motion.div
                         className="h-full rounded-full bg-emerald-500"
                         animate={{ width: `${Math.min(100, Math.max(8, memPct))}%` }}
@@ -608,7 +609,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                     <div className="flex items-center justify-between text-[11px] text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
-                        <span>Uptime: {topRam ? formatDuration(topRam.run_time_secs) : "—"}</span>
+                        <span>{topRam ? formatDuration(topRam.run_time_secs) : "—"}</span>
                       </span>
                       <span>CPU: {topRam ? `${topRam.cpu_usage.toFixed(1)}%` : "0%"}</span>
                       {topRam && (
@@ -639,21 +640,21 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
             type="button"
             onClick={() => setActiveTab("apps")}
             className={cn(
-              "flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer",
+              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer",
               activeTab === "apps"
                 ? "bg-card text-foreground shadow-2xs border border-border/60"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
             <AppWindow className="h-4 w-4 text-indigo-500" weight="bold" />
-            <span>Running Applications ({snapshot?.total_processes_count || 0})</span>
+            <span>Applications ({snapshot?.total_processes_count || 0})</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab("cockpit")}
             className={cn(
-              "flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer",
+              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer",
               activeTab === "cockpit"
                 ? "bg-card text-foreground shadow-2xs border border-border/60"
                 : "text-muted-foreground hover:text-foreground"
@@ -667,14 +668,14 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
             type="button"
             onClick={() => setActiveTab("bottlenecks")}
             className={cn(
-              "flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer",
+              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer",
               activeTab === "bottlenecks"
                 ? "bg-card text-foreground shadow-2xs border border-border/60"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
             <ShieldCheck className="h-4 w-4 text-emerald-500" weight="bold" />
-            <span>Bottleneck Radar</span>
+            <span>Bottlenecks</span>
             {filteredAlerts.length > 0 && (
               <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-500">
                 {filteredAlerts.length}
@@ -686,21 +687,21 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
             type="button"
             onClick={() => setActiveTab("turbo")}
             className={cn(
-              "flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer",
+              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer",
               activeTab === "turbo"
                 ? "bg-card text-foreground shadow-2xs border border-border/60"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
             <Lightning className="h-4 w-4 text-amber-500" weight="fill" />
-            <span>Stash Turbo Engine</span>
+            <span>Stash Turbo</span>
           </button>
         </div>
 
         <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground font-mono">
-          <span>PC: {snapshot?.hostname || "DESKTOP"}</span>
+          <span>{snapshot?.hostname || "DESKTOP"}</span>
           <span>·</span>
-          <span>OS: {snapshot?.os_name || "Windows"}</span>
+          <span>{snapshot?.os_name || "Windows"}</span>
         </div>
       </div>
 
@@ -708,17 +709,17 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
       {/* 4. TAB CONTENT: RUNNING APPLICATIONS & PROCESS INSPECTOR                  */}
       {/* ========================================================================= */}
       {activeTab === "apps" && (
-        <div className="flex flex-col gap-4">
-          {/* Controls Bar: Search, Category Filters, Sort */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-card border border-border/70 shadow-xs">
+        <div className="flex flex-col gap-3.5">
+          {/* Controls Bar: Search, Category Filters, Premium Select Dropdown */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 rounded-xl bg-card border border-border/70 shadow-xs">
             {/* Search Input */}
-            <div className="relative flex-1 max-w-md">
+            <div className="relative flex-1 max-w-sm">
               <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <input
                 type="text"
                 value={processSearch}
                 onChange={(e) => setProcessSearch(e.target.value)}
-                placeholder="Search processes by application name or PID…"
+                placeholder="Search processes or PID…"
                 className="w-full pl-9 pr-8 py-1.5 rounded-lg text-xs bg-background border border-border/70 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-all"
               />
               {processSearch && (
@@ -744,7 +745,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 )}
               >
-                All Processes
+                All
               </button>
               <button
                 type="button"
@@ -757,7 +758,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                 )}
               >
                 <Flame className="h-3 w-3" />
-                <span>Heavy Impact (&gt;3% CPU or &gt;200MB)</span>
+                <span>Heavy Impact</span>
               </button>
               <button
                 type="button"
@@ -769,49 +770,47 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 )}
               >
-                User Apps Only
+                User Apps
               </button>
             </div>
 
-            {/* Sort Selector */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                <SlidersHorizontal className="h-3.5 w-3.5" />
-                <span>Sort:</span>
-              </span>
-              <select
+            {/* Premium Select Sort Dropdown */}
+            <div className="flex items-center gap-1.5">
+              <PremiumSelect<ProcessSortField>
                 value={processSort}
-                onChange={(e) => setProcessSort(e.target.value as ProcessSortField)}
-                className="px-2.5 py-1 rounded-lg text-xs font-medium border border-border/70 bg-background text-foreground focus:outline-none cursor-pointer"
-              >
-                <option value="cpu">CPU Usage (Highest First)</option>
-                <option value="memory">RAM Usage (Highest First)</option>
-                <option value="name">Process Name (A–Z)</option>
-                <option value="pid">PID Number</option>
-              </select>
+                onChange={setProcessSort}
+                options={[
+                  { value: "cpu", label: "CPU Usage" },
+                  { value: "memory", label: "Memory (RAM)" },
+                  { value: "name", label: "Name (A–Z)" },
+                  { value: "pid", label: "PID" },
+                ]}
+                align="end"
+              />
+
               <button
                 type="button"
                 onClick={() => setProcessSortAsc((asc) => !asc)}
                 className="p-1.5 rounded-lg border border-border/70 bg-background text-foreground hover:bg-muted transition-colors cursor-pointer"
                 title={processSortAsc ? "Ascending order" : "Descending order"}
               >
-                {processSortAsc ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
+                {processSortAsc ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />}
               </button>
             </div>
           </div>
 
-          {/* Process Table */}
+          {/* Process Table with Real App Icons */}
           <div className="rounded-xl border border-border/80 bg-card overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
                   <tr className="border-b border-border/60 bg-muted/40 text-muted-foreground font-semibold">
-                    <th className="py-2.5 px-4">Application / Process</th>
+                    <th className="py-2.5 px-4">Application</th>
                     <th className="py-2.5 px-3">PID</th>
                     <th className="py-2.5 px-3 text-right">CPU %</th>
-                    <th className="py-2.5 px-3">CPU Load</th>
-                    <th className="py-2.5 px-3 text-right">RAM (Working Set)</th>
-                    <th className="py-2.5 px-3">Memory Load</th>
+                    <th className="py-2.5 px-3">CPU</th>
+                    <th className="py-2.5 px-3 text-right">Memory</th>
+                    <th className="py-2.5 px-3">RAM</th>
                     <th className="py-2.5 px-3">Uptime</th>
                     <th className="py-2.5 px-4 text-right">Action</th>
                   </tr>
@@ -819,10 +818,9 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                 <tbody className="divide-y divide-border/40 font-mono">
                   {filteredProcesses.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="py-12 text-center text-muted-foreground font-sans">
-                        <MagnifyingGlass className="h-6 w-6 mx-auto mb-2 opacity-50" />
+                      <td colSpan={8} className="py-10 text-center text-muted-foreground font-sans">
+                        <MagnifyingGlass className="h-5 w-5 mx-auto mb-1.5 opacity-50" />
                         <p className="text-xs font-semibold">No applications found</p>
-                        <p className="text-[11px] mt-0.5">Try adjusting your search query or filter mode.</p>
                       </td>
                     </tr>
                   ) : (
@@ -840,58 +838,48 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                           className={cn(
                             "hover:bg-muted/30 transition-colors group",
                             proc.is_stash && "bg-primary/5",
-                            isHeavy && "bg-rose-500/[0.03]"
+                            isHeavy && "bg-rose-500/[0.02]"
                           )}
                         >
-                          {/* Application Name & Badge */}
-                          <td className="py-2.5 px-4 font-sans font-medium text-foreground flex items-center gap-2.5">
-                            {/* Process Avatar / Icon */}
-                            <div
-                              className={cn(
-                                "h-7 w-7 rounded-lg flex items-center justify-center font-bold text-xs uppercase shrink-0 border shadow-2xs",
-                                proc.is_stash
-                                  ? "bg-primary text-primary-foreground border-primary"
-                                  : isHeavy
-                                  ? "bg-rose-500/15 text-rose-500 border-rose-500/30"
-                                  : "bg-muted text-muted-foreground border-border/60"
-                              )}
-                            >
-                              {proc.name.charAt(0)}
-                            </div>
+                          {/* Application Name & Actual App Icon */}
+                          <td className="py-2 px-4 font-sans font-medium text-foreground flex items-center gap-2.5">
+                            <ProcessAppIcon
+                              processName={proc.name}
+                              isStash={proc.is_stash}
+                              size={18}
+                            />
 
-                            <div className="flex flex-col min-w-0">
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className="font-semibold truncate max-w-[200px]" title={proc.name}>
-                                  {proc.name}
+                            <div className="flex items-center gap-1.5 truncate">
+                              <span className="font-semibold truncate max-w-[190px]" title={proc.name}>
+                                {proc.name}
+                              </span>
+                              {proc.is_stash && (
+                                <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-primary/20 text-primary border border-primary/30">
+                                  Stash
                                 </span>
-                                {proc.is_stash && (
-                                  <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-primary/20 text-primary border border-primary/30">
-                                    ⚡ This App
-                                  </span>
-                                )}
-                                {proc.pid === topCpu?.pid && (
-                                  <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-rose-500/20 text-rose-500 border border-rose-500/30">
-                                    Top CPU
-                                  </span>
-                                )}
-                                {proc.pid === topRam?.pid && (
-                                  <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-500 border border-emerald-500/30">
-                                    Top RAM
-                                  </span>
-                                )}
-                              </div>
+                              )}
+                              {proc.pid === topCpu?.pid && (
+                                <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-rose-500/20 text-rose-500 border border-rose-500/30">
+                                  Top CPU
+                                </span>
+                              )}
+                              {proc.pid === topRam?.pid && (
+                                <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-500 border border-emerald-500/30">
+                                  Top RAM
+                                </span>
+                              )}
                             </div>
                           </td>
 
                           {/* PID */}
-                          <td className="py-2.5 px-3 text-muted-foreground text-xs">
+                          <td className="py-2 px-3 text-muted-foreground text-xs">
                             {proc.pid}
                           </td>
 
                           {/* CPU % */}
                           <td
                             className={cn(
-                              "py-2.5 px-3 text-right font-bold text-xs",
+                              "py-2 px-3 text-right font-bold text-xs",
                               proc.cpu_usage >= 20
                                 ? "text-rose-500"
                                 : proc.cpu_usage >= 5
@@ -903,7 +891,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                           </td>
 
                           {/* CPU Meter */}
-                          <td className="py-2.5 px-3 w-32">
+                          <td className="py-2 px-3 w-28">
                             <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                               <div
                                 className={cn(
@@ -920,12 +908,12 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                           </td>
 
                           {/* Memory */}
-                          <td className="py-2.5 px-3 text-right font-bold text-xs text-foreground">
+                          <td className="py-2 px-3 text-right font-bold text-xs text-foreground">
                             {formatBytes(proc.memory_bytes)}
                           </td>
 
                           {/* Memory Meter */}
-                          <td className="py-2.5 px-3 w-32">
+                          <td className="py-2 px-3 w-28">
                             <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                               <div
                                 className={cn(
@@ -938,19 +926,19 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                           </td>
 
                           {/* Uptime */}
-                          <td className="py-2.5 px-3 text-muted-foreground text-[11px] font-sans">
+                          <td className="py-2 px-3 text-muted-foreground text-[11px] font-sans">
                             {formatDuration(proc.run_time_secs)}
                           </td>
 
                           {/* Action End Process */}
-                          <td className="py-2.5 px-4 text-right font-sans">
+                          <td className="py-2 px-4 text-right font-sans">
                             {proc.is_stash ? (
                               <span className="text-[10px] text-muted-foreground italic">Protected</span>
                             ) : (
                               <button
                                 type="button"
                                 onClick={() => setProcessToKill(proc)}
-                                className="px-2 py-1 rounded-md text-[11px] font-semibold text-rose-500 hover:bg-rose-500/10 hover:border-rose-500/30 border border-transparent transition-all cursor-pointer opacity-70 group-hover:opacity-100"
+                                className="px-2 py-0.5 rounded text-[11px] font-semibold text-rose-500 hover:bg-rose-500/10 hover:border-rose-500/30 border border-transparent transition-all cursor-pointer opacity-70 group-hover:opacity-100"
                                 title={`End process ${proc.name}`}
                               >
                                 End Task
@@ -965,13 +953,13 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
               </table>
             </div>
 
-            {/* Table Footer Summary */}
-            <div className="p-3 border-t border-border/60 bg-muted/20 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
+            {/* Table Footer */}
+            <div className="p-2.5 border-t border-border/60 bg-muted/20 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-muted-foreground">
               <span>
-                Showing <strong>{filteredProcesses.length}</strong> of {snapshot?.total_processes_count || 0} active processes
+                Showing <strong>{filteredProcesses.length}</strong> of {snapshot?.total_processes_count || 0} processes
               </span>
               <span>
-                Total RAM occupied by shown processes:{" "}
+                Total RAM occupied:{" "}
                 <strong className="text-foreground">
                   {formatBytes(filteredProcesses.reduce((acc, p) => acc + p.memory_bytes, 0))}
                 </strong>
@@ -982,18 +970,18 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
       )}
 
       {/* ========================================================================= */}
-      {/* 5. TAB CONTENT: HARDWARE COCKPIT (Gauges, Storage, Cores, Network)        */}
+      {/* 5. TAB CONTENT: HARDWARE COCKPIT                                          */}
       {/* ========================================================================= */}
       {activeTab === "cockpit" && (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-5">
           {/* Main Grid: 4 Cockpit Gauges */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Card 1: CPU Cockpit */}
-            <div className="p-4 rounded-xl bg-card border border-border/70 flex flex-col gap-3 shadow-xs relative overflow-hidden">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            {/* CPU Cockpit */}
+            <div className="p-4 rounded-xl bg-card border border-border/70 flex flex-col gap-2.5 shadow-xs relative overflow-hidden">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                   <Cpu className={cn("h-4 w-4", isColorful ? "text-blue-500" : "text-foreground")} />
-                  <span>Processor (CPU)</span>
+                  <span>CPU</span>
                 </span>
                 <span className="font-mono text-sm font-bold text-foreground">
                   {snapshot ? `${snapshot.global_cpu_usage.toFixed(1)}%` : "…"}
@@ -1001,7 +989,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
               </div>
 
               <div className="space-y-1">
-                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                   <motion.div
                     className={cn(
                       "h-full rounded-full",
@@ -1015,8 +1003,8 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                     transition={{ duration: 0.4 }}
                   />
                 </div>
-                <div className="flex justify-between items-center text-[11px] text-muted-foreground font-mono">
-                  <span>{snapshot ? `${snapshot.physical_core_count}P / ${snapshot.logical_core_count}T` : "0 Cores"}</span>
+                <div className="flex justify-between items-center text-[10px] text-muted-foreground font-mono">
+                  <span>{snapshot ? `${snapshot.physical_core_count}P / ${snapshot.logical_core_count}T` : ""}</span>
                   <span>{snapshot?.cpu_cores[0]?.frequency ? `${snapshot.cpu_cores[0].frequency} MHz` : "Turbo"}</span>
                 </div>
               </div>
@@ -1025,8 +1013,8 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                 {snapshot?.cpu_brand || "System Processor"}
               </p>
 
-              {/* Mini Sparkline */}
-              <div className="flex items-end gap-1 h-6 pt-1 border-t border-border/40">
+              {/* Sparkline */}
+              <div className="flex items-end gap-1 h-5 pt-1 border-t border-border/40">
                 {cpuHistory.map((val, idx) => (
                   <div
                     key={idx}
@@ -1038,12 +1026,12 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
               </div>
             </div>
 
-            {/* Card 2: Memory (RAM) */}
-            <div className="p-4 rounded-xl bg-card border border-border/70 flex flex-col gap-3 shadow-xs relative overflow-hidden">
+            {/* Memory (RAM) */}
+            <div className="p-4 rounded-xl bg-card border border-border/70 flex flex-col gap-2.5 shadow-xs relative overflow-hidden">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                   <Pulse className={cn("h-4 w-4", isColorful ? "text-emerald-500" : "text-foreground")} />
-                  <span>Memory (RAM)</span>
+                  <span>Memory</span>
                 </span>
                 <span className="font-mono text-sm font-bold text-foreground">
                   {ramUsagePct.toFixed(1)}%
@@ -1051,7 +1039,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
               </div>
 
               <div className="space-y-1">
-                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                   <motion.div
                     className={cn(
                       "h-full rounded-full",
@@ -1065,18 +1053,18 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                     transition={{ duration: 0.4 }}
                   />
                 </div>
-                <div className="flex justify-between items-center text-[11px] text-muted-foreground font-mono">
+                <div className="flex justify-between items-center text-[10px] text-muted-foreground font-mono">
                   <span>{snapshot ? formatBytes(snapshot.used_memory) : "0 GB"} used</span>
                   <span>{snapshot ? formatBytes(snapshot.total_memory) : "0 GB"} total</span>
                 </div>
               </div>
 
               <p className="text-[11px] text-muted-foreground truncate">
-                {snapshot ? `${formatBytes(snapshot.available_memory)} available buffer` : "Detecting RAM…"}
+                {snapshot ? `${formatBytes(snapshot.available_memory)} available` : "Detecting RAM…"}
               </p>
 
-              {/* Mini Sparkline */}
-              <div className="flex items-end gap-1 h-6 pt-1 border-t border-border/40">
+              {/* Sparkline */}
+              <div className="flex items-end gap-1 h-5 pt-1 border-t border-border/40">
                 {ramHistory.map((val, idx) => (
                   <div
                     key={idx}
@@ -1088,33 +1076,33 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
               </div>
             </div>
 
-            {/* Card 3: GPU & Display Engine */}
-            <div className="p-4 rounded-xl bg-card border border-border/70 flex flex-col gap-3 shadow-xs relative overflow-hidden">
+            {/* Graphics & GPU */}
+            <div className="p-4 rounded-xl bg-card border border-border/70 flex flex-col gap-2.5 shadow-xs relative overflow-hidden">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                   <Desktop className={cn("h-4 w-4", isColorful ? "text-purple-500" : "text-foreground")} />
-                  <span>Graphics & GPU</span>
+                  <span>Graphics</span>
                 </span>
-                <span className="font-mono text-sm font-bold text-emerald-500 flex items-center gap-1">
-                  <span>{fps} FPS</span>
+                <span className="font-mono text-sm font-bold text-emerald-500">
+                  {fps} FPS
                 </span>
               </div>
 
               <div className="space-y-1">
-                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                   <div
                     className="h-full rounded-full bg-purple-500"
                     style={{ width: `${Math.min(100, (fps / 144) * 100)}%` }}
                   />
                 </div>
-                <div className="flex justify-between items-center text-[11px] text-muted-foreground font-mono">
+                <div className="flex justify-between items-center text-[10px] text-muted-foreground font-mono">
                   <span>{(1000 / Math.max(1, fps)).toFixed(1)} ms frame</span>
                   <span>Hardware Accel</span>
                 </div>
               </div>
 
               <p className="text-[11px] text-muted-foreground truncate" title={gpu?.unmaskedRenderer}>
-                {gpu?.unmaskedRenderer || "Detecting display adapter…"}
+                {gpu?.unmaskedRenderer || "Detecting GPU…"}
               </p>
 
               <div className="flex items-center justify-between text-[10px] text-muted-foreground font-mono pt-1 border-t border-border/40">
@@ -1123,8 +1111,8 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
               </div>
             </div>
 
-            {/* Card 4: Primary Storage */}
-            <div className="p-4 rounded-xl bg-card border border-border/70 flex flex-col gap-3 shadow-xs relative overflow-hidden">
+            {/* Storage Drive */}
+            <div className="p-4 rounded-xl bg-card border border-border/70 flex flex-col gap-2.5 shadow-xs relative overflow-hidden">
               {(() => {
                 const disk = snapshot?.disks[0];
                 const usedDisk = disk ? disk.total_space - disk.available_space : 0;
@@ -1134,7 +1122,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                         <HardDrive className={cn("h-4 w-4", isColorful ? "text-amber-500" : "text-foreground")} />
-                        <span>System Drive</span>
+                        <span>Storage</span>
                       </span>
                       <span className="font-mono text-sm font-bold text-foreground">
                         {diskPct.toFixed(0)}%
@@ -1142,7 +1130,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                     </div>
 
                     <div className="space-y-1">
-                      <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                      <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                         <div
                           className={cn(
                             "h-full rounded-full",
@@ -1151,19 +1139,19 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                           style={{ width: `${Math.min(100, diskPct)}%` }}
                         />
                       </div>
-                      <div className="flex justify-between items-center text-[11px] text-muted-foreground font-mono">
+                      <div className="flex justify-between items-center text-[10px] text-muted-foreground font-mono">
                         <span>{formatBytes(usedDisk)} used</span>
                         <span>{disk ? formatBytes(disk.total_space) : "0 GB"}</span>
                       </div>
                     </div>
 
                     <p className="text-[11px] text-muted-foreground truncate">
-                      {disk ? `${formatBytes(disk.available_space)} free on ${disk.mount_point}` : "Scanning drives…"}
+                      {disk ? `${formatBytes(disk.available_space)} free on ${disk.mount_point}` : "Scanning…"}
                     </p>
 
                     <div className="flex items-center justify-between text-[10px] text-muted-foreground font-mono pt-1 border-t border-border/40">
                       <span>{disk?.file_system || "NTFS"}</span>
-                      <span>{disk?.is_removable ? "Removable" : "Internal SSD/NVMe"}</span>
+                      <span>{disk?.is_removable ? "Removable" : "SSD/NVMe"}</span>
                     </div>
                   </>
                 );
@@ -1171,30 +1159,26 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
             </div>
           </div>
 
-          {/* Row 2: CPU Multi-Core Matrix & Storage Array */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Row 2: CPU Multi-Core Matrix & Network Status */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             {/* CPU Multi-Core Matrix */}
-            <div className="lg:col-span-2 p-5 rounded-2xl bg-card border border-border/80 shadow-xs flex flex-col gap-3">
+            <div className="lg:col-span-2 p-4 rounded-xl bg-card border border-border/80 shadow-xs flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
                   <Cpu className={cn("h-4 w-4", isColorful ? "text-blue-500" : "text-foreground")} />
-                  <span>Multi-Core Logical Thread Matrix</span>
+                  <span>Multi-Core Load Matrix</span>
                 </h3>
                 <span className="text-[11px] font-mono text-muted-foreground">
-                  {snapshot?.cpu_cores.length || 0} Cores Active
+                  {snapshot?.cpu_cores.length || 0} Cores
                 </span>
               </div>
 
-              <p className="text-xs text-muted-foreground">
-                Live thread distribution across all cores. Detects single-thread compute bottlenecks.
-              </p>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-h-[360px] overflow-y-auto pr-1">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 max-h-[300px] overflow-y-auto pr-1">
                 {snapshot?.cpu_cores.map((core) => (
                   <div
                     key={core.id}
                     className={cn(
-                      "p-2.5 rounded-lg border flex flex-col gap-1 transition-all",
+                      "p-2 rounded-lg border flex flex-col gap-1 transition-all",
                       core.usage >= 90
                         ? "bg-rose-500/10 border-rose-500/40"
                         : core.usage >= 65
@@ -1203,7 +1187,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                     )}
                   >
                     <div className="flex justify-between items-center text-[10px]">
-                      <span className="font-mono font-medium text-muted-foreground">{core.name}</span>
+                      <span className="font-mono text-muted-foreground">{core.name}</span>
                       <span
                         className={cn(
                           "font-mono font-bold",
@@ -1237,46 +1221,46 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
             </div>
 
             {/* Network & Hardware Status */}
-            <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-xs flex flex-col gap-4">
+            <div className="p-4 rounded-xl bg-card border border-border/80 shadow-xs flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
                   <Globe className={cn("h-4 w-4", isColorful ? "text-cyan-500" : "text-foreground")} />
-                  <span>Network Interfaces & Transfer</span>
+                  <span>Network Throughput</span>
                 </h3>
                 <span className="text-[11px] font-mono text-muted-foreground">
-                  {snapshot?.network?.active_interfaces || 1} Interfaces
+                  {snapshot?.network?.active_interfaces || 1} Ifaces
                 </span>
               </div>
 
-              <div className="flex flex-col gap-3">
-                <div className="p-3 rounded-xl bg-muted/30 border border-border/50 flex flex-col gap-1">
-                  <span className="text-[11px] font-medium text-muted-foreground flex items-center gap-1">
-                    <ArrowDown className="h-3.5 w-3.5 text-emerald-500" />
-                    <span>Download Throughput</span>
+              <div className="flex flex-col gap-2.5">
+                <div className="p-3 rounded-xl bg-muted/30 border border-border/50 flex flex-col gap-0.5">
+                  <span className="text-[10px] font-medium text-muted-foreground flex items-center gap-1">
+                    <ArrowDown className="h-3 w-3 text-emerald-500" />
+                    <span>Download</span>
                   </span>
-                  <span className="font-mono text-lg font-bold text-emerald-500">
+                  <span className="font-mono text-base font-bold text-emerald-500">
                     {snapshot?.network ? formatSpeed(snapshot.network.rx_rate_bytes_per_sec) : "0 KB/s"}
                   </span>
                   <span className="text-[10px] text-muted-foreground">
-                    Total session: {snapshot?.network ? formatBytes(snapshot.network.total_rx_bytes) : "0 B"}
+                    Total: {snapshot?.network ? formatBytes(snapshot.network.total_rx_bytes) : "0 B"}
                   </span>
                 </div>
 
-                <div className="p-3 rounded-xl bg-muted/30 border border-border/50 flex flex-col gap-1">
-                  <span className="text-[11px] font-medium text-muted-foreground flex items-center gap-1">
-                    <ArrowUp className="h-3.5 w-3.5 text-blue-500" />
-                    <span>Upload Throughput</span>
+                <div className="p-3 rounded-xl bg-muted/30 border border-border/50 flex flex-col gap-0.5">
+                  <span className="text-[10px] font-medium text-muted-foreground flex items-center gap-1">
+                    <ArrowUp className="h-3 w-3 text-blue-500" />
+                    <span>Upload</span>
                   </span>
-                  <span className="font-mono text-lg font-bold text-blue-500">
+                  <span className="font-mono text-base font-bold text-blue-500">
                     {snapshot?.network ? formatSpeed(snapshot.network.tx_rate_bytes_per_sec) : "0 KB/s"}
                   </span>
                   <span className="text-[10px] text-muted-foreground">
-                    Total session: {snapshot?.network ? formatBytes(snapshot.network.total_tx_bytes) : "0 B"}
+                    Total: {snapshot?.network ? formatBytes(snapshot.network.total_tx_bytes) : "0 B"}
                   </span>
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-border/50 text-[11px] text-muted-foreground font-mono flex items-center justify-between">
+              <div className="pt-2 border-t border-border/50 text-[10px] text-muted-foreground font-mono flex items-center justify-between">
                 <span>Thermal Sensors: {snapshot?.thermal?.sensor_count || 0}</span>
                 <span>Uptime: {snapshot ? formatDuration(snapshot.uptime_secs) : "—"}</span>
               </div>
@@ -1289,16 +1273,13 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
       {/* 6. TAB CONTENT: BOTTLENECK RADAR                                          */}
       {/* ========================================================================= */}
       {activeTab === "bottlenecks" && (
-        <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-xs flex flex-col gap-4">
+        <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-xs flex flex-col gap-3.5">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
-              <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                <ShieldCheck className={cn("h-5 w-5", isColorful ? "text-primary" : "text-foreground")} />
-                <span>Bottleneck Intelligence Advisor</span>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
+                <ShieldCheck className={cn("h-4 w-4", isColorful ? "text-primary" : "text-foreground")} />
+                <span>Bottleneck Diagnostics</span>
               </h3>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Automated heuristics checking memory saturation, thermal throttling, single-core limits, and disk queue pressure.
-              </p>
             </div>
 
             {/* Category Filter Chips */}
@@ -1315,20 +1296,20 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   )}
                 >
-                  {cat === "all" ? "All Insights" : cat}
+                  {cat === "all" ? "All" : cat}
                 </button>
               ))}
             </div>
           </div>
 
           {/* Alerts List */}
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-2">
             {filteredAlerts.length === 0 ? (
-              <div className="p-10 text-center rounded-xl bg-muted/30 border border-border/50 flex flex-col items-center justify-center">
-                <CheckCircle className="h-8 w-8 text-emerald-500 mb-2" weight="fill" />
+              <div className="p-8 text-center rounded-xl bg-muted/30 border border-border/50 flex flex-col items-center justify-center">
+                <CheckCircle className="h-7 w-7 text-emerald-500 mb-1.5" weight="fill" />
                 <p className="text-xs font-semibold text-foreground">No Bottlenecks Detected</p>
                 <p className="text-[11px] text-muted-foreground mt-0.5">
-                  Your PC is running with balanced throughput, adequate headroom, and low latency.
+                  Hardware running with adequate headroom and low latency.
                 </p>
               </div>
             ) : (
@@ -1338,7 +1319,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                   initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
                   className={cn(
-                    "p-4 rounded-xl border flex flex-col gap-1.5 transition-all text-xs",
+                    "p-3 rounded-xl border flex flex-col gap-1 transition-all text-xs",
                     alert.severity === "critical"
                       ? "bg-rose-500/10 border-rose-500/30 text-rose-500"
                       : alert.severity === "warning"
@@ -1366,14 +1347,14 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                     </span>
                   </div>
 
-                  <p className="text-muted-foreground text-[11.5px] leading-relaxed">
+                  <p className="text-muted-foreground text-[11px] leading-relaxed">
                     {alert.detail}
                   </p>
 
                   {alert.recommendation && (
-                    <div className="flex items-start gap-1.5 pt-1 text-[11px] text-primary">
+                    <div className="flex items-start gap-1.5 pt-0.5 text-[11px] text-primary">
                       <CaretRight className="h-3 w-3 shrink-0 mt-0.5" />
-                      <span><strong>Recommendation:</strong> {alert.recommendation}</span>
+                      <span><strong>Action:</strong> {alert.recommendation}</span>
                     </div>
                   )}
                 </motion.div>
@@ -1384,27 +1365,22 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
       )}
 
       {/* ========================================================================= */}
-      {/* 7. TAB CONTENT: STASH TURBO ENGINE (Lightweight footprint proof)         */}
+      {/* 7. TAB CONTENT: STASH TURBO ENGINE                                        */}
       {/* ========================================================================= */}
       {activeTab === "turbo" && (
-        <div className="flex flex-col gap-6">
-          <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/10 via-card to-card border border-primary/25 shadow-sm">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-border/50">
+        <div className="flex flex-col gap-5">
+          <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-border/50">
               <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-xs">
-                  <Lightning className="h-6 w-6" weight="fill" />
+                <div className="h-10 w-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-xs">
+                  <Lightning className="h-5 w-5" weight="fill" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-base font-bold text-foreground">
-                      Stash Turbo & Zero-Lag Architecture
-                    </h2>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
-                      ⚡ Lightning Fast
-                    </span>
-                  </div>
+                  <h2 className="text-base font-bold text-foreground">
+                    Stash Engine & Memory Footprint
+                  </h2>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Engineered in native Rust and lightweight system webviews to guarantee your PC never slows down.
+                    Native Rust backend with zero-drag memory footprint.
                   </p>
                 </div>
               </div>
@@ -1413,52 +1389,52 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                 type="button"
                 onClick={handleOptimizeStash}
                 disabled={isOptimizing}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-primary hover:bg-primary/90 shadow-sm shadow-primary/25 transition-all cursor-pointer disabled:opacity-50"
+                className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-primary hover:bg-primary/90 shadow-xs shadow-primary/20 transition-all cursor-pointer disabled:opacity-50"
               >
-                <Sparkles className={cn("h-4 w-4", isOptimizing && "animate-spin")} weight="bold" />
-                <span>{isOptimizing ? "Compacting SQLite & Cache…" : "Compact Database & Trim RAM"}</span>
+                <Lightning className={cn("h-4 w-4", isOptimizing && "animate-spin")} weight="fill" />
+                <span>{isOptimizing ? "Compacting…" : "Turbo Optimize Stash"}</span>
               </button>
             </div>
 
             {/* Proof Metrics */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
-              <div className="flex flex-col gap-1 p-3.5 rounded-xl bg-background/50 border border-border/50">
-                <span className="text-[11px] font-medium text-muted-foreground">Stash Memory Footprint</span>
-                <span className="font-mono text-xl font-bold text-foreground">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3">
+              <div className="flex flex-col gap-0.5 p-3 rounded-xl bg-background/50 border border-border/50">
+                <span className="text-[10px] font-medium text-muted-foreground uppercase">Working Set</span>
+                <span className="font-mono text-lg font-bold text-foreground">
                   {snapshot?.stash_process ? formatBytes(snapshot.stash_process.memory_bytes) : "48 MB"}
                 </span>
                 <span className="text-[10px] text-emerald-500 font-semibold">
-                  {analysis ? `< ${analysis.stashOverheadPctOfRam.toFixed(2)}% of total RAM` : "< 0.1%"}
+                  {analysis ? `< ${analysis.stashOverheadPctOfRam.toFixed(2)}% RAM` : "< 0.1%"}
                 </span>
               </div>
 
-              <div className="flex flex-col gap-1 p-3.5 rounded-xl bg-background/50 border border-border/50">
-                <span className="text-[11px] font-medium text-muted-foreground">CPU Usage</span>
-                <span className="font-mono text-xl font-bold text-foreground">
+              <div className="flex flex-col gap-0.5 p-3 rounded-xl bg-background/50 border border-border/50">
+                <span className="text-[10px] font-medium text-muted-foreground uppercase">CPU Usage</span>
+                <span className="font-mono text-lg font-bold text-foreground">
                   {snapshot?.stash_process ? `${snapshot.stash_process.cpu_usage.toFixed(1)}%` : "< 0.1%"}
                 </span>
                 <span className="text-[10px] text-emerald-500 font-semibold">
-                  Zero Idle Thread Overhead
+                  Near-Zero Idle
                 </span>
               </div>
 
-              <div className="flex flex-col gap-1 p-3.5 rounded-xl bg-background/50 border border-border/50">
-                <span className="text-[11px] font-medium text-muted-foreground">Local SQLite Database</span>
-                <span className="font-mono text-xl font-bold text-foreground">
+              <div className="flex flex-col gap-0.5 p-3 rounded-xl bg-background/50 border border-border/50">
+                <span className="text-[10px] font-medium text-muted-foreground uppercase">SQLite DB Size</span>
+                <span className="font-mono text-lg font-bold text-foreground">
                   {snapshot ? formatBytes(snapshot.db_size_bytes) : "420 KB"}
                 </span>
                 <span className="text-[10px] text-muted-foreground">
-                  Indexed WAL Storage
+                  Indexed WAL
                 </span>
               </div>
 
-              <div className="flex flex-col gap-1 p-3.5 rounded-xl bg-background/50 border border-border/50">
-                <span className="text-[11px] font-medium text-muted-foreground">Active Tauri Windows</span>
-                <span className="font-mono text-xl font-bold text-foreground">
-                  {snapshot ? `${snapshot.active_windows_count} window` : "1 window"}
+              <div className="flex flex-col gap-0.5 p-3 rounded-xl bg-background/50 border border-border/50">
+                <span className="text-[10px] font-medium text-muted-foreground uppercase">Windows Active</span>
+                <span className="font-mono text-lg font-bold text-foreground">
+                  {snapshot ? `${snapshot.active_windows_count}` : "1"}
                 </span>
                 <span className="text-[10px] text-muted-foreground">
-                  Isolated Webview Instances
+                  Tauri Webview
                 </span>
               </div>
             </div>
@@ -1466,18 +1442,15 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
 
           {/* Benchmark comparison card */}
           <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-xs flex flex-col gap-3">
-            <h3 className="text-sm font-bold text-foreground">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">
               Desktop Application Memory Footprint Comparison
             </h3>
-            <p className="text-xs text-muted-foreground">
-              Typical Electron desktop apps vs Stash's native Rust architecture.
-            </p>
 
-            <div className="space-y-3 pt-2">
+            <div className="space-y-2.5 pt-1">
               {[
-                { name: "Typical Slack App", memory: "850 MB", pct: 85, color: "bg-muted-foreground/30" },
-                { name: "Typical Notion Desktop", memory: "720 MB", pct: 72, color: "bg-muted-foreground/30" },
-                { name: "Typical Teams App", memory: "980 MB", pct: 98, color: "bg-muted-foreground/30" },
+                { name: "Slack", memory: "850 MB", pct: 85, color: "bg-muted-foreground/30" },
+                { name: "Notion Desktop", memory: "720 MB", pct: 72, color: "bg-muted-foreground/30" },
+                { name: "Microsoft Teams", memory: "980 MB", pct: 98, color: "bg-muted-foreground/30" },
                 { name: "Stash (Native Rust)", memory: snapshot?.stash_process ? formatBytes(snapshot.stash_process.memory_bytes) : "48 MB", pct: 6, color: "bg-primary font-bold" },
               ].map((item, idx) => (
                 <div key={idx} className="flex flex-col gap-1">
@@ -1485,7 +1458,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                     <span className="font-medium text-foreground">{item.name}</span>
                     <span className="font-mono font-bold text-foreground">{item.memory}</span>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-muted/60 overflow-hidden">
+                  <div className="h-1.5 w-full rounded-full bg-muted/60 overflow-hidden">
                     <div
                       className={cn("h-full rounded-full transition-all duration-500", item.color)}
                       style={{ width: `${item.pct}%` }}
@@ -1508,26 +1481,28 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md rounded-2xl bg-card border border-border/80 shadow-2xl p-6 flex flex-col gap-4 relative overflow-hidden"
+              className="w-full max-w-md rounded-2xl bg-card border border-border/80 shadow-2xl p-5 flex flex-col gap-3.5 relative overflow-hidden"
             >
               <div className="flex items-start gap-3">
-                <div className="h-10 w-10 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-500 flex items-center justify-center shrink-0">
-                  <Warning className="h-5 w-5" weight="fill" />
-                </div>
+                <ProcessAppIcon
+                  processName={processToKill.name}
+                  isStash={processToKill.is_stash}
+                  size={24}
+                />
                 <div>
                   <h3 className="text-base font-bold text-foreground">
                     End Task: {processToKill.name}?
                   </h3>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    PID: {processToKill.pid} · Currently consuming{" "}
+                    PID: {processToKill.pid} · Consuming{" "}
                     <strong>{processToKill.cpu_usage.toFixed(1)}% CPU</strong> and{" "}
                     <strong>{formatBytes(processToKill.memory_bytes)} RAM</strong>.
                   </p>
                 </div>
               </div>
 
-              <p className="text-xs text-muted-foreground bg-muted/40 p-3 rounded-xl border border-border/50">
-                Terminating an active desktop application will force it to close. Any unsaved documents or state in that application may be lost.
+              <p className="text-xs text-muted-foreground bg-muted/40 p-2.5 rounded-xl border border-border/50">
+                Terminating an active desktop application will force it to close. Any unsaved documents in that application may be lost.
               </p>
 
               <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/40">
@@ -1535,7 +1510,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                   type="button"
                   onClick={() => setProcessToKill(null)}
                   disabled={isKilling}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold border border-border hover:bg-muted text-foreground transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-border hover:bg-muted text-foreground transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -1543,7 +1518,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                   type="button"
                   onClick={handleConfirmKillProcess}
                   disabled={isKilling}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 active:scale-95 shadow-xs shadow-rose-600/25 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 active:scale-95 shadow-xs shadow-rose-600/25 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
                 >
                   <StopCircle className="h-4 w-4" weight="bold" />
                   <span>{isKilling ? "Terminating…" : "End Process"}</span>
