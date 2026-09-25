@@ -75,6 +75,7 @@ export interface AppProcessInfo {
   virtual_memory_bytes: number;
   run_time_secs: number;
   is_stash: boolean;
+  icon_data?: string | null;
 }
 
 export interface NetworkTelemetry {

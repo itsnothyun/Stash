@@ -412,9 +412,9 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
         {/* Vital Signs Ribbon Bar */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pt-3 border-t border-border/50 text-xs">
           {/* CPU Global */}
-          <div className="flex flex-col p-2.5 rounded-xl bg-background/50 border border-border/50">
+          <div className="flex flex-col p-2.5 rounded-xl bg-background/50 border border-border/50 hover:border-brand/40 hover:bg-background/80 hover:shadow-2xs transition-all duration-200 cursor-default">
             <span className="text-[10px] text-muted-foreground uppercase font-semibold flex items-center gap-1">
-              <Cpu className={cn("h-3 w-3", isColorful ? "text-blue-500" : "text-foreground")} />
+              <Cpu className="h-3 w-3 text-brand" />
               <span>CPU Load</span>
             </span>
             <span className="font-mono text-sm font-bold text-foreground mt-0.5">
@@ -426,9 +426,9 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
           </div>
 
           {/* RAM Memory */}
-          <div className="flex flex-col p-2.5 rounded-xl bg-background/50 border border-border/50">
+          <div className="flex flex-col p-2.5 rounded-xl bg-background/50 border border-border/50 hover:border-brand/40 hover:bg-background/80 hover:shadow-2xs transition-all duration-200 cursor-default">
             <span className="text-[10px] text-muted-foreground uppercase font-semibold flex items-center gap-1">
-              <Pulse className={cn("h-3 w-3", isColorful ? "text-emerald-500" : "text-foreground")} />
+              <Pulse className="h-3 w-3 text-brand" />
               <span>RAM Used</span>
             </span>
             <span className="font-mono text-sm font-bold text-foreground mt-0.5">
@@ -440,17 +440,17 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
           </div>
 
           {/* Network Throughput */}
-          <div className="flex flex-col p-2.5 rounded-xl bg-background/50 border border-border/50">
+          <div className="flex flex-col p-2.5 rounded-xl bg-background/50 border border-border/50 hover:border-brand/40 hover:bg-background/80 hover:shadow-2xs transition-all duration-200 cursor-default">
             <span className="text-[10px] text-muted-foreground uppercase font-semibold flex items-center gap-1">
-              <Globe className={cn("h-3 w-3", isColorful ? "text-cyan-500" : "text-foreground")} />
+              <Globe className="h-3 w-3 text-brand" />
               <span>Network</span>
             </span>
             <div className="flex items-center gap-2 mt-0.5 font-mono text-xs font-bold">
-              <span className="text-emerald-500 flex items-center gap-0.5">
+              <span className="text-brand flex items-center gap-0.5">
                 <ArrowDown className="h-3 w-3 shrink-0" />
                 <span>{snapshot?.network ? formatSpeed(snapshot.network.rx_rate_bytes_per_sec) : "0 KB/s"}</span>
               </span>
-              <span className="text-blue-500 flex items-center gap-0.5">
+              <span className="text-brand/80 flex items-center gap-0.5">
                 <ArrowUp className="h-3 w-3 shrink-0" />
                 <span>{snapshot?.network ? formatSpeed(snapshot.network.tx_rate_bytes_per_sec) : "0 KB/s"}</span>
               </span>
@@ -461,9 +461,9 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
           </div>
 
           {/* Thermal Temp */}
-          <div className="flex flex-col p-2.5 rounded-xl bg-background/50 border border-border/50">
+          <div className="flex flex-col p-2.5 rounded-xl bg-background/50 border border-border/50 hover:border-brand/40 hover:bg-background/80 hover:shadow-2xs transition-all duration-200 cursor-default">
             <span className="text-[10px] text-muted-foreground uppercase font-semibold flex items-center gap-1">
-              <Thermometer className={cn("h-3 w-3", isColorful ? "text-rose-500" : "text-foreground")} />
+              <Thermometer className="h-3 w-3 text-brand" />
               <span>Package Temp</span>
             </span>
             <span className="font-mono text-sm font-bold text-foreground mt-0.5">
@@ -479,23 +479,23 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
           </div>
 
           {/* Stash Footprint */}
-          <div className="flex flex-col p-2.5 rounded-xl bg-background/50 border border-border/50">
+          <div className="flex flex-col p-2.5 rounded-xl bg-background/50 border border-border/50 hover:border-brand/40 hover:bg-background/80 hover:shadow-2xs transition-all duration-200 cursor-default">
             <span className="text-[10px] text-muted-foreground uppercase font-semibold flex items-center gap-1">
-              <Lightning className="h-3 w-3 text-primary" weight="fill" />
+              <Lightning className="h-3 w-3 text-brand" weight="fill" />
               <span>Stash Memory</span>
             </span>
-            <span className="font-mono text-sm font-bold text-emerald-500 mt-0.5">
+            <span className="font-mono text-sm font-bold text-brand mt-0.5">
               {snapshot?.stash_process ? formatBytes(snapshot.stash_process.memory_bytes) : "48 MB"}
             </span>
-            <span className="text-[10px] text-emerald-500 font-medium">
+            <span className="text-[10px] text-brand/80 font-medium">
               &lt; 0.1% System RAM
             </span>
           </div>
 
           {/* Engine Latency */}
-          <div className="flex flex-col p-2.5 rounded-xl bg-background/50 border border-border/50">
+          <div className="flex flex-col p-2.5 rounded-xl bg-background/50 border border-border/50 hover:border-brand/40 hover:bg-background/80 hover:shadow-2xs transition-all duration-200 cursor-default">
             <span className="text-[10px] text-muted-foreground uppercase font-semibold flex items-center gap-1">
-              <Database className="h-3 w-3 text-primary" />
+              <Database className="h-3 w-3 text-brand" />
               <span>SQLite IPC</span>
             </span>
             <span className="font-mono text-sm font-bold text-foreground mt-0.5">
@@ -514,7 +514,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
       <div className="flex flex-col gap-2.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            <Flame className="h-4 w-4 text-rose-500" weight="bold" />
+            <Flame className="h-4 w-4 text-brand" weight="bold" />
             <span>Top Resource Consumers</span>
           </div>
           <span className="text-[11px] text-muted-foreground font-mono">
@@ -524,12 +524,13 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
           {/* Card A: Highest CPU Consumer */}
-          <div className="p-4 rounded-xl bg-card border border-border/80 shadow-xs flex flex-col justify-between gap-3">
+          <div className="p-4 rounded-xl bg-card border border-border/80 shadow-xs flex flex-col justify-between gap-3 transition-all duration-200 hover:border-brand/40 hover:shadow-md hover:bg-card/95 group cursor-default">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
                 <ProcessAppIcon
                   processName={topCpu?.name || "App"}
                   isStash={topCpu?.is_stash}
+                  iconData={topCpu?.icon_data}
                   size={24}
                 />
                 <div className="min-w-0">
@@ -541,7 +542,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                       PID: {topCpu?.pid || "—"}
                     </span>
                   </div>
-                  <h3 className="text-sm font-bold text-foreground mt-0.5 truncate" title={topCpu?.name}>
+                  <h3 className="text-sm font-bold text-foreground mt-0.5 truncate group-hover:text-brand transition-colors" title={topCpu?.name}>
                     {topCpu?.name || "System Idle"}
                   </h3>
                 </div>
@@ -586,31 +587,32 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
           </div>
 
           {/* Card B: Highest RAM Consumer */}
-          <div className="p-4 rounded-xl bg-card border border-border/80 shadow-xs flex flex-col justify-between gap-3">
+          <div className="p-4 rounded-xl bg-card border border-border/80 shadow-xs flex flex-col justify-between gap-3 transition-all duration-200 hover:border-brand/40 hover:shadow-md hover:bg-card/95 group cursor-default">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
                 <ProcessAppIcon
                   processName={topRam?.name || "App"}
                   isStash={topRam?.is_stash}
+                  iconData={topRam?.icon_data}
                   size={24}
                 />
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-semibold uppercase px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-500 border border-emerald-500/25">
+                    <span className="text-[10px] font-semibold uppercase px-1.5 py-0.2 rounded bg-brand/15 text-brand border border-brand/25">
                       Highest Memory
                     </span>
                     <span className="text-[11px] font-mono text-muted-foreground">
                       PID: {topRam?.pid || "—"}
                     </span>
                   </div>
-                  <h3 className="text-sm font-bold text-foreground mt-0.5 truncate" title={topRam?.name}>
+                  <h3 className="text-sm font-bold text-foreground mt-0.5 truncate group-hover:text-brand transition-colors" title={topRam?.name}>
                     {topRam?.name || "System Idle"}
                   </h3>
                 </div>
               </div>
 
               <div className="text-right shrink-0">
-                <span className="font-mono text-lg font-bold text-emerald-500">
+                <span className="font-mono text-lg font-bold text-brand">
                   {topRam ? formatBytes(topRam.memory_bytes) : "0 MB"}
                 </span>
                 <p className="text-[10px] text-muted-foreground">
@@ -632,7 +634,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                   <>
                     <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                       <motion.div
-                        className="h-full rounded-full bg-emerald-500"
+                        className="h-full rounded-full bg-brand"
                         animate={{ width: `${Math.min(100, Math.max(8, memPct))}%` }}
                         transition={{ duration: 0.3 }}
                       />
@@ -678,7 +680,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <AppWindow className="h-4 w-4 text-indigo-500" weight="bold" />
+            <AppWindow className={cn("h-4 w-4", activeTab === "apps" ? "text-brand" : "text-muted-foreground")} weight="bold" />
             <span>Applications ({snapshot?.total_processes_count || 0})</span>
           </button>
 
@@ -693,7 +695,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <HardDrive className="h-4 w-4 text-amber-500" weight="bold" />
+            <HardDrive className={cn("h-4 w-4", activeTab === "storage" ? "text-brand" : "text-muted-foreground")} weight="bold" />
             <span>Disk Management ({snapshot?.disks.length || 0})</span>
           </button>
 
@@ -707,7 +709,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <SquaresFour className="h-4 w-4 text-blue-500" weight="bold" />
+            <SquaresFour className={cn("h-4 w-4", activeTab === "cockpit" ? "text-brand" : "text-muted-foreground")} weight="bold" />
             <span>Hardware Cockpit</span>
           </button>
 
@@ -721,7 +723,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <ShieldCheck className="h-4 w-4 text-emerald-500" weight="bold" />
+            <ShieldCheck className={cn("h-4 w-4", activeTab === "bottlenecks" ? "text-brand" : "text-muted-foreground")} weight="bold" />
             <span>Bottlenecks</span>
             {filteredAlerts.length > 0 && (
               <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-500">
@@ -740,7 +742,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <Lightning className="h-4 w-4 text-amber-500" weight="fill" />
+            <Lightning className={cn("h-4 w-4", activeTab === "turbo" ? "text-brand" : "text-muted-foreground")} weight="fill" />
             <span>Stash Turbo</span>
           </button>
         </div>
@@ -893,7 +895,8 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                             <ProcessAppIcon
                               processName={proc.name}
                               isStash={proc.is_stash}
-                              size={18}
+                              iconData={proc.icon_data}
+                              size={20}
                             />
 
                             <div className="flex items-center gap-1.5 truncate">
@@ -1022,15 +1025,10 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
       {activeTab === "storage" && (
         <div className="flex flex-col gap-4">
           {/* Master Storage Banner */}
-          <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-xs flex flex-col gap-4">
+          <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-xs flex flex-col gap-4 transition-all duration-200 hover:border-brand/40 hover:shadow-md">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div
-                  className={cn(
-                    "h-10 w-10 rounded-xl flex items-center justify-center shrink-0 border shadow-2xs",
-                    isColorful ? "bg-amber-500/15 text-amber-500 border-amber-500/30" : "bg-muted text-foreground border-border"
-                  )}
-                >
+                <div className="h-10 w-10 rounded-xl flex items-center justify-center shrink-0 border shadow-2xs bg-brand/10 text-brand border-brand/25">
                   <HardDrive className="h-5 w-5" weight="bold" />
                 </div>
                 <div>
@@ -1047,10 +1045,10 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
               <button
                 type="button"
                 onClick={handleOpenStorageSettings}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-border/80 bg-background/80 hover:bg-muted text-foreground transition-all cursor-pointer shadow-2xs"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-border/80 bg-background/80 hover:bg-muted text-foreground hover:border-brand/30 transition-all cursor-pointer shadow-2xs"
                 title="Open Windows Storage Settings / Cleanup"
               >
-                <ArrowSquareOut className="h-3.5 w-3.5" />
+                <ArrowSquareOut className="h-3.5 w-3.5 text-brand" />
                 <span>Windows Storage Settings</span>
               </button>
             </div>
@@ -1061,7 +1059,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                 <span className="text-muted-foreground">
                   Used: <strong className="text-foreground">{formatBytes(storageSummary.usedBytes)}</strong> ({storageSummary.usedPct.toFixed(1)}%)
                 </span>
-                <span className="text-emerald-500 font-semibold">
+                <span className="text-brand font-semibold">
                   Free: {formatBytes(storageSummary.freeBytes)} Available
                 </span>
               </div>
@@ -1072,9 +1070,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                     "h-full rounded-full transition-all duration-400",
                     storageSummary.usedPct >= 90
                       ? "bg-rose-500"
-                      : storageSummary.usedPct >= 75
-                      ? "bg-amber-500"
-                      : "bg-primary"
+                      : "bg-brand"
                   )}
                   animate={{ width: `${Math.min(100, storageSummary.usedPct)}%` }}
                   transition={{ duration: 0.4 }}
@@ -1095,17 +1091,20 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
               return (
                 <div
                   key={disk.mount_point || idx}
-                  className="p-4 rounded-xl bg-card border border-border/80 shadow-xs flex flex-col justify-between gap-3 relative overflow-hidden"
+                  className="p-4 rounded-xl bg-card border border-border/80 shadow-xs flex flex-col justify-between gap-3 relative overflow-hidden transition-all duration-200 hover:border-brand/50 hover:shadow-md hover:bg-card/95 group cursor-default"
                 >
+                  {/* Subtle hover gradient sheen */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-brand/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
                   {/* Card Header: Mount Point, Volume Name & Disk Type */}
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start justify-between gap-2 relative z-10">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div
                         className={cn(
-                          "h-9 w-9 rounded-lg flex items-center justify-center shrink-0 border shadow-2xs font-mono font-bold text-xs",
+                          "h-9 w-9 rounded-lg flex items-center justify-center shrink-0 border shadow-2xs font-mono font-bold text-xs transition-transform duration-200 group-hover:scale-105",
                           isBootDrive
-                            ? "bg-primary/15 text-primary border-primary/30"
-                            : "bg-muted text-foreground border-border/60"
+                            ? "bg-brand/15 text-brand border-brand/30"
+                            : "bg-muted text-foreground border-border/60 group-hover:border-brand/30 group-hover:text-brand"
                         )}
                       >
                         {disk.mount_point.replace(/\\|\//g, "") || "D:"}
@@ -1113,11 +1112,11 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
 
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <h3 className="text-sm font-bold text-foreground truncate" title={disk.name}>
+                          <h3 className="text-sm font-bold text-foreground truncate group-hover:text-brand transition-colors" title={disk.name}>
                             {disk.name || `Local Disk (${disk.mount_point})`}
                           </h3>
                           {isBootDrive && (
-                            <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-primary/20 text-primary border border-primary/30">
+                            <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-brand/15 text-brand border border-brand/30">
                               OS Boot
                             </span>
                           )}
@@ -1131,12 +1130,12 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                     {/* Disk Type Badge */}
                     <span
                       className={cn(
-                        "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase shrink-0 border",
+                        "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase shrink-0 border transition-colors",
                         disk.disk_type === "SSD"
-                          ? "bg-purple-500/10 text-purple-500 border-purple-500/25"
+                          ? "bg-brand/10 text-brand border-brand/25"
                           : disk.is_removable
                           ? "bg-amber-500/10 text-amber-500 border-amber-500/25"
-                          : "bg-muted text-muted-foreground border-border"
+                          : "bg-muted text-muted-foreground border-border group-hover:border-brand/25 group-hover:text-brand"
                       )}
                     >
                       {disk.disk_type || (disk.is_removable ? "Removable" : "SSD/NVMe")}
@@ -1144,7 +1143,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                   </div>
 
                   {/* Meter Bar */}
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 relative z-10">
                     <div className="flex justify-between items-center text-[11px] font-mono">
                       <span className="text-muted-foreground">
                         {formatBytes(usedSpace)} ({usedPct.toFixed(0)}%)
@@ -1162,9 +1161,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                             ? "bg-rose-500"
                             : isWarning
                             ? "bg-amber-500"
-                            : isBootDrive
-                            ? "bg-primary"
-                            : "bg-blue-500"
+                            : "bg-brand"
                         )}
                         animate={{ width: `${Math.min(100, Math.max(3, usedPct))}%` }}
                         transition={{ duration: 0.3 }}
@@ -1179,7 +1176,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                             ? "text-rose-500 font-bold"
                             : isWarning
                             ? "text-amber-500 font-bold"
-                            : "text-emerald-500"
+                            : "text-brand"
                         )}
                       >
                         {formatBytes(disk.available_space)} free space
@@ -1189,7 +1186,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                       <button
                         type="button"
                         onClick={() => handleOpenDrive(disk.mount_point)}
-                        className="text-[11px] font-semibold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+                        className="text-[11px] font-semibold text-brand hover:underline flex items-center gap-1 cursor-pointer transition-colors"
                         title={`Open ${disk.mount_point} in Windows Explorer`}
                       >
                         <FolderOpen className="h-3.5 w-3.5" />
@@ -1212,27 +1209,27 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
           {/* Main Grid: 4 Cockpit Gauges */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
             {/* CPU Cockpit */}
-            <div className="p-4 rounded-xl bg-card border border-border/70 flex flex-col gap-2.5 shadow-xs relative overflow-hidden">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                  <Cpu className={cn("h-4 w-4", isColorful ? "text-blue-500" : "text-foreground")} />
+            <div className="p-4 rounded-xl bg-card border border-border/70 flex flex-col gap-2.5 shadow-xs relative overflow-hidden transition-all duration-200 hover:border-brand/50 hover:shadow-md hover:bg-card/95 group cursor-default">
+              <div className="absolute inset-0 bg-gradient-to-br from-brand/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
+              <div className="flex items-center justify-between relative z-10">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors flex items-center gap-1.5">
+                  <Cpu className="h-4 w-4 text-brand transition-transform duration-200 group-hover:scale-110" />
                   <span>CPU</span>
                 </span>
-                <span className="font-mono text-sm font-bold text-foreground">
+                <span className="font-mono text-sm font-bold text-brand">
                   {snapshot ? `${snapshot.global_cpu_usage.toFixed(1)}%` : "…"}
                 </span>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-1 relative z-10">
                 <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                   <motion.div
                     className={cn(
-                      "h-full rounded-full",
+                      "h-full rounded-full transition-all duration-400",
                       snapshot && snapshot.global_cpu_usage >= 85
                         ? "bg-rose-500"
-                        : snapshot && snapshot.global_cpu_usage >= 60
-                        ? "bg-amber-500"
-                        : "bg-blue-500"
+                        : "bg-brand"
                     )}
                     animate={{ width: `${Math.min(100, snapshot?.global_cpu_usage || 0)}%` }}
                     transition={{ duration: 0.4 }}
@@ -1244,16 +1241,16 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                 </div>
               </div>
 
-              <p className="text-[11px] text-muted-foreground truncate" title={snapshot?.cpu_brand}>
+              <p className="text-[11px] text-muted-foreground truncate relative z-10" title={snapshot?.cpu_brand}>
                 {snapshot?.cpu_brand || "System Processor"}
               </p>
 
               {/* Sparkline */}
-              <div className="flex items-end gap-1 h-5 pt-1 border-t border-border/40">
+              <div className="flex items-end gap-1 h-5 pt-1 border-t border-border/40 relative z-10">
                 {cpuHistory.map((val, idx) => (
                   <div
                     key={idx}
-                    className="flex-1 bg-blue-500/25 rounded-t-xs hover:bg-blue-500 transition-colors"
+                    className="flex-1 bg-brand/20 rounded-t-xs group-hover:bg-brand/35 hover:!bg-brand transition-colors"
                     style={{ height: `${Math.max(15, val)}%` }}
                     title={`${val}%`}
                   />
@@ -1262,27 +1259,27 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
             </div>
 
             {/* Memory (RAM) */}
-            <div className="p-4 rounded-xl bg-card border border-border/70 flex flex-col gap-2.5 shadow-xs relative overflow-hidden">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                  <Pulse className={cn("h-4 w-4", isColorful ? "text-emerald-500" : "text-foreground")} />
+            <div className="p-4 rounded-xl bg-card border border-border/70 flex flex-col gap-2.5 shadow-xs relative overflow-hidden transition-all duration-200 hover:border-brand/50 hover:shadow-md hover:bg-card/95 group cursor-default">
+              <div className="absolute inset-0 bg-gradient-to-br from-brand/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
+              <div className="flex items-center justify-between relative z-10">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors flex items-center gap-1.5">
+                  <Pulse className="h-4 w-4 text-brand transition-transform duration-200 group-hover:scale-110" />
                   <span>Memory</span>
                 </span>
-                <span className="font-mono text-sm font-bold text-foreground">
+                <span className="font-mono text-sm font-bold text-brand">
                   {ramUsagePct.toFixed(1)}%
                 </span>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-1 relative z-10">
                 <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                   <motion.div
                     className={cn(
-                      "h-full rounded-full",
+                      "h-full rounded-full transition-all duration-400",
                       ramUsagePct >= 90
                         ? "bg-rose-500"
-                        : ramUsagePct >= 75
-                        ? "bg-amber-500"
-                        : "bg-emerald-500"
+                        : "bg-brand"
                     )}
                     animate={{ width: `${Math.min(100, ramUsagePct)}%` }}
                     transition={{ duration: 0.4 }}
@@ -1294,16 +1291,16 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                 </div>
               </div>
 
-              <p className="text-[11px] text-muted-foreground truncate">
+              <p className="text-[11px] text-muted-foreground truncate relative z-10">
                 {snapshot ? `${formatBytes(snapshot.available_memory)} available` : "Detecting RAM…"}
               </p>
 
               {/* Sparkline */}
-              <div className="flex items-end gap-1 h-5 pt-1 border-t border-border/40">
+              <div className="flex items-end gap-1 h-5 pt-1 border-t border-border/40 relative z-10">
                 {ramHistory.map((val, idx) => (
                   <div
                     key={idx}
-                    className="flex-1 bg-emerald-500/25 rounded-t-xs hover:bg-emerald-500 transition-colors"
+                    className="flex-1 bg-brand/20 rounded-t-xs group-hover:bg-brand/35 hover:!bg-brand transition-colors"
                     style={{ height: `${Math.max(15, val)}%` }}
                     title={`${val}%`}
                   />
@@ -1312,21 +1309,23 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
             </div>
 
             {/* Graphics & GPU */}
-            <div className="p-4 rounded-xl bg-card border border-border/70 flex flex-col gap-2.5 shadow-xs relative overflow-hidden">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                  <Desktop className={cn("h-4 w-4", isColorful ? "text-purple-500" : "text-foreground")} />
+            <div className="p-4 rounded-xl bg-card border border-border/70 flex flex-col gap-2.5 shadow-xs relative overflow-hidden transition-all duration-200 hover:border-brand/50 hover:shadow-md hover:bg-card/95 group cursor-default">
+              <div className="absolute inset-0 bg-gradient-to-br from-brand/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
+              <div className="flex items-center justify-between relative z-10">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors flex items-center gap-1.5">
+                  <Desktop className="h-4 w-4 text-brand transition-transform duration-200 group-hover:scale-110" />
                   <span>Graphics</span>
                 </span>
-                <span className="font-mono text-sm font-bold text-emerald-500">
+                <span className="font-mono text-sm font-bold text-brand">
                   {fps} FPS
                 </span>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-1 relative z-10">
                 <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-purple-500"
+                    className="h-full rounded-full bg-brand transition-all duration-300"
                     style={{ width: `${Math.min(100, (fps / 144) * 100)}%` }}
                   />
                 </div>
@@ -1336,40 +1335,42 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                 </div>
               </div>
 
-              <p className="text-[11px] text-muted-foreground truncate" title={gpu?.unmaskedRenderer}>
+              <p className="text-[11px] text-muted-foreground truncate relative z-10" title={gpu?.unmaskedRenderer}>
                 {gpu?.unmaskedRenderer || "Detecting GPU…"}
               </p>
 
-              <div className="flex items-center justify-between text-[10px] text-muted-foreground font-mono pt-1 border-t border-border/40">
+              <div className="flex items-center justify-between text-[10px] text-muted-foreground font-mono pt-1 border-t border-border/40 relative z-10">
                 <span>{gpu?.unmaskedVendor || "GPU"}</span>
                 <span>Max Tex: {gpu?.maxTextureSize || 8192}px</span>
               </div>
             </div>
 
             {/* Storage Drive */}
-            <div className="p-4 rounded-xl bg-card border border-border/70 flex flex-col gap-2.5 shadow-xs relative overflow-hidden">
+            <div className="p-4 rounded-xl bg-card border border-border/70 flex flex-col gap-2.5 shadow-xs relative overflow-hidden transition-all duration-200 hover:border-brand/50 hover:shadow-md hover:bg-card/95 group cursor-default">
+              <div className="absolute inset-0 bg-gradient-to-br from-brand/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
               {(() => {
                 const disk = snapshot?.disks[0];
                 const usedDisk = disk ? disk.total_space - disk.available_space : 0;
                 const diskPct = disk && disk.total_space > 0 ? (usedDisk / disk.total_space) * 100 : 0;
                 return (
                   <>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                        <HardDrive className={cn("h-4 w-4", isColorful ? "text-amber-500" : "text-foreground")} />
+                    <div className="flex items-center justify-between relative z-10">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors flex items-center gap-1.5">
+                        <HardDrive className="h-4 w-4 text-brand transition-transform duration-200 group-hover:scale-110" />
                         <span>Storage</span>
                       </span>
-                      <span className="font-mono text-sm font-bold text-foreground">
+                      <span className="font-mono text-sm font-bold text-brand">
                         {diskPct.toFixed(0)}%
                       </span>
                     </div>
 
-                    <div className="space-y-1">
+                    <div className="space-y-1 relative z-10">
                       <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                         <div
                           className={cn(
-                            "h-full rounded-full",
-                            diskPct >= 90 ? "bg-rose-500" : "bg-amber-500"
+                            "h-full rounded-full transition-all duration-300",
+                            diskPct >= 90 ? "bg-rose-500" : "bg-brand"
                           )}
                           style={{ width: `${Math.min(100, diskPct)}%` }}
                         />
@@ -1380,11 +1381,11 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                       </div>
                     </div>
 
-                    <p className="text-[11px] text-muted-foreground truncate">
+                    <p className="text-[11px] text-muted-foreground truncate relative z-10">
                       {disk ? `${formatBytes(disk.available_space)} free on ${disk.mount_point}` : "Scanning…"}
                     </p>
 
-                    <div className="flex items-center justify-between text-[10px] text-muted-foreground font-mono pt-1 border-t border-border/40">
+                    <div className="flex items-center justify-between text-[10px] text-muted-foreground font-mono pt-1 border-t border-border/40 relative z-10">
                       <span>{disk?.file_system || "NTFS"}</span>
                       <span>{disk?.is_removable ? "Removable" : "SSD/NVMe"}</span>
                     </div>
@@ -1397,10 +1398,10 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
           {/* Row 2: CPU Multi-Core Matrix & Network Status */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             {/* CPU Multi-Core Matrix */}
-            <div className="lg:col-span-2 p-4 rounded-xl bg-card border border-border/80 shadow-xs flex flex-col gap-3">
+            <div className="lg:col-span-2 p-4 rounded-xl bg-card border border-border/80 shadow-xs flex flex-col gap-3 transition-all duration-200 hover:border-brand/40 hover:shadow-md">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
-                  <Cpu className={cn("h-4 w-4", isColorful ? "text-blue-500" : "text-foreground")} />
+                  <Cpu className="h-4 w-4 text-brand" />
                   <span>Multi-Core Load Matrix</span>
                 </h3>
                 <span className="text-[11px] font-mono text-muted-foreground">
@@ -1416,9 +1417,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                       "p-2 rounded-lg border flex flex-col gap-1 transition-all",
                       core.usage >= 90
                         ? "bg-rose-500/10 border-rose-500/40"
-                        : core.usage >= 65
-                        ? "bg-amber-500/10 border-amber-500/30"
-                        : "bg-muted/30 border-border/50"
+                        : "bg-muted/30 border-border/50 hover:border-brand/40 hover:bg-brand/5"
                     )}
                   >
                     <div className="flex justify-between items-center text-[10px]">
@@ -1428,8 +1427,6 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                           "font-mono font-bold",
                           core.usage >= 90
                             ? "text-rose-500"
-                            : core.usage >= 65
-                            ? "text-amber-500"
                             : "text-foreground"
                         )}
                       >
@@ -1443,9 +1440,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                           "h-full rounded-full transition-all duration-300",
                           core.usage >= 90
                             ? "bg-rose-500"
-                            : core.usage >= 65
-                            ? "bg-amber-500"
-                            : "bg-primary"
+                            : "bg-brand"
                         )}
                         style={{ width: `${Math.min(100, core.usage)}%` }}
                       />
@@ -1456,10 +1451,10 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
             </div>
 
             {/* Network & Hardware Status */}
-            <div className="p-4 rounded-xl bg-card border border-border/80 shadow-xs flex flex-col gap-3">
+            <div className="p-4 rounded-xl bg-card border border-border/80 shadow-xs flex flex-col gap-3 transition-all duration-200 hover:border-brand/40 hover:shadow-md">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
-                  <Globe className={cn("h-4 w-4", isColorful ? "text-cyan-500" : "text-foreground")} />
+                  <Globe className="h-4 w-4 text-brand" />
                   <span>Network Throughput</span>
                 </h3>
                 <span className="text-[11px] font-mono text-muted-foreground">
@@ -1468,12 +1463,12 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
               </div>
 
               <div className="flex flex-col gap-2.5">
-                <div className="p-3 rounded-xl bg-muted/30 border border-border/50 flex flex-col gap-0.5">
+                <div className="p-3 rounded-xl bg-muted/30 border border-border/50 flex flex-col gap-0.5 hover:border-brand/30 hover:bg-brand/5 transition-all">
                   <span className="text-[10px] font-medium text-muted-foreground flex items-center gap-1">
-                    <ArrowDown className="h-3 w-3 text-emerald-500" />
+                    <ArrowDown className="h-3 w-3 text-brand" />
                     <span>Download</span>
                   </span>
-                  <span className="font-mono text-base font-bold text-emerald-500">
+                  <span className="font-mono text-base font-bold text-brand">
                     {snapshot?.network ? formatSpeed(snapshot.network.rx_rate_bytes_per_sec) : "0 KB/s"}
                   </span>
                   <span className="text-[10px] text-muted-foreground">
@@ -1481,12 +1476,12 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                   </span>
                 </div>
 
-                <div className="p-3 rounded-xl bg-muted/30 border border-border/50 flex flex-col gap-0.5">
+                <div className="p-3 rounded-xl bg-muted/30 border border-border/50 flex flex-col gap-0.5 hover:border-brand/30 hover:bg-brand/5 transition-all">
                   <span className="text-[10px] font-medium text-muted-foreground flex items-center gap-1">
-                    <ArrowUp className="h-3 w-3 text-blue-500" />
+                    <ArrowUp className="h-3 w-3 text-brand/80" />
                     <span>Upload</span>
                   </span>
-                  <span className="font-mono text-base font-bold text-blue-500">
+                  <span className="font-mono text-base font-bold text-brand/80">
                     {snapshot?.network ? formatSpeed(snapshot.network.tx_rate_bytes_per_sec) : "0 KB/s"}
                   </span>
                   <span className="text-[10px] text-muted-foreground">
@@ -1722,7 +1717,8 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                 <ProcessAppIcon
                   processName={processToKill.name}
                   isStash={processToKill.is_stash}
-                  size={24}
+                  iconData={processToKill.icon_data}
+                  size={26}
                 />
                 <div>
                   <h3 className="text-base font-bold text-foreground">
