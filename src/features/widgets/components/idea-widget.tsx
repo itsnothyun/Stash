@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Check, Lightbulb, ArrowClockwise as RefreshCw, ThumbsUp, ThumbsDown, Sparkle as Sparkles } from "@phosphor-icons/react";
 import { WidgetInsertButton } from "./widget-insert-button";
 import { cn } from "@/lib/utils/cn";
+import { useUIStore } from "@/stores/ui-store";
 
 interface IdeaWidgetProps {
   onInsertToNote?: (text: string) => void;
@@ -19,6 +20,8 @@ export const IdeaWidget: React.FC<IdeaWidgetProps> = ({
   onInsertToNote,
   className,
 }) => {
+  const iconSet = useUIStore((s) => s.iconSet);
+  const isColorful = iconSet === "colorful";
   const [concept, setConcept] = useState("AI-powered ephemeral scratchpad with component widgets");
   const [confidence, setConfidence] = useState(85);
   const [validationInterviews, setValidationInterviews] = useState(12);
@@ -62,7 +65,7 @@ export const IdeaWidget: React.FC<IdeaWidgetProps> = ({
       <div className="flex flex-col gap-2 rounded-xl bg-card border border-border/70 p-2.5 shadow-xs">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground">
+            <div className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-lg", isColorful ? "bg-yellow-500/15 text-yellow-500" : "bg-muted text-foreground")}>
               <Lightbulb className="h-4 w-4" />
             </div>
             <input
@@ -164,7 +167,7 @@ export const IdeaWidget: React.FC<IdeaWidgetProps> = ({
       <div className="grid grid-cols-2 gap-2">
         <div className="space-y-1">
           <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-            <ThumbsUp className="h-2.5 w-2.5 text-foreground" />
+            <ThumbsUp className={cn("h-2.5 w-2.5", isColorful ? "text-emerald-500" : "text-foreground")} />
             <span>Key Advantages</span>
           </label>
           <textarea
@@ -176,7 +179,7 @@ export const IdeaWidget: React.FC<IdeaWidgetProps> = ({
         </div>
         <div className="space-y-1">
           <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-            <ThumbsDown className="h-2.5 w-2.5 text-foreground" />
+            <ThumbsDown className={cn("h-2.5 w-2.5", isColorful ? "text-rose-500" : "text-foreground")} />
             <span>Risks & Trade-offs</span>
           </label>
           <textarea

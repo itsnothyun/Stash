@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Plus, Bug, Trash as Trash2, ArrowRight } from "@phosphor-icons/react";
 import { WidgetInsertButton } from "./widget-insert-button";
 import { cn } from "@/lib/utils/cn";
+import { useUIStore } from "@/stores/ui-store";
 
 type Severity = "P0" | "P1" | "P2";
 type BugStatus = "Triage" | "In Flight" | "Resolved";
@@ -15,6 +16,8 @@ export const BugWidget: React.FC<BugWidgetProps> = ({
   onInsertToNote,
   className,
 }) => {
+  const iconSet = useUIStore((s) => s.iconSet);
+  const isColorful = iconSet === "colorful";
   const [title, setTitle] = useState("Window shade roll up animation glitch");
   const [severity, setSeverity] = useState<Severity>("P1");
   const [status, setStatus] = useState<BugStatus>("In Flight");
@@ -59,7 +62,7 @@ export const BugWidget: React.FC<BugWidgetProps> = ({
       <div className="flex flex-col gap-2 rounded-xl bg-card border border-border/70 p-2.5 shadow-xs">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground">
+            <div className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-lg", isColorful ? "bg-rose-500/15 text-rose-500" : "bg-muted text-foreground")}>
               <Bug className="h-4 w-4" />
             </div>
             <input

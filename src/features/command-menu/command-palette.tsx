@@ -35,8 +35,9 @@ import {
   MagnifyingGlassPlus as ZoomIn,
   MagnifyingGlassMinus as ZoomOut,
   Globe,
+  Palette,
 } from "@phosphor-icons/react";
-import { NOTE_TEMPLATES } from "@/features/stash/templates";
+import { NOTE_TEMPLATES, getTemplateIconStyle } from "@/features/stash/templates";
 import { cn } from "@/lib/utils/cn";
 import { stashIpc } from "@/lib/ipc/stash-ipc";
 
@@ -74,10 +75,14 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     setSettingsOpen,
     requestSearchFocus,
     setTheme,
+    iconSet,
+    toggleIconSet,
     zoomIn,
     zoomOut,
     resetZoom,
   } = useUIStore();
+
+  const isColorful = iconSet === "colorful";
 
   const run = (action: () => void) => {
     setCommandPaletteOpen(false);
@@ -148,7 +153,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               })
             }
           >
-            <Globe className="mr-2 h-4 w-4 text-foreground" />
+            <Globe
+              className={cn(
+                "mr-2 h-4 w-4",
+                isColorful ? "text-cyan-500" : "text-foreground"
+              )}
+            />
             <span>Open Picture-in-Picture Browser</span>
           </CommandItem>
         </CommandGroup>
@@ -158,6 +168,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         <CommandGroup heading="Templates">
           {NOTE_TEMPLATES.map((tmpl) => {
             const Icon = tmpl.icon;
+            const style = getTemplateIconStyle(tmpl, isColorful);
             return (
               <CommandItem
                 key={tmpl.id}
@@ -178,10 +189,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 <div
                   className={cn(
                     "mr-2 flex h-5 w-5 shrink-0 items-center justify-center rounded",
-                    tmpl.iconBg
+                    style.iconBg
                   )}
                 >
-                  <Icon className={cn("h-3.5 w-3.5", tmpl.iconColor)} />
+                  <Icon className={cn("h-3.5 w-3.5", style.iconColor)} />
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{tmpl.name}</span>
@@ -298,6 +309,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               </CommandItem>
             );
           })}
+
+          <CommandItem onSelect={() => run(() => toggleIconSet())}>
+            <Palette className="mr-2 h-4 w-4" />
+            <span>Toggle icon set ({iconSet === "colorful" ? "Monochrome" : "Colorful"})</span>
+          </CommandItem>
 
           <CommandItem onSelect={() => run(() => setSettingsOpen(true))}>
             <SettingsIcon className="mr-2 h-4 w-4" />

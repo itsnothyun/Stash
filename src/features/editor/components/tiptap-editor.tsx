@@ -211,6 +211,9 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
           const coords = view.coordsAtPos(selection.from);
           setSlashMenuPos({ top: coords.bottom + 6, left: coords.left });
           setSlashMenuOpen(true);
+          // The menu has its own search input — suppress the '/' itself so it
+          // never lands in the note (there'd be nothing left to clean up).
+          return true;
         } else if (event.key === "Escape") {
           setSlashMenuOpen(false);
         } else if (event.key === "=") {

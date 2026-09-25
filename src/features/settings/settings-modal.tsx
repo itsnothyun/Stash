@@ -78,6 +78,9 @@ import {
   SpeakerHigh as Volume2,
   Palette,
   Terminal,
+  Calculator,
+  Timer,
+  Kanban,
 } from "@phosphor-icons/react";
 import {
   THEMES_LIST,
@@ -205,6 +208,8 @@ export const SettingsModal: React.FC = () => {
     resetZoom,
     accentColor,
     setAccentColor,
+    iconSet,
+    setIconSet,
     fontFamily,
     setFontFamily,
     cardDensity,
@@ -1076,6 +1081,147 @@ export const SettingsModal: React.FC = () => {
                         );
                       })}
                     </div>
+                  </div>
+
+                  {/* Icon Set: Colorful vs Monochrome */}
+                  <div className="border-t border-border pt-5">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-semibold text-foreground">
+                        Icon Set & Iconography
+                      </span>
+                      <span className="text-[10px] font-mono text-muted-foreground uppercase">
+                        Active: {iconSet === "colorful" ? "Colorful (Vibrant)" : "Monochrome"}
+                      </span>
+                    </div>
+                    <p className="text-2xs text-muted-foreground mb-3">
+                      Choose between vibrant multi-color icons or sleek minimalist monochrome styling across widgets, slash commands, checklists, and note cards.
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                      {/* Colorful Card */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIconSet("colorful");
+                          if (soundEffectsEnabled) playPopSound();
+                          toast.show({
+                            message: "Icon set: Colorful",
+                            description: "Vibrant multi-color icons activated across all views.",
+                          });
+                        }}
+                        className={cn(
+                          "flex flex-col items-start gap-2.5 rounded-xl border p-3 text-left transition-all cursor-pointer relative",
+                          iconSet === "colorful"
+                            ? "border-brand bg-brand/10 shadow-xs ring-1 ring-brand/30"
+                            : "border-border/60 hover:bg-surface-hover hover:border-border"
+                        )}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-semibold text-foreground">Colorful</span>
+                            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-semibold">
+                              Vibrant
+                            </span>
+                          </div>
+                          {iconSet === "colorful" && (
+                            <span className="h-4 w-4 rounded-full bg-brand text-brand-foreground flex items-center justify-center">
+                              <Check className="h-2.5 w-2.5" weight="bold" />
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-2xs text-muted-foreground leading-relaxed">
+                          Rich, multi-color icons for widgets, slash commands, categories, and status indicators.
+                        </p>
+                        {/* Visual icon preview row */}
+                        <div className="flex items-center gap-1.5 pt-1">
+                          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-amber-500/15 text-amber-500 border border-amber-500/30">
+                            <Calculator className="h-3.5 w-3.5" />
+                          </span>
+                          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-rose-500/15 text-rose-500 border border-rose-500/30">
+                            <Timer className="h-3.5 w-3.5" />
+                          </span>
+                          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+                            <Sparkles className="h-3.5 w-3.5" />
+                          </span>
+                          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-500/15 text-blue-500 border border-blue-500/30">
+                            <Kanban className="h-3.5 w-3.5" />
+                          </span>
+                          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-pink-500/15 text-pink-500 border border-pink-500/30">
+                            <Palette className="h-3.5 w-3.5" />
+                          </span>
+                        </div>
+                      </button>
+
+                      {/* Monochrome Card */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIconSet("monochrome");
+                          if (soundEffectsEnabled) playPopSound();
+                          toast.show({
+                            message: "Icon set: Monochrome",
+                            description: "Clean monochrome icons activated across all views.",
+                          });
+                        }}
+                        className={cn(
+                          "flex flex-col items-start gap-2.5 rounded-xl border p-3 text-left transition-all cursor-pointer relative",
+                          iconSet === "monochrome"
+                            ? "border-brand bg-brand/10 shadow-xs ring-1 ring-brand/30"
+                            : "border-border/60 hover:bg-surface-hover hover:border-border"
+                        )}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-semibold text-foreground">Monochrome</span>
+                            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border/60 font-semibold">
+                              Minimalist
+                            </span>
+                          </div>
+                          {iconSet === "monochrome" && (
+                            <span className="h-4 w-4 rounded-full bg-brand text-brand-foreground flex items-center justify-center">
+                              <Check className="h-2.5 w-2.5" weight="bold" />
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-2xs text-muted-foreground leading-relaxed">
+                          Clean, single-tone neutral icons for a distraction-free, ultra-minimal aesthetic.
+                        </p>
+                        {/* Visual icon preview row */}
+                        <div className="flex items-center gap-1.5 pt-1">
+                          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-muted text-foreground border border-border/60">
+                            <Calculator className="h-3.5 w-3.5" />
+                          </span>
+                          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-muted text-foreground border border-border/60">
+                            <Timer className="h-3.5 w-3.5" />
+                          </span>
+                          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-muted text-foreground border border-border/60">
+                            <Sparkles className="h-3.5 w-3.5" />
+                          </span>
+                          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-muted text-foreground border border-border/60">
+                            <Kanban className="h-3.5 w-3.5" />
+                          </span>
+                          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-muted text-foreground border border-border/60">
+                            <Palette className="h-3.5 w-3.5" />
+                          </span>
+                        </div>
+                      </button>
+                    </div>
+
+                    {/* Quick Toggle Switch */}
+                    <Row
+                      title="Vibrant multi-color icon palette"
+                      description="Quickly toggle between colorful and monochrome icon appearance."
+                      className="border-t border-border/50 pt-3"
+                    >
+                      <Switch
+                        checked={iconSet === "colorful"}
+                        onCheckedChange={(checked) => {
+                          const next = checked ? "colorful" : "monochrome";
+                          setIconSet(next);
+                          if (soundEffectsEnabled) playClickSound();
+                        }}
+                      />
+                    </Row>
                   </div>
 
                   {/* Typography Font Family */}

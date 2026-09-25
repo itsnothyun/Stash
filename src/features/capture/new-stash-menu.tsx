@@ -8,7 +8,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { createAndOpenStash } from "@/features/capture/create-stash";
-import { NOTE_TEMPLATES } from "@/features/stash/templates";
+import { NOTE_TEMPLATES, getTemplateIconStyle } from "@/features/stash/templates";
+import { useUIStore } from "@/stores/ui-store";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils/cn";
 
@@ -21,6 +22,9 @@ export const NewStashMenu: React.FC<NewStashMenuProps> = ({
   onCreate,
   className,
 }) => {
+  const iconSet = useUIStore((s) => s.iconSet);
+  const isColorful = iconSet === "colorful";
+
   const handleClipboard = async () => {
     try {
       const text = await navigator.clipboard.readText();
@@ -86,6 +90,7 @@ export const NewStashMenu: React.FC<NewStashMenuProps> = ({
           </div>
           {NOTE_TEMPLATES.map((tmpl) => {
             const Icon = tmpl.icon;
+            const style = getTemplateIconStyle(tmpl, isColorful);
             return (
               <DropdownMenuItem
                 key={tmpl.id}
@@ -95,10 +100,10 @@ export const NewStashMenu: React.FC<NewStashMenuProps> = ({
                 <div
                   className={cn(
                     "flex h-6 w-6 shrink-0 items-center justify-center rounded-md mt-0.5",
-                    tmpl.iconBg
+                    style.iconBg
                   )}
                 >
-                  <Icon className={cn("h-3.5 w-3.5", tmpl.iconColor)} />
+                  <Icon className={cn("h-3.5 w-3.5", style.iconColor)} />
                 </div>
                 <div className="flex flex-col min-w-0 flex-1">
                   <div className="flex items-center gap-1 font-medium text-foreground">

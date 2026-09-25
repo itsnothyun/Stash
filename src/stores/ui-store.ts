@@ -45,7 +45,9 @@ export const MASK_LOCKED_PREVIEWS_KEY = "stash_mask_locked_previews";
 export const AUTO_LOCK_TIMEOUT_KEY = "stash_auto_lock_timeout";
 export const THEME_KEY = "stash_app_theme";
 export const TERMINAL_SETTINGS_KEY = "stash_terminal_settings";
+export const ICON_SET_KEY = "stash_icon_set";
 
+export type IconSet = "colorful" | "monochrome";
 export type { AppTheme, TerminalUXSettings };
 
 export const DEFAULT_ZOOM = 100;
@@ -359,6 +361,12 @@ export function readTerminalSettings(): TerminalUXSettings {
   return DEFAULT_TERMINAL_SETTINGS;
 }
 
+export function readIconSet(): IconSet {
+  if (typeof localStorage === "undefined") return "colorful";
+  const v = localStorage.getItem(ICON_SET_KEY);
+  return v === "monochrome" ? "monochrome" : "colorful";
+}
+
 export function applyThemeToDocument(theme: AppTheme, terminalSettings?: TerminalUXSettings) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
@@ -423,6 +431,11 @@ export function applyDensityToDocument(density: CardDensity) {
   document.documentElement.setAttribute("data-density", density);
 }
 
+export function applyIconSetToDocument(iconSet: IconSet) {
+  if (typeof document === "undefined") return;
+  document.documentElement.setAttribute("data-icon-set", iconSet);
+}
+
 export function applyEditorStylesToDocument(fontSize: EditorFontSize, lineHeight: EditorLineHeight) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
@@ -472,6 +485,7 @@ applyZoomToDocument(readZoomLevel());
 applyAccentToDocument(readAccentColor());
 applyFontToDocument(readFontFamily());
 applyDensityToDocument(readCardDensity());
+applyIconSetToDocument(readIconSet());
 applyEditorStylesToDocument(readEditorFontSize(), readEditorLineHeight());
 applyThemeToDocument(readTheme(), readTerminalSettings());
 
@@ -509,6 +523,7 @@ interface UIState {
 
   // Personalization settings
   accentColor: AccentColor;
+  iconSet: IconSet;
   fontFamily: FontFamily;
   cardDensity: CardDensity;
   quickFilter: QuickFilter;
@@ -568,6 +583,8 @@ interface UIState {
 
   // Personalization setters
   setAccentColor: (accent: AccentColor, broadcast?: boolean) => void;
+  setIconSet: (iconSet: IconSet, broadcast?: boolean) => void;
+  toggleIconSet: (broadcast?: boolean) => void;
   setFontFamily: (font: FontFamily, broadcast?: boolean) => void;
   setCardDensity: (density: CardDensity, broadcast?: boolean) => void;
   setQuickFilter: (filter: QuickFilter) => void;
@@ -621,6 +638,7 @@ export const useUIStore = create<UIState>((set, get) => ({
   groupBy: readGroupBy(),
 
   accentColor: readAccentColor(),
+  iconSet: readIconSet(),
   fontFamily: readFontFamily(),
   cardDensity: readCardDensity(),
   quickFilter: "all",
@@ -743,6 +761,22 @@ export const useUIStore = create<UIState>((set, get) => ({
       syncChannel.postMessage({ type: "accent", accentColor: accent });
     }
     set({ accentColor: accent });
+  },
+
+  setIconSet: (iconSet, broadcast = true) => {
+    applyIconSetToDocument(iconSet);
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(ICON_SET_KEY, iconSet);
+    }
+    if (broadcast && syncChannel) {
+      syncChannel.postMessage({ type: "icon_set", iconSet });
+    }
+    set({ iconSet });
+  },
+
+  toggleIconSet: (broadcast = true) => {
+    const next = get().iconSet === "colorful" ? "monochrome" : "colorful";
+    get().setIconSet(next, broadcast);
   },
 
   setFontFamily: (font, broadcast = true) => {
@@ -943,6 +977,9 @@ if (syncChannel) {
     } else if (data.type === "accent" && typeof data.accentColor === "string") {
       applyAccentToDocument(data.accentColor);
       useUIStore.setState({ accentColor: data.accentColor });
+    } else if (data.type === "icon_set" && typeof data.iconSet === "string") {
+      applyIconSetToDocument(data.iconSet as IconSet);
+      useUIStore.setState({ iconSet: data.iconSet as IconSet });
     } else if (data.type === "font" && typeof data.fontFamily === "string") {
       applyFontToDocument(data.fontFamily);
       useUIStore.setState({ fontFamily: data.fontFamily });

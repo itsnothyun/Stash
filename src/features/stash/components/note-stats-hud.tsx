@@ -9,6 +9,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useUIStore } from "@/stores/ui-store";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils/cn";
 
@@ -74,6 +75,8 @@ export const NoteStatsHud: React.FC<NoteStatsHudProps> = ({
   plainText,
   className,
 }) => {
+  const iconSet = useUIStore((s) => s.iconSet);
+  const isColorful = iconSet === "colorful";
   const stats = useMemo(() => computeNoteStats(plainText), [plainText]);
 
   const handleCopyStats = () => {
@@ -109,7 +112,12 @@ export const NoteStatsHud: React.FC<NoteStatsHudProps> = ({
             className
           )}
         >
-          <BarChart3 className="h-3 w-3 text-foreground/70 shrink-0" />
+          <BarChart3
+            className={cn(
+              "h-3 w-3 shrink-0",
+              isColorful ? "text-primary opacity-80" : "text-foreground/70"
+            )}
+          />
           <span>{pillLabel}</span>
         </button>
       </PopoverTrigger>
@@ -121,7 +129,9 @@ export const NoteStatsHud: React.FC<NoteStatsHudProps> = ({
       >
         <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/40">
           <div className="flex items-center gap-1.5 font-semibold text-foreground">
-            <BarChart3 className="h-3.5 w-3.5 text-foreground" />
+            <BarChart3
+              className={cn("h-3.5 w-3.5", isColorful ? "text-primary" : "text-foreground")}
+            />
             <span>Note Insights</span>
           </div>
           <button
@@ -140,16 +150,29 @@ export const NoteStatsHud: React.FC<NoteStatsHudProps> = ({
           <div className="mb-3 rounded-md bg-muted/40 p-2 border border-border/30">
             <div className="flex items-center justify-between text-[11px] mb-1.5">
               <span className="flex items-center gap-1 text-foreground font-medium">
-                <ListTodo className="h-3 w-3 text-foreground/80" />
+                <ListTodo
+                  className={cn(
+                    "h-3 w-3",
+                    isColorful ? "text-emerald-500" : "text-foreground/80"
+                  )}
+                />
                 Checklist
               </span>
-              <span className="font-semibold text-foreground">
+              <span
+                className={cn(
+                  "font-semibold",
+                  isColorful ? "text-emerald-600 dark:text-emerald-400" : "text-foreground"
+                )}
+              >
                 {stats.completedTasks}/{stats.totalTasks} ({stats.taskProgress}%)
               </span>
             </div>
             <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
               <div
-                className="h-full bg-foreground rounded-full transition-all duration-300"
+                className={cn(
+                  "h-full rounded-full transition-all duration-300",
+                  isColorful ? "bg-emerald-500" : "bg-foreground"
+                )}
                 style={{ width: `${stats.taskProgress}%` }}
               />
             </div>

@@ -23,7 +23,8 @@ import { ConfirmDialog } from "@/components/ui/alert-dialog";
 import { toast } from "@/components/ui/toast";
 import { formatShortcut, SHORTCUTS, useShortcuts } from "@/lib/keyboard/shortcuts";
 import { NOTE_COLORS } from "@/features/stash/types/color";
-import { NOTE_TEMPLATES } from "@/features/stash/templates";
+import { NOTE_TEMPLATES, getTemplateIconStyle } from "@/features/stash/templates";
+import { colorClass } from "@/lib/icons/icon-theme";
 import { createAndOpenStash } from "@/features/capture/create-stash";
 import {
   ContextMenu,
@@ -155,7 +156,9 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
     setDateHorizon,
     userDisplayName,
     showGreetingHeader,
+    iconSet,
   } = useUIStore();
+  const isColorful = iconSet === "colorful";
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -1171,7 +1174,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
 
           <ContextMenuContent className="w-56">
             <ContextMenuItem onClick={() => void handleRefreshLibrary()}>
-              <ArrowClockwise className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+              <ArrowClockwise className={cn("mr-2 h-3.5 w-3.5", colorClass("text-emerald-500", isColorful, "text-muted-foreground"))} />
               <span>Refresh Library</span>
               <ContextMenuShortcut>F5</ContextMenuShortcut>
             </ContextMenuItem>
@@ -1179,7 +1182,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             <ContextMenuSeparator />
 
             <ContextMenuItem onClick={() => void onCapture()}>
-              <Plus className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+              <Plus className={cn("mr-2 h-3.5 w-3.5", colorClass("text-primary", isColorful, "text-muted-foreground"))} />
               <span>New Stash Note</span>
               <ContextMenuShortcut>Ctrl+N</ContextMenuShortcut>
             </ContextMenuItem>
@@ -1192,7 +1195,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 });
               }}
             >
-              <CheckSquareOffset className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+              <CheckSquareOffset className={cn("mr-2 h-3.5 w-3.5", colorClass("text-emerald-500", isColorful, "text-muted-foreground"))} />
               <span>New To-do Checklist</span>
             </ContextMenuItem>
 
@@ -1211,14 +1214,14 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 }
               }}
             >
-              <ClipboardText className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+              <ClipboardText className={cn("mr-2 h-3.5 w-3.5", colorClass("text-blue-500", isColorful, "text-muted-foreground"))} />
               <span>Paste from Clipboard</span>
             </ContextMenuItem>
 
             {/* Templates */}
             <ContextMenuSub>
               <ContextMenuSubTrigger>
-                <FileText className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+                <FileText className={cn("mr-2 h-3.5 w-3.5", colorClass("text-amber-500", isColorful, "text-muted-foreground"))} />
                 <span>Note Templates</span>
               </ContextMenuSubTrigger>
               <ContextMenuSubContent className="w-52">
@@ -1227,6 +1230,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 </div>
                 {NOTE_TEMPLATES.map((tmpl) => {
                   const Icon = tmpl.icon;
+                  const { iconColor, iconBg } = getTemplateIconStyle(tmpl, isColorful);
                   return (
                     <ContextMenuItem
                       key={tmpl.id}
@@ -1244,8 +1248,8 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                       }}
                       className="flex items-center gap-2 cursor-pointer py-1.5"
                     >
-                      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-muted/60 text-foreground">
-                        <Icon className="h-3.5 w-3.5 text-foreground/80" />
+                      <div className={cn("flex h-5 w-5 shrink-0 items-center justify-center rounded", iconBg)}>
+                        <Icon className={cn("h-3.5 w-3.5", iconColor)} />
                       </div>
                       <span>{tmpl.name}</span>
                     </ContextMenuItem>
@@ -1259,7 +1263,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             {/* View Mode */}
             <ContextMenuSub>
               <ContextMenuSubTrigger>
-                <SquaresFour className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+                <SquaresFour className={cn("mr-2 h-3.5 w-3.5", colorClass("text-blue-500", isColorful, "text-muted-foreground"))} />
                 <span>View Mode</span>
               </ContextMenuSubTrigger>
               <ContextMenuSubContent className="w-36">
@@ -1289,7 +1293,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             {/* Sort Submenu */}
             <ContextMenuSub>
               <ContextMenuSubTrigger>
-                <SortAscending className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+                <SortAscending className={cn("mr-2 h-3.5 w-3.5", colorClass("text-amber-500", isColorful, "text-muted-foreground"))} />
                 <span>Sort Notes</span>
               </ContextMenuSubTrigger>
               <ContextMenuSubContent className="w-44">
@@ -1331,7 +1335,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             {/* Group By Submenu */}
             <ContextMenuSub>
               <ContextMenuSubTrigger>
-                <Stack className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+                <Stack className={cn("mr-2 h-3.5 w-3.5", colorClass("text-teal-500", isColorful, "text-muted-foreground"))} />
                 <span>Group By</span>
               </ContextMenuSubTrigger>
               <ContextMenuSubContent className="w-40">
@@ -1357,7 +1361,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             {/* Color Filter */}
             <ContextMenuSub>
               <ContextMenuSubTrigger>
-                <Palette className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+                <Palette className={cn("mr-2 h-3.5 w-3.5", colorClass("text-pink-500", isColorful, "text-muted-foreground"))} />
                 <span>Filter by Color</span>
               </ContextMenuSubTrigger>
               <ContextMenuSubContent className="w-40">
@@ -1393,13 +1397,13 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             <ContextMenuSeparator />
 
             <ContextMenuItem onClick={() => void handleRefreshLibrary()}>
-              <ArrowClockwise className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+              <ArrowClockwise className={cn("mr-2 h-3.5 w-3.5", colorClass("text-emerald-500", isColorful, "text-muted-foreground"))} />
               <span>Refresh Library</span>
               <ContextMenuShortcut>F5</ContextMenuShortcut>
             </ContextMenuItem>
 
             <ContextMenuItem onClick={() => setSettingsOpen(true)}>
-              <GearSix className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+              <GearSix className={cn("mr-2 h-3.5 w-3.5", colorClass("text-indigo-500", isColorful, "text-muted-foreground"))} />
               <span>Preferences</span>
               <ContextMenuShortcut>Ctrl+,</ContextMenuShortcut>
             </ContextMenuItem>

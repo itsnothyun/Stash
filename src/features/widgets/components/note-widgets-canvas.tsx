@@ -46,6 +46,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { NoteWidgetData, WidgetType } from "../types";
+import { useUIStore } from "@/stores/ui-store";
 import { Swap } from "@/components/shared/swap";
 import { TickerWidget } from "./ticker-widget";
 import { CalculatorWidget } from "./calculator-widget";
@@ -186,44 +187,47 @@ export const NoteWidgetsCanvas: React.FC<NoteWidgetsCanvasProps> = ({
     onUpdateWidgets(reordered);
   };
 
+  const iconSet = useUIStore((s) => s.iconSet);
+  const isColorful = iconSet === "colorful";
+
   const getWidgetIcon = (type: NoteWidgetData["type"]) => {
     switch (type) {
       case "swap":
-        return <ArrowUpDown className="h-3.5 w-3.5 text-foreground" />;
+        return <ArrowUpDown className={cn("h-3.5 w-3.5", isColorful ? "text-emerald-500" : "text-foreground")} />;
       case "ticker":
-        return <TrendingUp className="h-3.5 w-3.5 text-foreground" />;
+        return <TrendingUp className={cn("h-3.5 w-3.5", isColorful ? "text-blue-500" : "text-foreground")} />;
       case "calculator":
-        return <CalcIcon className="h-3.5 w-3.5 text-foreground" />;
+        return <CalcIcon className={cn("h-3.5 w-3.5", isColorful ? "text-amber-500" : "text-foreground")} />;
       case "timer":
-        return <TimerIcon className="h-3.5 w-3.5 text-foreground" />;
+        return <TimerIcon className={cn("h-3.5 w-3.5", isColorful ? "text-rose-500" : "text-foreground")} />;
       case "worldclock":
-        return <Globe className="h-3.5 w-3.5 text-foreground" />;
+        return <Globe className={cn("h-3.5 w-3.5", isColorful ? "text-cyan-500" : "text-foreground")} />;
       case "unitconverter":
-        return <Ruler className="h-3.5 w-3.5 text-foreground" />;
+        return <Ruler className={cn("h-3.5 w-3.5", isColorful ? "text-indigo-500" : "text-foreground")} />;
       case "counter":
-        return <Target className="h-3.5 w-3.5 text-foreground" />;
+        return <Target className={cn("h-3.5 w-3.5", isColorful ? "text-purple-500" : "text-foreground")} />;
       case "countdown":
-        return <CalendarClock className="h-3.5 w-3.5 text-foreground" />;
+        return <CalendarClock className={cn("h-3.5 w-3.5", isColorful ? "text-orange-500" : "text-foreground")} />;
       case "kanban":
-        return <Kanban className="h-3.5 w-3.5 text-foreground" />;
+        return <Kanban className={cn("h-3.5 w-3.5", isColorful ? "text-blue-500" : "text-foreground")} />;
       case "habits":
-        return <Sparkles className="h-3.5 w-3.5 text-foreground" />;
+        return <Sparkles className={cn("h-3.5 w-3.5", isColorful ? "text-emerald-500" : "text-foreground")} />;
       case "palette":
-        return <Palette className="h-3.5 w-3.5 text-foreground" />;
+        return <Palette className={cn("h-3.5 w-3.5", isColorful ? "text-pink-500" : "text-foreground")} />;
       case "browser":
-        return <Globe className="h-3.5 w-3.5 text-foreground" />;
+        return <Globe className={cn("h-3.5 w-3.5", isColorful ? "text-cyan-500" : "text-foreground")} />;
       case "scratchpad":
-        return <Sun className="h-3.5 w-3.5 text-foreground" />;
+        return <Sun className={cn("h-3.5 w-3.5", isColorful ? "text-amber-500" : "text-foreground")} />;
       case "meeting":
-        return <Users className="h-3.5 w-3.5 text-foreground" />;
+        return <Users className={cn("h-3.5 w-3.5", isColorful ? "text-emerald-500" : "text-foreground")} />;
       case "bug":
-        return <Bug className="h-3.5 w-3.5 text-foreground" />;
+        return <Bug className={cn("h-3.5 w-3.5", isColorful ? "text-rose-500" : "text-foreground")} />;
       case "idea":
-        return <Lightbulb className="h-3.5 w-3.5 text-foreground" />;
+        return <Lightbulb className={cn("h-3.5 w-3.5", isColorful ? "text-yellow-500" : "text-foreground")} />;
       case "api":
-        return <Code2 className="h-3.5 w-3.5 text-foreground" />;
+        return <Code2 className={cn("h-3.5 w-3.5", isColorful ? "text-blue-500" : "text-foreground")} />;
       case "reading":
-        return <BookOpen className="h-3.5 w-3.5 text-foreground" />;
+        return <BookOpen className={cn("h-3.5 w-3.5", isColorful ? "text-indigo-500" : "text-foreground")} />;
     }
   };
 

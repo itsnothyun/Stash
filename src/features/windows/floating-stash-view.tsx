@@ -3,6 +3,7 @@ import { Note, Revision } from "@/features/stash/types/note";
 import { getColorClass, NoteColor, NOTE_COLORS, getColorDot } from "@/features/stash/types/color";
 import { stashIpc } from "@/lib/ipc/stash-ipc";
 import { useUIStore } from "@/stores/ui-store";
+import { getWidgetColorClass, colorClass } from "@/lib/icons/icon-theme";
 import { TiptapEditor, TiptapEditorRef } from "@/features/editor/components/tiptap-editor";
 import {
   appendPlainTextToContent,
@@ -108,13 +109,6 @@ import { NotePersonaModal } from "@/features/stash/components/note-persona-modal
 import { NoteExportImageModal } from "@/features/stash/components/note-export-image-modal";
 import { NoteWidgetsCanvas } from "@/features/widgets/components/note-widgets-canvas";
 import { NoteWidgetData, WidgetType } from "@/features/widgets/types";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   SimpleDropdown,
   SimpleDropdownItem,
@@ -235,7 +229,8 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
   noteRef.current = note;
   const titleRef = useRef<string>(title);
   titleRef.current = title;
-  const { theme, autoTitleFromFirstLine } = useUIStore();
+  const { theme, autoTitleFromFirstLine, iconSet } = useUIStore();
+  const isColorful = iconSet === "colorful";
   const isTerminal =
     theme === "terminal" ||
     theme === "amber-crt" ||
@@ -1239,10 +1234,13 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
           )}
         >
           {/* Add Widget Dropdown */}
-          <DropdownMenu>
-            <HeaderTooltip label="Attach Interactive Widget">
-              <DropdownMenuTrigger asChild>
+          <SimpleDropdown
+            align="end"
+            contentClassName="w-56 text-xs max-h-[85vh] overflow-y-auto"
+            trigger={({ toggle }) => (
+              <HeaderTooltip label="Attach Interactive Widget">
                 <button
+                  onClick={toggle}
                   className={cn(
                     iconButton,
                     "w-auto px-1.5 gap-1 text-[11px] font-medium text-current/80 hover:text-current hover:bg-current/10"
@@ -1252,138 +1250,137 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                   <Plus className="h-3 w-3" />
                   <span>Widget</span>
                 </button>
-              </DropdownMenuTrigger>
-            </HeaderTooltip>
-            <DropdownMenuContent align="end" className="w-56 text-xs max-h-[85vh] overflow-y-auto">
-              <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border/40">
-                Interactive Tools
+              </HeaderTooltip>
+            )}
+          >
+            <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+              Interactive Tools
+            </div>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("calculator")}>
+              <CalcIcon className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("calculator", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Quick Calculator</span>
+                <span className="text-[10px] text-muted-foreground">Desktop math scratchpad</span>
               </div>
-              <DropdownMenuItem onClick={() => handleAddWidget("calculator")}>
-                <CalcIcon className="mr-2 h-3.5 w-3.5 text-foreground" />
-                <div className="flex flex-col">
-                  <span className="font-medium">Quick Calculator</span>
-                  <span className="text-[10px] text-muted-foreground">Desktop math scratchpad</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("timer")}>
-                <TimerIcon className="mr-2 h-3.5 w-3.5 text-foreground" />
-                <div className="flex flex-col">
-                  <span className="font-medium">Focus & Pomodoro Timer</span>
-                  <span className="text-[10px] text-muted-foreground">Pomodoro & count-up stopwatch</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("swap")}>
-                <ArrowUpDown className="mr-2 h-3.5 w-3.5 text-foreground" />
-                <div className="flex flex-col">
-                  <span className="font-medium">Currency Converter</span>
-                  <span className="text-[10px] text-muted-foreground">Instant fiat & crypto rates</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("ticker")}>
-                <TrendingUp className="mr-2 h-3.5 w-3.5 text-foreground" />
-                <div className="flex flex-col">
-                  <span className="font-medium">Market Tickers</span>
-                  <span className="text-[10px] text-muted-foreground">Live asset prices & 24h trend</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("countdown")}>
-                <CalendarClock className="mr-2 h-3.5 w-3.5 text-foreground" />
-                <div className="flex flex-col">
-                  <span className="font-medium">Countdown Timer</span>
-                  <span className="text-[10px] text-muted-foreground">Count down to any date or event</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("worldclock")}>
-                <Globe className="mr-2 h-3.5 w-3.5 text-foreground" />
-                <div className="flex flex-col">
-                  <span className="font-medium">World Clocks</span>
-                  <span className="text-[10px] text-muted-foreground">Global timezones & offsets</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("unitconverter")}>
-                <Ruler className="mr-2 h-3.5 w-3.5 text-foreground" />
-                <div className="flex flex-col">
-                  <span className="font-medium">Unit Converter</span>
-                  <span className="text-[10px] text-muted-foreground">Length, weight, temp & data</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("counter")}>
-                <Target className="mr-2 h-3.5 w-3.5 text-foreground" />
-                <div className="flex flex-col">
-                  <span className="font-medium">Tally & Goal Counter</span>
-                  <span className="text-[10px] text-muted-foreground">Habit, task & quantity tracker</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("browser")}>
-                <Globe className="mr-2 h-3.5 w-3.5 text-foreground" />
-                <div className="flex flex-col">
-                  <span className="font-medium">Web Browser (PiP)</span>
-                  <span className="text-[10px] text-muted-foreground">Embedded web & detachable PiP</span>
-                </div>
-              </DropdownMenuItem>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("timer")}>
+              <TimerIcon className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("timer", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Focus & Pomodoro Timer</span>
+                <span className="text-[10px] text-muted-foreground">Pomodoro & count-up stopwatch</span>
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("swap")}>
+              <ArrowUpDown className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("swap", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Currency Converter</span>
+                <span className="text-[10px] text-muted-foreground">Instant fiat & crypto rates</span>
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("ticker")}>
+              <TrendingUp className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("ticker", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Market Tickers</span>
+                <span className="text-[10px] text-muted-foreground">Live asset prices & 24h trend</span>
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("countdown")}>
+              <CalendarClock className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("countdown", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Countdown Timer</span>
+                <span className="text-[10px] text-muted-foreground">Count down to any date or event</span>
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("worldclock")}>
+              <Globe className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("worldclock", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">World Clocks</span>
+                <span className="text-[10px] text-muted-foreground">Global timezones & offsets</span>
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("unitconverter")}>
+              <Ruler className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("unitconverter", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Unit Converter</span>
+                <span className="text-[10px] text-muted-foreground">Length, weight, temp & data</span>
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("counter")}>
+              <Target className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("counter", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Tally & Goal Counter</span>
+                <span className="text-[10px] text-muted-foreground">Habit, task & quantity tracker</span>
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("browser")}>
+              <Globe className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("browser", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Web Browser (PiP)</span>
+                <span className="text-[10px] text-muted-foreground">Embedded web & detachable PiP</span>
+              </div>
+            </SimpleDropdownItem>
 
-              <DropdownMenuSeparator />
-              <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border/40">
-                Component Blocks
+            <SimpleDropdownSeparator />
+            <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+              Component Blocks
+            </div>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("scratchpad")}>
+              <Sun className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("scratchpad", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Daily Scratchpad</span>
+                <span className="text-[10px] text-muted-foreground">Focus timer, streak & notes</span>
               </div>
-              <DropdownMenuItem onClick={() => handleAddWidget("scratchpad")}>
-                <Sun className="mr-2 h-3.5 w-3.5 text-foreground" />
-                <div className="flex flex-col">
-                  <span className="font-medium">Daily Scratchpad</span>
-                  <span className="text-[10px] text-muted-foreground">Focus timer, streak & notes</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("meeting")}>
-                <Users className="mr-2 h-3.5 w-3.5 text-foreground" />
-                <div className="flex flex-col">
-                  <span className="font-medium">Meeting Minutes</span>
-                  <span className="text-[10px] text-muted-foreground">Agenda, presence & actions</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("kanban")}>
-                <Kanban className="mr-2 h-3.5 w-3.5 text-foreground" />
-                <div className="flex flex-col">
-                  <span className="font-medium">Kanban Board</span>
-                  <span className="text-[10px] text-muted-foreground">To Do, Doing, Done card flow</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("habits")}>
-                <Sparkles className="mr-2 h-3.5 w-3.5 text-foreground" />
-                <div className="flex flex-col">
-                  <span className="font-medium">7-Day Habit Tracker</span>
-                  <span className="text-[10px] text-muted-foreground">Weekly streaks & daily checks</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("bug")}>
-                <Bug className="mr-2 h-3.5 w-3.5 text-foreground" />
-                <div className="flex flex-col">
-                  <span className="font-medium">Bug Blitz & Triage</span>
-                  <span className="text-[10px] text-muted-foreground">Severity, status & repro steps</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("idea")}>
-                <Lightbulb className="mr-2 h-3.5 w-3.5 text-foreground" />
-                <div className="flex flex-col">
-                  <span className="font-medium">Idea Incubator</span>
-                  <span className="text-[10px] text-muted-foreground">Confidence slider & notes</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("reading")}>
-                <BookOpen className="mr-2 h-3.5 w-3.5 text-foreground" />
-                <div className="flex flex-col">
-                  <span className="font-medium">Book & Article Digest</span>
-                  <span className="text-[10px] text-muted-foreground">Rating, takeaways & quotes</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddWidget("palette")}>
-                <Palette className="mr-2 h-3.5 w-3.5 text-foreground" />
-                <div className="flex flex-col">
-                  <span className="font-medium">Color Palette</span>
-                  <span className="text-[10px] text-muted-foreground">Hex swatches & 1-click copy</span>
-                </div>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("meeting")}>
+              <Users className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("meeting", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Meeting Minutes</span>
+                <span className="text-[10px] text-muted-foreground">Agenda, presence & actions</span>
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("kanban")}>
+              <Kanban className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("kanban", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Kanban Board</span>
+                <span className="text-[10px] text-muted-foreground">To Do, Doing, Done card flow</span>
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("habits")}>
+              <Sparkles className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("habits", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">7-Day Habit Tracker</span>
+                <span className="text-[10px] text-muted-foreground">Weekly streaks & daily checks</span>
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("bug")}>
+              <Bug className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("bug", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Bug Blitz & Triage</span>
+                <span className="text-[10px] text-muted-foreground">Severity, status & repro steps</span>
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("idea")}>
+              <Lightbulb className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("idea", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Idea Incubator</span>
+                <span className="text-[10px] text-muted-foreground">Confidence slider & notes</span>
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("reading")}>
+              <BookOpen className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("reading", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Book & Article Digest</span>
+                <span className="text-[10px] text-muted-foreground">Rating, takeaways & quotes</span>
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("palette")}>
+              <Palette className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("palette", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Color Palette</span>
+                <span className="text-[10px] text-muted-foreground">Hex swatches & 1-click copy</span>
+              </div>
+            </SimpleDropdownItem>
+          </SimpleDropdown>
 
           {/* Formatting dock toggle: minimize or maximize the dock */}
           <HeaderTooltip
@@ -1467,15 +1464,15 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
             )}
           >
             <SimpleDropdownItem onSelect={() => setExportImageOpen(true)}>
-              <Camera className="mr-2 h-3.5 w-3.5 text-primary" />
+              <Camera className={cn("mr-2 h-3.5 w-3.5", colorClass("text-cyan-500", isColorful, "text-primary"))} />
               Share as Beautiful Image
             </SimpleDropdownItem>
             <SimpleDropdownItem onSelect={() => setPersonaModalOpen(true)}>
-              <Sparkles className="mr-2 h-3.5 w-3.5 text-primary" />
+              <Sparkles className={cn("mr-2 h-3.5 w-3.5", colorClass("text-amber-500", isColorful, "text-primary"))} />
               Personalize note persona
             </SimpleDropdownItem>
             <SimpleDropdownItem onSelect={handleOrganizeChecklist}>
-              <ListChecks className="mr-2 h-3.5 w-3.5 text-foreground" />
+              <ListChecks className={cn("mr-2 h-3.5 w-3.5", colorClass("text-emerald-500", isColorful, "text-foreground"))} />
               Organize checklist (done to bottom)
             </SimpleDropdownItem>
             <SimpleDropdownSeparator />
@@ -1485,24 +1482,24 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                 await stashIpc.openFloatingStash(dup.id);
               }}
             >
-              <Copy className="mr-2 h-3.5 w-3.5" />
+              <Copy className={cn("mr-2 h-3.5 w-3.5", colorClass("text-blue-500", isColorful))} />
               Duplicate
             </SimpleDropdownItem>
             <SimpleDropdownItem onSelect={handleOpenRevisions}>
-              <History className="mr-2 h-3.5 w-3.5" />
+              <History className={cn("mr-2 h-3.5 w-3.5", colorClass("text-purple-500", isColorful))} />
               Revision history
             </SimpleDropdownItem>
             <SimpleDropdownItem onSelect={handleExportMarkdown}>
-              <FileDown className="mr-2 h-3.5 w-3.5" />
+              <FileDown className={cn("mr-2 h-3.5 w-3.5", colorClass("text-indigo-500", isColorful))} />
               Export as Markdown
             </SimpleDropdownItem>
             <SimpleDropdownItem onSelect={handleImportMarkdown}>
-              <FileUp className="mr-2 h-3.5 w-3.5" />
+              <FileUp className={cn("mr-2 h-3.5 w-3.5", colorClass("text-teal-500", isColorful))} />
               Import Markdown
             </SimpleDropdownItem>
             <SimpleDropdownSub
               label="Currency Swap"
-              icon={<ArrowUpDown className="mr-2 h-3.5 w-3.5 text-foreground" />}
+              icon={<ArrowUpDown className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("swap", isColorful, "text-foreground"))} />}
             >
               <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                 Popular Pairs
@@ -1545,11 +1542,11 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
             </SimpleDropdownSub>
             <SimpleDropdownSeparator />
             <SimpleDropdownItem onSelect={() => setDueDateDialogOpen(true)}>
-              <CalendarClock className="mr-2 h-3.5 w-3.5 text-foreground" />
+              <CalendarClock className={cn("mr-2 h-3.5 w-3.5", colorClass("text-orange-500", isColorful, "text-foreground"))} />
               {dueDate ? "Manage due date & reminder" : "Set due date & reminder"}
             </SimpleDropdownItem>
             <SimpleDropdownItem onSelect={() => setPinDialogOpen(true)}>
-              <Lock className="mr-2 h-3.5 w-3.5 text-primary" />
+              <Lock className={cn("mr-2 h-3.5 w-3.5", colorClass("text-rose-500", isColorful, "text-primary"))} />
               {hasPin ? "Change or remove PIN" : "Protect note with PIN"}
             </SimpleDropdownItem>
             {hasPin && isSessionUnlocked && (
@@ -1643,7 +1640,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       </div>
 
       <ContextMenuItem onClick={() => void handleRefreshNote()}>
-        <RefreshCw className="mr-2 h-3.5 w-3.5 text-primary" />
+        <RefreshCw className={cn("mr-2 h-3.5 w-3.5", colorClass("text-blue-500", isColorful, "text-primary"))} />
         <span>Refresh Note</span>
         <ContextMenuShortcut>F5</ContextMenuShortcut>
       </ContextMenuItem>
@@ -1656,7 +1653,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
           </>
         ) : (
           <>
-            <Pin className="mr-2 h-3.5 w-3.5 text-foreground" />
+            <Pin className={cn("mr-2 h-3.5 w-3.5", colorClass("text-amber-500", isColorful, "text-foreground"))} />
             <span>Keep on top</span>
           </>
         )}
@@ -1679,7 +1676,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       {/* Color Submenu */}
       <ContextMenuSub>
         <ContextMenuSubTrigger>
-          <Palette className="mr-2 h-3.5 w-3.5 text-foreground" />
+          <Palette className={cn("mr-2 h-3.5 w-3.5", colorClass("text-pink-500", isColorful, "text-foreground"))} />
           <span>Note Color</span>
         </ContextMenuSubTrigger>
         <ContextMenuSubContent className="w-40">
@@ -1710,7 +1707,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       {/* Currency Swap Submenu */}
       <ContextMenuSub>
         <ContextMenuSubTrigger>
-          <ArrowUpDown className="mr-2 h-3.5 w-3.5 text-foreground" />
+          <ArrowUpDown className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("swap", isColorful, "text-foreground"))} />
           <span>Currency Swap</span>
         </ContextMenuSubTrigger>
         <ContextMenuSubContent className="w-56">
@@ -1760,7 +1757,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       {/* Widgets Submenu */}
       <ContextMenuSub>
         <ContextMenuSubTrigger>
-          <Plus className="mr-2 h-3.5 w-3.5 text-foreground" />
+          <Plus className={cn("mr-2 h-3.5 w-3.5", colorClass("text-primary", isColorful, "text-foreground"))} />
           <span>Attach Widget</span>
         </ContextMenuSubTrigger>
         <ContextMenuSubContent className="w-56 max-h-[80vh] overflow-y-auto">
@@ -1768,31 +1765,31 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
             Interactive Tools
           </div>
           <ContextMenuItem onClick={() => handleAddWidget("calculator")}>
-            <CalcIcon className="mr-2 h-3.5 w-3.5 text-foreground" />
+            <CalcIcon className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("calculator", isColorful))} />
             <span>Quick Calculator</span>
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleAddWidget("timer")}>
-            <TimerIcon className="mr-2 h-3.5 w-3.5 text-foreground" />
+            <TimerIcon className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("timer", isColorful))} />
             <span>Focus & Pomodoro</span>
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleAddWidget("countdown")}>
-            <CalendarClock className="mr-2 h-3.5 w-3.5 text-foreground" />
+            <CalendarClock className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("countdown", isColorful))} />
             <span>Countdown Timer</span>
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleAddWidget("worldclock")}>
-            <Globe className="mr-2 h-3.5 w-3.5 text-foreground" />
+            <Globe className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("worldclock", isColorful))} />
             <span>World Clock</span>
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleAddWidget("unitconverter")}>
-            <Ruler className="mr-2 h-3.5 w-3.5 text-foreground" />
+            <Ruler className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("unitconverter", isColorful))} />
             <span>Unit Converter</span>
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleAddWidget("counter")}>
-            <Target className="mr-2 h-3.5 w-3.5 text-foreground" />
+            <Target className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("counter", isColorful))} />
             <span>Tally Counter</span>
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleAddWidget("browser")}>
-            <Globe className="mr-2 h-3.5 w-3.5 text-foreground" />
+            <Globe className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("browser", isColorful))} />
             <span>Mini Web Browser</span>
           </ContextMenuItem>
 
@@ -1801,57 +1798,57 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
             Component Blocks
           </div>
           <ContextMenuItem onClick={() => handleAddWidget("scratchpad")}>
-            <Sun className="mr-2 h-3.5 w-3.5 text-foreground" />
+            <Sun className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("scratchpad", isColorful))} />
             <span>Daily Scratchpad</span>
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleAddWidget("meeting")}>
-            <Users className="mr-2 h-3.5 w-3.5 text-foreground" />
+            <Users className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("meeting", isColorful))} />
             <span>Meeting Minutes</span>
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleAddWidget("kanban")}>
-            <Kanban className="mr-2 h-3.5 w-3.5 text-foreground" />
+            <Kanban className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("kanban", isColorful))} />
             <span>Kanban Board</span>
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleAddWidget("habits")}>
-            <Sparkles className="mr-2 h-3.5 w-3.5 text-foreground" />
+            <Sparkles className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("habits", isColorful))} />
             <span>7-Day Habit Tracker</span>
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleAddWidget("bug")}>
-            <Bug className="mr-2 h-3.5 w-3.5 text-foreground" />
+            <Bug className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("bug", isColorful))} />
             <span>Bug Blitz & Triage</span>
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleAddWidget("idea")}>
-            <Lightbulb className="mr-2 h-3.5 w-3.5 text-foreground" />
+            <Lightbulb className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("idea", isColorful))} />
             <span>Idea Incubator</span>
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleAddWidget("reading")}>
-            <BookOpen className="mr-2 h-3.5 w-3.5 text-foreground" />
+            <BookOpen className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("reading", isColorful))} />
             <span>Book & Article Digest</span>
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleAddWidget("palette")}>
-            <Palette className="mr-2 h-3.5 w-3.5 text-foreground" />
+            <Palette className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("palette", isColorful))} />
             <span>Color Palette</span>
           </ContextMenuItem>
         </ContextMenuSubContent>
       </ContextMenuSub>
 
       <ContextMenuItem onClick={() => setPersonaModalOpen(true)}>
-        <Sparkles className="mr-2 h-3.5 w-3.5 text-primary" />
+        <Sparkles className={cn("mr-2 h-3.5 w-3.5", colorClass("text-amber-500", isColorful, "text-primary"))} />
         <span>Personalize Note Persona</span>
       </ContextMenuItem>
 
       <ContextMenuItem onClick={handleOrganizeChecklist}>
-        <ListChecks className="mr-2 h-3.5 w-3.5 text-foreground" />
+        <ListChecks className={cn("mr-2 h-3.5 w-3.5", colorClass("text-emerald-500", isColorful, "text-foreground"))} />
         <span>Organize Checklist (Done to bottom)</span>
       </ContextMenuItem>
 
       <ContextMenuItem onClick={() => setDueDateDialogOpen(true)}>
-        <CalendarClock className="mr-2 h-3.5 w-3.5 text-foreground" />
+        <CalendarClock className={cn("mr-2 h-3.5 w-3.5", colorClass("text-orange-500", isColorful, "text-foreground"))} />
         <span>Due Date & Reminder</span>
       </ContextMenuItem>
 
       <ContextMenuItem onClick={() => setPinDialogOpen(true)}>
-        <Lock className="mr-2 h-3.5 w-3.5 text-primary" />
+        <Lock className={cn("mr-2 h-3.5 w-3.5", colorClass("text-rose-500", isColorful, "text-primary"))} />
         <span>{hasPin ? "Change or Remove PIN" : "Protect Note with PIN"}</span>
       </ContextMenuItem>
 

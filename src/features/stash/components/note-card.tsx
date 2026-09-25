@@ -104,11 +104,13 @@ export const NoteCard: React.FC<NoteCardProps> = ({
   const {
     theme,
     cardDensity,
+    iconSet,
     showWordCount,
     showRelativeTime,
     showColorRibbon,
     showWidgetBadges,
   } = useUIStore();
+  const isColorful = iconSet === "colorful";
   const isTerminal =
     theme === "terminal" ||
     theme === "amber-crt" ||
@@ -218,17 +220,32 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                     <Ghost className="h-3 w-3" weight="regular" />
                   </span>
                 )}
-                {note.isPinned && <PushPin className="h-3 w-3" weight="fill" />}
+                {note.isPinned && (
+                  <PushPin
+                    className={cn("h-3 w-3", isColorful ? "text-amber-500" : "text-foreground")}
+                    weight="fill"
+                  />
+                )}
                 {note.isFavorite && (
-                  <Star className="h-3 w-3 text-foreground" weight="fill" />
+                  <Star
+                    className={cn("h-3 w-3", isColorful ? "text-amber-400" : "text-foreground")}
+                    weight="fill"
+                  />
                 )}
               </div>
             </div>
 
             {isLocked && !isUnlocked ? (
               <div className="flex flex-col items-center justify-center gap-1.5 py-3.5 px-2 my-1 rounded-md bg-foreground/[0.04] border border-foreground/10 text-center select-none backdrop-blur-[2px]">
-                <div className="h-6 w-6 rounded-full bg-foreground/[0.08] flex items-center justify-center text-foreground/80 shadow-xs">
-                  <LockSimple className="h-3 w-3" weight="regular" />
+                <div
+                  className={cn(
+                    "h-6 w-6 rounded-full flex items-center justify-center shadow-xs",
+                    isColorful
+                      ? "bg-amber-500/15 text-amber-500"
+                      : "bg-foreground/[0.08] text-foreground/80"
+                  )}
+                >
+                  <LockSimple className="h-3 w-3" weight={isColorful ? "bold" : "regular"} />
                 </div>
                 <span className="text-[11px] font-medium tracking-tight text-foreground/85">
                   Confidential Stash
@@ -321,7 +338,13 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                   <span
                     className={cn(
                       "shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-tight",
-                      dueDateStatus.isOverdue
+                      isColorful
+                        ? dueDateStatus.isOverdue
+                          ? "bg-destructive/20 text-destructive font-semibold border border-destructive/30"
+                          : dueDateStatus.isToday
+                          ? "bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30"
+                          : "bg-current/10 opacity-75"
+                        : dueDateStatus.isOverdue
                         ? "bg-foreground/15 text-foreground font-semibold border border-foreground/20"
                         : "bg-foreground/10 text-foreground/80 border border-foreground/10"
                     )}
@@ -333,7 +356,12 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                 )}
                 {showWidgetBadges && opacity < 100 && (
                   <span
-                    className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-tight bg-foreground/10 text-foreground border border-foreground/15"
+                    className={cn(
+                      "shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-tight",
+                      isColorful
+                        ? "bg-primary/15 text-primary border border-primary/20"
+                        : "bg-foreground/10 text-foreground border border-foreground/15"
+                    )}
                     title={`Ghost Mode (${opacity}%)`}
                   >
                     <Ghost className="h-2.5 w-2.5" weight="regular" />
@@ -342,7 +370,12 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                 )}
                 {showWidgetBadges && attachedWidgets.length > 0 && (
                   <span
-                    className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-tight bg-foreground/10 text-foreground border border-foreground/15"
+                    className={cn(
+                      "shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-tight",
+                      isColorful
+                        ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25"
+                        : "bg-foreground/10 text-foreground border border-foreground/15"
+                    )}
                     title={`${attachedWidgets.length} attached widget${attachedWidgets.length > 1 ? "s" : ""}: ${attachedWidgets.map((w) => w.title).join(", ")}`}
                   >
                     <Sparkle className="h-2.5 w-2.5" weight="regular" />
