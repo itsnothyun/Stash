@@ -25,7 +25,10 @@ import {
   Lock,
   CalendarClock,
   Ghost,
+  Sparkles,
 } from "lucide-react";
+import { extractWidgets } from "@/features/editor/stash-content";
+import { NoteWidgetData } from "@/features/widgets/types";
 import {
   hasNotePin,
   isNoteSessionUnlocked,
@@ -119,6 +122,11 @@ export const NoteCard: React.FC<NoteCardProps> = ({
       return formatNoteDate(note.updatedAt);
     }
   }, [note.updatedAt, showRelativeTime]);
+
+  const attachedWidgets = useMemo(
+    () => extractWidgets<NoteWidgetData>(note.contentJson),
+    [note.contentJson]
+  );
 
   const noteActionProps = {
     note,
@@ -316,6 +324,15 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                   >
                     <Ghost className="h-2.5 w-2.5" />
                     <span>{opacity}%</span>
+                  </span>
+                )}
+                {showWidgetBadges && attachedWidgets.length > 0 && (
+                  <span
+                    className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-tight bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25"
+                    title={`${attachedWidgets.length} attached widget${attachedWidgets.length > 1 ? "s" : ""}: ${attachedWidgets.map((w) => w.title).join(", ")}`}
+                  >
+                    <Sparkles className="h-2.5 w-2.5" />
+                    <span>{attachedWidgets.length} {attachedWidgets.length === 1 ? "widget" : "widgets"}</span>
                   </span>
                 )}
                 {showWordCount && wordCount > 0 && (

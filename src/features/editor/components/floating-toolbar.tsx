@@ -33,6 +33,23 @@ import {
   Underline as UnderlineIcon,
   Unlink,
   Undo2,
+  Calculator as CalcIcon,
+  Timer as TimerIcon,
+  ArrowUpDown,
+  TrendingUp,
+  CalendarClock,
+  Globe,
+  Ruler,
+  Target,
+  Sun,
+  Users,
+  Kanban,
+  Sparkles,
+  Bug,
+  Lightbulb,
+  Code2,
+  BookOpen,
+  Palette,
 } from "lucide-react";
 import "@tiptap/extension-underline";
 import "@tiptap/extension-subscript";
@@ -42,6 +59,7 @@ import "@tiptap/extension-text-align";
 import "@tiptap/extension-color";
 import "@tiptap/extension-font-family";
 import "../extensions/font-size";
+import { WidgetType } from "@/features/widgets/types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -161,6 +179,7 @@ interface FloatingToolbarProps {
   className?: string;
   isMinimized?: boolean;
   onToggleMinimize?: (minimized?: boolean) => void;
+  onAddWidget?: (type: WidgetType) => void;
 }
 
 /**
@@ -177,6 +196,7 @@ export const FloatingToolbar: React.FC<FloatingToolbarProps> = ({
   className,
   isMinimized,
   onToggleMinimize,
+  onAddWidget,
 }) => {
   const panelRef = useRef<HTMLDivElement | null>(null);
 
@@ -1041,6 +1061,108 @@ export const FloatingToolbar: React.FC<FloatingToolbarProps> = ({
                 <span className="font-mono text-[10px] font-semibold leading-none">×T</span>
               </button>
             </DockTooltip>
+          </>
+        )}
+
+        {onAddWidget && (
+          <>
+            <Divider />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="flex h-7 shrink-0 items-center gap-1 rounded px-2 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 transition-all active:scale-95 cursor-pointer shadow-2xs"
+                  aria-label="Attach Interactive Widget"
+                  title="Attach Interactive Widget"
+                >
+                  <Plus className="h-3 w-3 stroke-[2.5]" />
+                  <span>Widget</span>
+                  <ChevronDown className="h-2.5 w-2.5 opacity-60" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-56 max-h-[70vh] overflow-y-auto text-xs">
+                <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+                  Interactive Tools
+                </div>
+                <DropdownMenuItem onClick={() => onAddWidget("calculator")} className="cursor-pointer">
+                  <CalcIcon className="mr-2 h-3.5 w-3.5 text-amber-500" />
+                  <span>Quick Calculator</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("timer")} className="cursor-pointer">
+                  <TimerIcon className="mr-2 h-3.5 w-3.5 text-rose-500" />
+                  <span>Focus & Pomodoro</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("swap")} className="cursor-pointer">
+                  <ArrowUpDown className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+                  <span>Currency Converter</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("ticker")} className="cursor-pointer">
+                  <TrendingUp className="mr-2 h-3.5 w-3.5 text-blue-500" />
+                  <span>Market Tickers</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("countdown")} className="cursor-pointer">
+                  <CalendarClock className="mr-2 h-3.5 w-3.5 text-orange-500" />
+                  <span>Countdown Timer</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("worldclock")} className="cursor-pointer">
+                  <Globe className="mr-2 h-3.5 w-3.5 text-cyan-500" />
+                  <span>World Clock</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("unitconverter")} className="cursor-pointer">
+                  <Ruler className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+                  <span>Unit Converter</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("counter")} className="cursor-pointer">
+                  <Target className="mr-2 h-3.5 w-3.5 text-purple-500" />
+                  <span>Tally Counter</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("browser")} className="cursor-pointer">
+                  <Globe className="mr-2 h-3.5 w-3.5 text-cyan-500" />
+                  <span>Mini Web Browser</span>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+                <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+                  Component Blocks
+                </div>
+                <DropdownMenuItem onClick={() => onAddWidget("scratchpad")} className="cursor-pointer">
+                  <Sun className="mr-2 h-3.5 w-3.5 text-amber-500" />
+                  <span>Daily Scratchpad</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("meeting")} className="cursor-pointer">
+                  <Users className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+                  <span>Meeting Minutes</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("kanban")} className="cursor-pointer">
+                  <Kanban className="mr-2 h-3.5 w-3.5 text-blue-500" />
+                  <span>Kanban Board</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("habits")} className="cursor-pointer">
+                  <Sparkles className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+                  <span>7-Day Habit Tracker</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("bug")} className="cursor-pointer">
+                  <Bug className="mr-2 h-3.5 w-3.5 text-rose-500" />
+                  <span>Bug Blitz & Triage</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("idea")} className="cursor-pointer">
+                  <Lightbulb className="mr-2 h-3.5 w-3.5 text-yellow-500" />
+                  <span>Idea Incubator</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("api")} className="cursor-pointer">
+                  <Code2 className="mr-2 h-3.5 w-3.5 text-blue-500" />
+                  <span>API & Tech Blueprint</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("reading")} className="cursor-pointer">
+                  <BookOpen className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+                  <span>Book & Article Digest</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("palette")} className="cursor-pointer">
+                  <Palette className="mr-2 h-3.5 w-3.5 text-pink-500" />
+                  <span>Color Palette</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </>
         )}
 

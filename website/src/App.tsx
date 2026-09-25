@@ -15,6 +15,8 @@ import { DocsPage } from "./components/docs-page";
 import { TemplatesPage } from "./components/templates-page";
 import { ChangelogPage } from "./components/changelog-page";
 import { ShortcutsPage } from "./components/shortcuts-page";
+import { VerticalDock } from "./components/vertical-dock";
+import { EcosystemDockSection } from "./components/ecosystem-dock-section";
 
 const DOCS_SECTION_IDS = [
   "overview",
@@ -79,6 +81,9 @@ export const App: React.FC = () => {
       {/* Universal Floating Liquid Glass Navbar */}
       <Navbar currentView={currentView} onNavigate={navigateToView} />
 
+      {/* Floating Vertical Desktop Dock (Nova, Cove, Crest, Stash) */}
+      <VerticalDock position="fixed" />
+
       {/* Dynamic View Content */}
       {currentView === "docs" && (
         <>
@@ -118,6 +123,7 @@ export const App: React.FC = () => {
             <FeatureShortcuts />
             <FeatureBenchmarks />
             <FeatureSecurity />
+            <EcosystemDockSection />
 
             {/* Documentation Teaser Ribbon */}
             <section id="docs-preview" className="py-16 relative">

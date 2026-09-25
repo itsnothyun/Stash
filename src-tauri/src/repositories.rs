@@ -220,19 +220,6 @@ impl NoteRepository {
         let existing = Self::get_by_id(conn, &input.id)?
             .ok_or_else(|| AppError::NotFound(input.id.clone()))?;
 
-        // Guard against older asynchronous writes overwriting newer state
-        if let Some(incoming_ver) = input.version {
-            if incoming_ver < existing.version {
-                log::warn!(
-                    "Dropping outdated note write for {}: incoming ver {} < current ver {}",
-                    input.id,
-                    incoming_ver,
-                    existing.version
-                );
-                return Ok(existing);
-            }
-        }
-
         let now = Utc::now().to_rfc3339();
         let new_title = input.title.unwrap_or_else(|| existing.title.clone());
         let new_content_json = input.content_json.unwrap_or_else(|| existing.content_json.clone());

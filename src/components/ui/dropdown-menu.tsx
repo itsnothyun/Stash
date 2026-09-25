@@ -32,17 +32,31 @@ const DropdownMenuItem = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
     inset?: boolean;
   }
->(({ className, inset, ...props }, ref) => (
-  <DropdownMenuPrimitive.Item
-    ref={ref}
-    className={cn(
-      "relative flex cursor-default select-none items-center gap-2 rounded px-2 py-1.5 text-xs outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      inset && "pl-8",
-      className
-    )}
-    {...props}
-  />
-));
+>(({ className, inset, onSelect, onClick, ...props }, ref) => {
+  const lastSelectTimeRef = React.useRef(0);
+  return (
+    <DropdownMenuPrimitive.Item
+      ref={ref}
+      onSelect={(event) => {
+        lastSelectTimeRef.current = Date.now();
+        onSelect?.(event);
+        if (!event.defaultPrevented && onClick) {
+          (onClick as any)(event);
+        }
+      }}
+      onClick={(e) => {
+        if (Date.now() - lastSelectTimeRef.current < 150) return;
+        onClick?.(e);
+      }}
+      className={cn(
+        "relative flex cursor-default select-none items-center gap-2 rounded px-2 py-1.5 text-xs outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        inset && "pl-8",
+        className
+      )}
+      {...props}
+    />
+  );
+});
 DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName;
 
 const DropdownMenuSeparator = React.forwardRef<

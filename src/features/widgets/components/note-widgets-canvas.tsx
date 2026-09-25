@@ -248,7 +248,7 @@ export const NoteWidgetsCanvas: React.FC<NoteWidgetsCanvasProps> = ({
 
       {/* Widgets Flow Shelf - each widget is ONE clean unified window card */}
       <div className="flex flex-wrap items-start gap-3">
-        <AnimatePresence mode="popLayout" initial={false}>
+        <AnimatePresence mode="popLayout">
           {widgets.map((widget, index) => {
             const currentWidth =
               liveWidths[widget.id] ??
@@ -259,35 +259,37 @@ export const NoteWidgetsCanvas: React.FC<NoteWidgetsCanvasProps> = ({
               typeof currentWidth === "number" ? `${currentWidth}px` : currentWidth;
 
             return (
-              <ContextMenu key={widget.id}>
-                <ContextMenuTrigger asChild>
-                  <motion.div
-                    layout
-                    initial={{ scale: 0.9, opacity: 0, y: 16 }}
-                    animate={{ scale: 1, opacity: 1, y: 0 }}
-                    exit={{ scale: 0.88, opacity: 0, y: -16 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 400,
-                      damping: 28,
-                      mass: 0.75,
-                    }}
-                    style={{
-                      width: widthStyle,
-                      minWidth: widget.isCollapsed ? "180px" : "250px",
-                      maxWidth: "100%",
-                    }}
-                    className={cn(
-                      "relative flex flex-col rounded-2xl shadow-sm border border-border/80 bg-card overflow-hidden transition-shadow duration-200",
-                resizingId === widget.id ? "select-none ring-1 ring-primary/40" : ""
-              )}
-            >
-              {/* Widget Card Header */}
-              <div className="flex items-center justify-between px-3 h-8 bg-muted/30 border-b border-border/40 text-xs text-muted-foreground select-none gap-2">
-                <div className="flex items-center gap-1.5 font-medium text-foreground min-w-0">
-                  {getWidgetIcon(widget.type)}
-                  <span className="text-[11px] truncate max-w-[140px]">
-                    {widget.title}
+              <motion.div
+                key={widget.id}
+                layout
+                initial={{ scale: 0.9, opacity: 0, y: 16 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.88, opacity: 0, y: -16 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 28,
+                  mass: 0.75,
+                }}
+                style={{
+                  width: widthStyle,
+                  minWidth: widget.isCollapsed ? "180px" : "250px",
+                  maxWidth: "100%",
+                }}
+                className={cn(
+                  "relative flex flex-col rounded-2xl shadow-sm border border-border/80 bg-card overflow-hidden transition-shadow duration-200",
+                  resizingId === widget.id ? "select-none ring-1 ring-primary/40" : ""
+                )}
+              >
+                <ContextMenu>
+                  <ContextMenuTrigger asChild>
+                    <div className="flex flex-col w-full h-full">
+                      {/* Widget Card Header */}
+                      <div className="flex items-center justify-between px-3 h-8 bg-muted/30 border-b border-border/40 text-xs text-muted-foreground select-none gap-2">
+                        <div className="flex items-center gap-1.5 font-medium text-foreground min-w-0">
+                          {getWidgetIcon(widget.type)}
+                          <span className="text-[11px] truncate max-w-[140px]">
+                            {widget.title}
                   </span>
                   {widget.type === "swap" && (
                     <span className="flex items-center gap-1 text-[10px] text-muted-foreground font-normal ml-1">
@@ -546,7 +548,7 @@ export const NoteWidgetsCanvas: React.FC<NoteWidgetsCanvasProps> = ({
                   )}
                 </div>
               )}
-            </motion.div>
+            </div>
           </ContextMenuTrigger>
 
           <ContextMenuContent className="w-52">
@@ -641,8 +643,9 @@ export const NoteWidgetsCanvas: React.FC<NoteWidgetsCanvasProps> = ({
             </ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>
-      );
-    })}
+      </motion.div>
+    );
+  })}
         </AnimatePresence>
       </div>
     </div>

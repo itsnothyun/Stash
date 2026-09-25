@@ -280,6 +280,7 @@ export const NoteMenuItems: React.FC<
       });
       playChimeSound();
       toast.show({ message: `Attached ${defaultTitles[type]} to note` });
+      await stashIpc.openFloatingStash(note.id);
     } catch {
       toast.error("Could not attach widget");
     }
@@ -309,6 +310,7 @@ export const NoteMenuItems: React.FC<
         toast.show({
           message: `Organized checklist: moved ${docResult.completedCount} completed task${docResult.completedCount > 1 ? "s" : ""} to bottom`,
         });
+        await stashIpc.openFloatingStash(note.id);
         return;
       }
 
@@ -333,6 +335,7 @@ export const NoteMenuItems: React.FC<
       toast.show({
         message: `Organized checklist: moved ${textResult.completedCount} completed task${textResult.completedCount > 1 ? "s" : ""} to bottom`,
       });
+      await stashIpc.openFloatingStash(note.id);
     } catch {
       toast.error("Could not organize checklist");
     }
@@ -356,6 +359,7 @@ export const NoteMenuItems: React.FC<
         });
         playChimeSound();
         toast.show({ message: `Imported ${file.name}` });
+        await stashIpc.openFloatingStash(note.id);
       }
       try {
         document.body.removeChild(input);

@@ -7,20 +7,51 @@
  * 3. Opacity / Translucency (Ghost Mode)
  */
 
+import { stashIpc } from "@/lib/ipc/stash-ipc";
+
 const PIN_PREFIX = "stash:pin:";
 const DUE_PREFIX = "stash:due:";
 const OPACITY_PREFIX = "stash:opacity:";
+const EMOJI_PREFIX = "stash:emoji:";
+const PAPER_PREFIX = "stash:paper:";
+const FONT_PREFIX = "stash:font:";
+const FRAME_PREFIX = "stash:frame:";
 
 // In-memory set of note IDs currently unlocked in this app session
 const unlockedInSession = new Set<string>();
 
-/** Notify listeners when note metadata changes */
+/** Notify listeners when note metadata changes across all windows */
 function dispatchMetaChangeEvent(noteId: string) {
   if (typeof window !== "undefined") {
     window.dispatchEvent(
       new CustomEvent("stash:note-meta-changed", { detail: { noteId } })
     );
+    void stashIpc.emitEvent("stash://note-meta-changed", { noteId });
   }
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (e) => {
+    if (!e.key) return;
+    const prefixes = [
+      PIN_PREFIX,
+      DUE_PREFIX,
+      OPACITY_PREFIX,
+      EMOJI_PREFIX,
+      PAPER_PREFIX,
+      FONT_PREFIX,
+      FRAME_PREFIX,
+    ];
+    for (const prefix of prefixes) {
+      if (e.key.startsWith(prefix)) {
+        const noteId = e.key.slice(prefix.length);
+        window.dispatchEvent(
+          new CustomEvent("stash:note-meta-changed", { detail: { noteId } })
+        );
+        break;
+      }
+    }
+  });
 }
 
 /* ------------------------------- PIN LOCK ------------------------------- */
@@ -156,8 +187,6 @@ export function setNoteOpacity(noteId: string, opacity: number): void {
 
 /* ------------------------------- EMOJI ICON ------------------------------ */
 
-const EMOJI_PREFIX = "stash:emoji:";
-
 export const EMOJI_PRESETS = [
   "🚀", "💡", "🎯", "⚡", "💻", "📝", "☕", "🎨",
   "🌿", "🔑", "📚", "🛠️", "💰", "🔥", "🌟", "📌",
@@ -180,8 +209,6 @@ export function setNoteEmoji(noteId: string, emoji: string | null): void {
 }
 
 /* --------------------------- PAPER TEXTURE / PATTERN --------------------- */
-
-const PAPER_PREFIX = "stash:paper:";
 
 export type PaperPattern = "plain" | "dots" | "lines" | "grid" | "blueprint";
 
@@ -244,8 +271,6 @@ export function getPaperPatternStyle(pattern: PaperPattern): React.CSSProperties
 
 /* --------------------------- TYPOGRAPHY PERSONA -------------------------- */
 
-const FONT_PREFIX = "stash:font:";
-
 export type NoteFontPersona = "sans" | "serif" | "mono" | "casual";
 
 export const FONT_PERSONAS: { id: NoteFontPersona; label: string; preview: string; fontClass: string }[] = [
@@ -271,8 +296,6 @@ export function setNoteFont(noteId: string, font: NoteFontPersona): void {
 }
 
 /* -------------------------- FRAME & ACCENT STYLE ------------------------- */
-
-const FRAME_PREFIX = "stash:frame:";
 
 export type NoteFrameStyle = "default" | "acrylic" | "neon" | "minimal";
 

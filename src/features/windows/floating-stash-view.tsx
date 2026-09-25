@@ -2,12 +2,14 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Note, Revision } from "@/features/stash/types/note";
 import { getColorClass, NoteColor, NOTE_COLORS, getColorDot } from "@/features/stash/types/color";
 import { stashIpc } from "@/lib/ipc/stash-ipc";
-import { TiptapEditor } from "@/features/editor/components/tiptap-editor";
+import { TiptapEditor, TiptapEditorRef } from "@/features/editor/components/tiptap-editor";
 import {
   appendPlainTextToContent,
   docToPlainText,
+  emptyDoc,
   extractDoc,
   extractWidgets,
+  plainTextToDoc,
   serializeStashContent,
   stashContentFromPlainText,
 } from "@/features/editor/stash-content";
@@ -221,6 +223,14 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
   const [contentToken, setContentToken] = useState(0);
 
   const flushRef = useRef<(() => void) | null>(null);
+  const editorRef = useRef<TiptapEditorRef | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const widgetsRef = useRef<NoteWidgetData[]>(widgets);
+  widgetsRef.current = widgets;
+  const noteRef = useRef<Note | null>(note);
+  noteRef.current = note;
+  const versionRef = useRef<number>(note?.version ?? 1);
+  const persistQueueRef = useRef<Promise<any>>(Promise.resolve());
   const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Window Shade mode
@@ -443,17 +453,20 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
   useEffect(() => {
     stashIpc.getNote(noteId).then((n) => {
       if (!n) return;
+      noteRef.current = n;
+      versionRef.current = n.version;
       setNote(n);
       setTitle(n.title);
 
       const stored = extractWidgets<NoteWidgetData>(n.contentJson);
       if (stored.length > 0) {
+        widgetsRef.current = stored;
         setWidgets(stored);
       } else if (
         n.plainText.includes("[swap-widget]") ||
         n.tags?.some((t) => t.name.toLowerCase() === "swap")
       ) {
-        setWidgets([
+        const swapWidget: NoteWidgetData[] = [
           {
             id: `swap-${n.id}`,
             type: "swap",
@@ -461,7 +474,12 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
             x: 0,
             y: 0,
           },
-        ]);
+        ];
+        widgetsRef.current = swapWidget;
+        setWidgets(swapWidget);
+      } else {
+        widgetsRef.current = [];
+        setWidgets([]);
       }
     });
 
@@ -470,18 +488,62 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       setAlwaysOnTopState(ws.alwaysOnTop);
       setAlwaysOnTop(ws.alwaysOnTop);
     });
+
+    const unlistenNote = stashIpc.listenToEvent<string>(
+      "stash://note-updated",
+      async (updatedId) => {
+        if (updatedId === noteId) {
+          try {
+            const fresh = await stashIpc.getNote(noteId);
+            if (!fresh) return;
+            // Only adopt external state if it is strictly newer than our local state,
+            // preventing this window's own broadcast from reverting optimistic widget additions.
+            if (fresh.version > versionRef.current) {
+              noteRef.current = fresh;
+              versionRef.current = fresh.version;
+              setNote(fresh);
+              setTitle(fresh.title);
+              const freshWidgets = extractWidgets<NoteWidgetData>(fresh.contentJson);
+              widgetsRef.current = freshWidgets;
+              setWidgets(freshWidgets);
+            }
+          } catch {}
+        }
+      }
+    );
+
+    const unlistenMeta = stashIpc.listenToEvent<{ noteId: string }>(
+      "stash://note-meta-changed",
+      (detail) => {
+        if (detail?.noteId === noteId) {
+          setHasPin(hasNotePin(noteId));
+          setIsSessionUnlocked(isNoteSessionUnlocked(noteId));
+          setDueDate(getNoteDueDate(noteId));
+          setNoteEmojiState(getNoteEmoji(noteId));
+          setNotePaperState(getNotePaper(noteId));
+          setNoteFontState(getNoteFont(noteId));
+          setNoteFrameState(getNoteFrame(noteId));
+        }
+      }
+    );
+
+    return () => {
+      unlistenNote.then((fn) => fn());
+      unlistenMeta.then((fn) => fn());
+    };
   }, [noteId]);
 
   const handleRefreshNote = useCallback(async () => {
     try {
       const n = await stashIpc.getNote(noteId);
       if (!n) return;
+      noteRef.current = n;
+      versionRef.current = n.version;
       setNote(n);
       setTitle(n.title);
       const stored = extractWidgets<NoteWidgetData>(n.contentJson);
-      if (stored.length > 0) {
-        setWidgets(stored);
-      }
+      widgetsRef.current = stored;
+      setWidgets(stored);
       setContentToken((t) => t + 1);
       toast.show({ message: "Note refreshed" });
     } catch {
@@ -589,45 +651,56 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
   /* ------------------------------ mutations ----------------------------- */
 
   const persist = useCallback(
-    async (patch: Partial<Note>) => {
-      if (!note) return;
+    (patch: Partial<Note>): Promise<Note | null> => {
+      const currentNote = noteRef.current;
+      if (!currentNote) return Promise.resolve(null);
       setSaveStatus("saving");
-      try {
-        const updated = await stashIpc.updateNote({
-          id: note.id,
-          version: note.version,
-          ...patch,
-        });
-        setNote(updated);
-        setSaveStatus("saved");
-        if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
-        savedTimerRef.current = setTimeout(() => setSaveStatus("idle"), 1400);
-      } catch {
-        setSaveStatus("idle");
-        toast.error("Could not save", "Your text is still on screen.");
-      }
+
+      const task = persistQueueRef.current.then(async () => {
+        try {
+          const updated = await stashIpc.updateNote({
+            id: currentNote.id,
+            version: versionRef.current,
+            ...patch,
+          });
+          versionRef.current = updated.version;
+          noteRef.current = updated;
+          setNote(updated);
+          setSaveStatus("saved");
+          if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+          savedTimerRef.current = setTimeout(() => setSaveStatus("idle"), 1400);
+          return updated;
+        } catch {
+          setSaveStatus("idle");
+          toast.error("Could not save", "Your text is still on screen.");
+          return null;
+        }
+      });
+      persistQueueRef.current = task;
+      return task;
     },
-    [note]
+    []
   );
 
   const handleContentUpdate = useCallback(
     (contentJson: string, plainText: string) => {
       void persist({
-        contentJson: serializeStashContent(extractDoc(contentJson), widgets),
+        contentJson: serializeStashContent(extractDoc(contentJson), widgetsRef.current),
         plainText,
       });
     },
-    [persist, widgets]
+    [persist]
   );
 
   const handleUpdateWidgets = (nextWidgets: NoteWidgetData[]) => {
+    widgetsRef.current = nextWidgets;
     setWidgets(nextWidgets);
-    if (!note) return;
+    const currentDoc =
+      editorRef.current?.getJSON() ||
+      extractDoc(noteRef.current?.contentJson) ||
+      emptyDoc();
     void persist({
-      contentJson: serializeStashContent(
-        extractDoc(note.contentJson),
-        nextWidgets
-      ),
+      contentJson: serializeStashContent(currentDoc, nextWidgets),
     });
   };
 
@@ -635,7 +708,6 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
     type: WidgetType,
     initialConfig?: Record<string, any>
   ) => {
-    flushRef.current?.();
     if (isShaded) {
       void handleToggleShade();
     }
@@ -676,14 +748,28 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
     const newWidget: NoteWidgetData = {
       id: `${type}-${Date.now()}`,
       type,
-      title: defaultTitles[type],
+      title: defaultTitles[type] || "Interactive Widget",
       x: 0,
       y: 0,
       config: initialConfig,
     };
-    handleUpdateWidgets([...widgets, newWidget]);
+    const nextWidgets = [...widgetsRef.current, newWidget];
+    widgetsRef.current = nextWidgets;
+    setWidgets(nextWidgets);
     playChimeSound();
     toast.show({ message: `Attached ${defaultTitles[type] || "widget"}` });
+
+    requestAnimationFrame(() => {
+      scrollContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    const currentDoc =
+      editorRef.current?.getJSON() ||
+      extractDoc(noteRef.current?.contentJson) ||
+      emptyDoc();
+    void persist({
+      contentJson: serializeStashContent(currentDoc, nextWidgets),
+    });
   };
 
   /**
@@ -691,18 +777,23 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
    * `plainText` alone is what made a note read full in the library and open
    * empty.
    */
-  const handleInsertTextToNote = useCallback((text: string) => {
-    if (!note) return;
-    flushRef.current?.();
-    void persist(appendPlainTextToContent(note.contentJson, widgets, text));
-    setContentToken((t) => t + 1);
-  }, [note, widgets, persist]);
+  const handleInsertTextToNote = useCallback(
+    (text: string) => {
+      if (editorRef.current) {
+        editorRef.current.insertContent(text);
+        editorRef.current.flush();
+      } else if (noteRef.current) {
+        void persist(appendPlainTextToContent(noteRef.current.contentJson, widgetsRef.current, text));
+      }
+    },
+    [persist]
+  );
 
   const handleExportMarkdown = useCallback(() => {
-    if (!note) return;
-    const doc = extractDoc(note.contentJson);
-    const text = docToPlainText(doc) || note.plainText || "";
-    const header = note.title?.trim() ? `# ${note.title.trim()}\n\n` : "";
+    const liveDoc = editorRef.current?.getJSON() || extractDoc(noteRef.current?.contentJson);
+    const text = docToPlainText(liveDoc) || editorRef.current?.getPlainText() || noteRef.current?.plainText || "";
+    const title = noteRef.current?.title || "";
+    const header = title.trim() ? `# ${title.trim()}\n\n` : "";
     const fullMd = `${header}${text}`.trim();
 
     const blob = new Blob([fullMd], { type: "text/markdown;charset=utf-8" });
@@ -710,7 +801,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
     const a = document.createElement("a");
     a.href = url;
     const filename =
-      (note.title || "stash")
+      (title || "stash")
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "") || "stash";
@@ -772,25 +863,24 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
   }, []);
 
   const handleOrganizeChecklist = useCallback(() => {
-    if (!note) return;
-    flushRef.current?.();
-
-    // 1. Try Tiptap AST doc organization first
-    const doc = extractDoc(note.contentJson);
-    const docResult = organizeDocTasks(doc);
+    const liveDoc = editorRef.current?.getJSON() || extractDoc(noteRef.current?.contentJson);
+    const docResult = organizeDocTasks(liveDoc);
     if (docResult.hasTasks) {
       if (docResult.completedCount === 0) {
         toast.show({ message: "All checklist tasks are already active" });
         return;
       }
-      const updatedDoc = docResult.updatedDoc;
-      const nextContentJson = serializeStashContent(updatedDoc, widgets);
-      const nextPlainText = docToPlainText(updatedDoc);
-      void persist({
-        contentJson: nextContentJson,
-        plainText: nextPlainText,
-      });
-      setContentToken((t) => t + 1);
+      if (editorRef.current) {
+        editorRef.current.setContent(docResult.updatedDoc);
+        editorRef.current.flush();
+      } else {
+        const nextContentJson = serializeStashContent(docResult.updatedDoc, widgetsRef.current);
+        const nextPlainText = docToPlainText(docResult.updatedDoc);
+        void persist({
+          contentJson: nextContentJson,
+          plainText: nextPlainText,
+        });
+      }
       playClickSound();
       toast.show({
         message: `Organized checklist: moved ${docResult.completedCount} completed task${docResult.completedCount > 1 ? "s" : ""} to bottom`,
@@ -799,7 +889,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
     }
 
     // 2. Fallback to plain text checklist regex
-    const text = note.plainText || "";
+    const text = editorRef.current?.getPlainText() || noteRef.current?.plainText || "";
     const textResult = organizeChecklist(text);
     if (!textResult.hasTasks) {
       toast.show({ message: "No checklist tasks found in this note" });
@@ -809,17 +899,21 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       toast.show({ message: "All checklist tasks are already active" });
       return;
     }
-    const nextContentJson = stashContentFromPlainText(textResult.updatedText, widgets);
-    void persist({
-      plainText: textResult.updatedText,
-      contentJson: nextContentJson,
-    });
-    setContentToken((t) => t + 1);
+    if (editorRef.current) {
+      editorRef.current.setContent(plainTextToDoc(textResult.updatedText));
+      editorRef.current.flush();
+    } else {
+      const nextContentJson = stashContentFromPlainText(textResult.updatedText, widgetsRef.current);
+      void persist({
+        plainText: textResult.updatedText,
+        contentJson: nextContentJson,
+      });
+    }
     playClickSound();
     toast.show({
       message: `Organized checklist: moved ${textResult.completedCount} completed task${textResult.completedCount > 1 ? "s" : ""} to bottom`,
     });
-  }, [note, widgets, persist]);
+  }, [persist]);
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
@@ -1110,20 +1204,19 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
         >
           {/* Add Widget Dropdown */}
           <DropdownMenu>
-            <HeaderTooltip label="Attach Interactive Widget">
-              <DropdownMenuTrigger asChild>
-                <button
-                  className={cn(
-                    iconButton,
-                    "w-auto px-1.5 gap-1 text-[11px] font-medium text-current/80 hover:text-current hover:bg-current/10"
-                  )}
-                  aria-label="Add interactive widget"
-                >
-                  <Plus className="h-3 w-3" />
-                  <span>Widget</span>
-                </button>
-              </DropdownMenuTrigger>
-            </HeaderTooltip>
+            <DropdownMenuTrigger asChild>
+              <button
+                className={cn(
+                  iconButton,
+                  "w-auto px-1.5 gap-1 text-[11px] font-medium text-current/80 hover:text-current hover:bg-current/10"
+                )}
+                aria-label="Add interactive widget"
+                title="Attach Interactive Widget"
+              >
+                <Plus className="h-3 w-3" />
+                <span>Widget</span>
+              </button>
+            </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 text-xs max-h-[85vh] overflow-y-auto">
               <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border/40">
                 Interactive Tools
@@ -1326,13 +1419,11 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
           </HeaderTooltip>
 
           <DropdownMenu>
-            <HeaderTooltip label="More Actions & Options">
-              <DropdownMenuTrigger asChild>
-                <button className={iconButton} aria-label="More actions">
-                  <MoreHorizontal className="h-3.5 w-3.5" />
-                </button>
-              </DropdownMenuTrigger>
-            </HeaderTooltip>
+            <DropdownMenuTrigger asChild>
+              <button className={iconButton} aria-label="More actions" title="More Actions & Options">
+                <MoreHorizontal className="h-3.5 w-3.5" />
+              </button>
+            </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuItem onClick={() => setExportImageOpen(true)}>
                 <Camera className="mr-2 h-3.5 w-3.5 text-primary" />
@@ -1884,7 +1975,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
             </form>
           </div>
         ) : (
-          <div className="relative flex flex-1 cursor-text flex-col overflow-y-auto px-4 pb-20 pt-3">
+          <div ref={scrollContainerRef} className="relative flex flex-1 cursor-text flex-col overflow-y-auto px-4 pb-20 pt-3">
             {/* Tactile Paper Pattern Texture Backdrop */}
             {notePaper !== "plain" && (
               <div
@@ -1914,6 +2005,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                 autoFocus={widgets.length === 0}
                 onUpdate={handleContentUpdate}
                 flushRef={flushRef}
+                editorRef={editorRef}
                 isDockMinimized={isDockMinimized}
                 onToggleDock={handleToggleDock}
                 className={currentFontPersona?.fontClass}

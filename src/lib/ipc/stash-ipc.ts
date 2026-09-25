@@ -41,8 +41,9 @@ export interface ExportData {
   windowStates: NoteWindowState[];
 }
 
-// In-memory fallback for local browser preview / unit testing
-const localMockNotes: Note[] = [
+const MOCK_NOTES_KEY = "stash_mock_notes_v2";
+
+const DEFAULT_MOCK_NOTES: Note[] = [
   {
     id: "mock-1",
     title: "Welcome to Stash",
@@ -153,6 +154,41 @@ const localMockNotes: Note[] = [
   },
 ];
 
+function loadMockNotes(): Note[] {
+  if (typeof window !== "undefined") {
+    try {
+      const stored = localStorage.getItem(MOCK_NOTES_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+  }
+  return [...DEFAULT_MOCK_NOTES];
+}
+
+let localMockNotes: Note[] = loadMockNotes();
+
+function saveMockNotes() {
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem(MOCK_NOTES_KEY, JSON.stringify(localMockNotes));
+    } catch {}
+  }
+}
+
+// Keep localMockNotes synchronized if another tab writes to localStorage
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (e) => {
+    if (e.key === MOCK_NOTES_KEY && e.newValue) {
+      try {
+        const parsed = JSON.parse(e.newValue);
+        if (Array.isArray(parsed)) localMockNotes = parsed;
+      } catch {}
+    }
+  });
+}
+
 let localMockSettings: Settings = {
   theme: "system",
   defaultColor: "Paper",
@@ -186,6 +222,8 @@ export const stashIpc = {
       tags: [],
     };
     localMockNotes.unshift(newNote);
+    saveMockNotes();
+    await this.emitEvent("stash://note-updated", newNote.id);
     return newNote;
   },
 
@@ -193,6 +231,10 @@ export const stashIpc = {
     if (isTauri()) {
       return await invoke<Note | null>("get_note", { id });
     }
+    // Re-check storage if note not yet in memory
+    const existing = localMockNotes.find((n) => n.id === id);
+    if (existing) return existing;
+    localMockNotes = loadMockNotes();
     return localMockNotes.find((n) => n.id === id) || null;
   },
 
@@ -227,7 +269,11 @@ export const stashIpc = {
     if (isTauri()) {
       return await invoke<Note>("update_note", { input });
     }
-    const idx = localMockNotes.findIndex((n) => n.id === input.id);
+    let idx = localMockNotes.findIndex((n) => n.id === input.id);
+    if (idx === -1) {
+      localMockNotes = loadMockNotes();
+      idx = localMockNotes.findIndex((n) => n.id === input.id);
+    }
     if (idx !== -1) {
       localMockNotes[idx] = {
         ...localMockNotes[idx],
@@ -256,6 +302,8 @@ export const stashIpc = {
         updatedAt: new Date().toISOString(),
         version: localMockNotes[idx].version + 1,
       };
+      saveMockNotes();
+      await this.emitEvent("stash://note-updated", input.id);
       return localMockNotes[idx];
     }
     throw new Error("Note not found");
@@ -476,7 +524,15 @@ export const stashIpc = {
     if (isTauri()) {
       await emit(event, payload);
     } else {
-      window.dispatchEvent(new CustomEvent(event, { detail: payload }));
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent(event, { detail: payload }));
+        try {
+          localStorage.setItem(
+            "stash:ipc-event",
+            JSON.stringify({ event, payload, ts: Date.now() })
+          );
+        } catch {}
+      }
     }
   },
 
@@ -547,6 +603,29 @@ export const stashIpc = {
     if (isTauri()) {
       return await listen<T>(event, (e) => handler(e.payload));
     }
-    return () => {};
+    if (typeof window === "undefined") return () => {};
+
+    const customListener = (e: Event) => {
+      const custom = e as CustomEvent<T>;
+      handler(custom.detail);
+    };
+    window.addEventListener(event, customListener);
+
+    const storageListener = (e: StorageEvent) => {
+      if (e.key === "stash:ipc-event" && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (parsed.event === event) {
+            handler(parsed.payload);
+          }
+        } catch {}
+      }
+    };
+    window.addEventListener("storage", storageListener);
+
+    return () => {
+      window.removeEventListener(event, customListener);
+      window.removeEventListener("storage", storageListener);
+    };
   },
 };

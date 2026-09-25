@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
+import { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import { focusOutsideChecklist, StashTaskItem } from "../extensions/stash-task-item";
@@ -23,6 +24,15 @@ import { EditorContextMenu } from "./editor-context-menu";
 import { WidgetType } from "@/features/widgets/types";
 import { cn } from "@/lib/utils/cn";
 
+export interface TiptapEditorRef {
+  getEditor: () => Editor | null;
+  getJSON: () => any;
+  getPlainText: () => string;
+  setContent: (content: any) => void;
+  insertContent: (content: string) => void;
+  flush: () => void;
+}
+
 interface TiptapEditorProps {
   initialContent?: string;
   /**
@@ -38,6 +48,7 @@ interface TiptapEditorProps {
    * owner can force a durable save before the window closes.
    */
   flushRef?: React.MutableRefObject<(() => void) | null>;
+  editorRef?: React.MutableRefObject<TiptapEditorRef | null>;
   className?: string;
   /**
    * Keeps the floating toolbar open at the caret even without a selection.
@@ -64,6 +75,7 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
   autoFocus = true,
   onUpdate,
   flushRef,
+  editorRef,
   className,
   isDockMinimized,
   onToggleDock,
@@ -82,20 +94,21 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
 
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingWriteRef = useRef<(() => void) | null>(null);
+  const onUpdateRef = useRef(onUpdate);
+  onUpdateRef.current = onUpdate;
 
   const handleUpdate = useCallback(
     (contentJson: string, plainText: string) => {
-      if (!onUpdate) return;
       const write = () => {
         pendingWriteRef.current = null;
-        onUpdate(contentJson, plainText);
+        onUpdateRef.current?.(contentJson, plainText);
       };
 
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
       pendingWriteRef.current = write;
       debounceTimerRef.current = setTimeout(write, 300);
     },
-    [onUpdate]
+    []
   );
 
   const flush = useCallback(() => {
@@ -217,6 +230,25 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
     },
   });
 
+  useEffect(() => {
+    if (!editorRef) return;
+    editorRef.current = {
+      getEditor: () => editor,
+      getJSON: () => (editor ? editor.getJSON() : null),
+      getPlainText: () => (editor ? docToPlainText(editor.getJSON()) : ""),
+      setContent: (content: any) => {
+        editor?.commands.setContent(content);
+      },
+      insertContent: (content: string) => {
+        editor?.commands.insertContent(content);
+      },
+      flush,
+    };
+    return () => {
+      editorRef.current = null;
+    };
+  }, [editorRef, editor, flush]);
+
   // A pending write must survive unmount — closing a note is exactly when
   // losing the last keystroke would hurt most.
   useEffect(() => {
@@ -259,6 +291,7 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
         editor={editor}
         isMinimized={isDockMinimized}
         onToggleMinimize={onToggleDock}
+        onAddWidget={onAddWidget}
       />
       {editor && (
         <SlashMenu
@@ -266,6 +299,7 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
           isOpen={slashMenuOpen}
           onClose={() => setSlashMenuOpen(false)}
           position={slashMenuPos}
+          onAddWidget={onAddWidget}
         />
       )}
     </div>
