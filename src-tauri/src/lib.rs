@@ -210,6 +210,7 @@ pub fn run() {
             commands::open_microphone_settings,
             commands::get_system_performance,
             commands::optimize_stash_system,
+            commands::kill_process,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Stash application");

@@ -670,3 +670,13 @@ pub async fn optimize_stash_system(
     crate::performance::optimize_stash_database(&app, &db)
 }
 
+/// Terminates a process by PID (used by performance app inspector).
+#[tauri::command]
+pub async fn kill_process(
+    perf: State<'_, crate::performance::PerformanceState>,
+    pid: u32,
+) -> Result<bool, String> {
+    crate::performance::kill_process_by_pid(&perf, pid)
+}
+
+

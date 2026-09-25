@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
-use sysinfo::{CpuRefreshKind, Disks, MemoryRefreshKind, ProcessRefreshKind, RefreshKind, System};
+use sysinfo::{
+    Components, CpuRefreshKind, Disks, MemoryRefreshKind, Networks, Pid, ProcessRefreshKind,
+    ProcessesToUpdate, RefreshKind, System,
+};
 use tauri::{AppHandle, Manager};
 use crate::db::DbState;
 
@@ -29,6 +32,33 @@ pub struct ProcessStats {
     pub virtual_memory_bytes: u64,
     pub cpu_usage: f32,
     pub run_time_secs: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AppProcessInfo {
+    pub pid: u32,
+    pub name: String,
+    pub cpu_usage: f32,
+    pub memory_bytes: u64,
+    pub virtual_memory_bytes: u64,
+    pub run_time_secs: u64,
+    pub is_stash: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NetworkTelemetry {
+    pub total_rx_bytes: u64,
+    pub total_tx_bytes: u64,
+    pub rx_rate_bytes_per_sec: u64,
+    pub tx_rate_bytes_per_sec: u64,
+    pub active_interfaces: usize,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ThermalTelemetry {
+    pub package_temp_celsius: Option<f32>,
+    pub max_temp_celsius: Option<f32>,
+    pub sensor_count: usize,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -62,10 +92,21 @@ pub struct SystemPerformanceSnapshot {
     pub stash_process: Option<ProcessStats>,
     pub db_size_bytes: u64,
     pub active_windows_count: usize,
+
+    // Running Applications & Top Consumers
+    pub processes: Vec<AppProcessInfo>,
+    pub total_processes_count: usize,
+    pub top_cpu_consumer: Option<AppProcessInfo>,
+    pub top_ram_consumer: Option<AppProcessInfo>,
+
+    // Network & Thermal
+    pub network: NetworkTelemetry,
+    pub thermal: ThermalTelemetry,
 }
 
 pub struct PerformanceState {
     pub system: Mutex<System>,
+    pub networks: Mutex<Networks>,
 }
 
 impl PerformanceState {
@@ -79,6 +120,7 @@ impl PerformanceState {
         sys.refresh_memory();
         Self {
             system: Mutex::new(sys),
+            networks: Mutex::new(Networks::new_with_refreshed_list()),
         }
     }
 }
@@ -95,9 +137,14 @@ pub fn collect_snapshot(
 ) -> SystemPerformanceSnapshot {
     let mut sys = state.system.lock().unwrap_or_else(|e| e.into_inner());
 
-    // Refresh CPU and Memory efficiently without full system scan
+    // Refresh CPU, Memory, and Processes efficiently (CPU + Memory only, no slow disk/user scanning)
     sys.refresh_cpu_usage();
     sys.refresh_memory();
+    sys.refresh_processes_specifics(
+        ProcessesToUpdate::All,
+        true,
+        ProcessRefreshKind::nothing().with_cpu().with_memory(),
+    );
 
     let os_name = System::name().unwrap_or_else(|| "Windows".to_string());
     let os_version = System::os_version().unwrap_or_else(|| "".to_string());
@@ -155,12 +202,9 @@ pub fn collect_snapshot(
 
     // Query Stash process stats
     let current_pid_res = sysinfo::get_current_pid();
+    let current_pid_num = current_pid_res.as_ref().map(|p| p.as_u32()).unwrap_or(0);
+
     let stash_process = if let Ok(pid) = current_pid_res {
-        sys.refresh_processes_specifics(
-            sysinfo::ProcessesToUpdate::Some(&[pid]),
-            true,
-            ProcessRefreshKind::everything(),
-        );
         sys.process(pid).map(|p| ProcessStats {
             pid: pid.as_u32(),
             memory_bytes: p.memory(),
@@ -170,6 +214,111 @@ pub fn collect_snapshot(
         })
     } else {
         None
+    };
+
+    // Collect and sort Running Processes
+    let total_processes_count = sys.processes().len();
+    let mut proc_list: Vec<AppProcessInfo> = sys
+        .processes()
+        .iter()
+        .map(|(pid, p)| {
+            let pid_num = pid.as_u32();
+            let raw_name = p.name().to_string_lossy().to_string();
+            let is_stash = pid_num == current_pid_num
+                || raw_name.eq_ignore_ascii_case("stash.exe")
+                || raw_name.eq_ignore_ascii_case("stash");
+
+            AppProcessInfo {
+                pid: pid_num,
+                name: raw_name,
+                cpu_usage: p.cpu_usage(),
+                memory_bytes: p.memory(),
+                virtual_memory_bytes: p.virtual_memory(),
+                run_time_secs: p.run_time(),
+                is_stash,
+            }
+        })
+        .collect();
+
+    // Find absolute top CPU consumer and top RAM consumer across all processes
+    let top_cpu_consumer = proc_list
+        .iter()
+        .filter(|p| !p.is_stash)
+        .max_by(|a, b| a.cpu_usage.partial_cmp(&b.cpu_usage).unwrap_or(std::cmp::Ordering::Equal))
+        .cloned();
+
+    let top_ram_consumer = proc_list
+        .iter()
+        .filter(|p| !p.is_stash)
+        .max_by_key(|p| p.memory_bytes)
+        .cloned();
+
+    // Filter out zero-impact idle kernel threads (< 0.1% CPU and < 8MB RAM) unless it's Stash,
+    // and sort by a blended score of CPU + Memory weight so the most prominent apps show first
+    proc_list.sort_by(|a, b| {
+        // Sort primarily by memory and CPU combined
+        let score_a = (a.cpu_usage * 10_000_000.0) as u64 + a.memory_bytes;
+        let score_b = (b.cpu_usage * 10_000_000.0) as u64 + b.memory_bytes;
+        score_b.cmp(&score_a)
+    });
+
+    // Retain the top 60 significant processes for crisp, instant UI rendering
+    proc_list.truncate(60);
+
+    // Network Telemetry
+    let mut networks = state.networks.lock().unwrap_or_else(|e| e.into_inner());
+    networks.refresh(true);
+    let mut total_rx = 0u64;
+    let mut total_tx = 0u64;
+    let mut rx_rate = 0u64;
+    let mut tx_rate = 0u64;
+    let mut active_ifaces = 0usize;
+
+    for (_name, net) in networks.iter() {
+        total_rx = total_rx.saturating_add(net.total_received());
+        total_tx = total_tx.saturating_add(net.total_transmitted());
+        rx_rate = rx_rate.saturating_add(net.received());
+        tx_rate = tx_rate.saturating_add(net.transmitted());
+        active_ifaces += 1;
+    }
+
+    let network = NetworkTelemetry {
+        total_rx_bytes: total_rx,
+        total_tx_bytes: total_tx,
+        rx_rate_bytes_per_sec: rx_rate,
+        tx_rate_bytes_per_sec: tx_rate,
+        active_interfaces: active_ifaces,
+    };
+
+    // Thermal Telemetry
+    let components = Components::new_with_refreshed_list();
+    let mut max_temp: Option<f32> = None;
+    let mut cpu_temp: Option<f32> = None;
+    let sensor_count = components.len();
+
+    for comp in &components {
+        if let Some(temp) = comp.temperature() {
+            if let Some(current_max) = max_temp {
+                if temp > current_max {
+                    max_temp = Some(temp);
+                }
+            } else {
+                max_temp = Some(temp);
+            }
+
+            let label = comp.label().to_lowercase();
+            if label.contains("cpu") || label.contains("package") || label.contains("core") {
+                if cpu_temp.is_none() || label.contains("package") {
+                    cpu_temp = Some(temp);
+                }
+            }
+        }
+    }
+
+    let thermal = ThermalTelemetry {
+        package_temp_celsius: cpu_temp.or(max_temp),
+        max_temp_celsius: max_temp,
+        sensor_count,
     };
 
     // Database file size
@@ -207,6 +356,12 @@ pub fn collect_snapshot(
         stash_process,
         db_size_bytes,
         active_windows_count,
+        processes: proc_list,
+        total_processes_count,
+        top_cpu_consumer,
+        top_ram_consumer,
+        network,
+        thermal,
     }
 }
 
@@ -262,4 +417,19 @@ pub fn optimize_stash_database(
         db_size_after,
         memory_freed_estimate_bytes,
     })
+}
+
+pub fn kill_process_by_pid(state: &PerformanceState, pid_num: u32) -> Result<bool, String> {
+    let mut sys = state.system.lock().unwrap_or_else(|e| e.into_inner());
+    let pid = Pid::from_u32(pid_num);
+    sys.refresh_processes_specifics(
+        ProcessesToUpdate::Some(&[pid]),
+        true,
+        ProcessRefreshKind::nothing(),
+    );
+    if let Some(proc) = sys.process(pid) {
+        Ok(proc.kill())
+    } else {
+        Err(format!("Process with PID {} not found or already terminated", pid_num))
+    }
 }

@@ -144,6 +144,28 @@ export function formatBytes(bytes: number, decimals = 1): string {
 }
 
 /**
+ * Formats bytes/sec into clean speed rates (e.g. 1.2 MB/s).
+ */
+export function formatSpeed(bytesPerSec: number): string {
+  if (!Number.isFinite(bytesPerSec) || bytesPerSec <= 0) return "0 KB/s";
+  if (bytesPerSec < 1024 * 1024) {
+    return `${(bytesPerSec / 1024).toFixed(1)} KB/s`;
+  }
+  return `${(bytesPerSec / (1024 * 1024)).toFixed(1)} MB/s`;
+}
+
+/**
+ * Formats seconds into human duration (e.g. 2h 15m).
+ */
+export function formatDuration(seconds: number): string {
+  if (!Number.isFinite(seconds) || seconds <= 0) return "< 1m";
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  return `${minutes}m`;
+}
+
+/**
  * Computes deep bottleneck analysis across CPU, RAM, Storage, and Stash App.
  */
 export function analyzeBottlenecks(
@@ -253,6 +275,61 @@ export function analyzeBottlenecks(
       detail: `Processor is operating with ${Math.max(0, 100 - cpuUsage).toFixed(0)}% idle capacity ready for instant burst work.`,
       value: `${cpuUsage.toFixed(0)}%`,
     });
+  }
+
+  // Thermal Hardware Sensor Check
+  if (sys.thermal?.package_temp_celsius != null) {
+    const temp = sys.thermal.package_temp_celsius;
+    if (temp >= 90) {
+      scoreDeductions += 25;
+      alerts.push({
+        id: "thermal-critical",
+        severity: "critical",
+        category: "CPU",
+        title: `Thermal Throttling Imminent (${temp.toFixed(1)}°C)`,
+        detail: `Processor package temperature reached ${temp.toFixed(1)}°C. System hardware may throttle clock frequencies to protect silicon integrity.`,
+        recommendation: "Ensure PC cooling fans are clear of dust and airflow vents are unblocked.",
+        value: `${temp.toFixed(0)}°C`,
+      });
+    } else if (temp >= 82) {
+      scoreDeductions += 10;
+      alerts.push({
+        id: "thermal-warning",
+        severity: "warning",
+        category: "CPU",
+        title: `Elevated CPU Temperature (${temp.toFixed(1)}°C)`,
+        detail: `Processor package is running warm under sustained workload.`,
+        value: `${temp.toFixed(0)}°C`,
+      });
+    }
+  }
+
+  // Top Resource Consumers Inspection
+  if (sys.top_cpu_consumer && sys.top_cpu_consumer.cpu_usage >= 25) {
+    alerts.push({
+      id: "app-heavy-cpu",
+      severity: sys.top_cpu_consumer.cpu_usage >= 60 ? "critical" : "warning",
+      category: "CPU",
+      title: `Top CPU Consumer: ${sys.top_cpu_consumer.name}`,
+      detail: `${sys.top_cpu_consumer.name} (PID: ${sys.top_cpu_consumer.pid}) is using ${sys.top_cpu_consumer.cpu_usage.toFixed(1)}% of your CPU.`,
+      recommendation: "Inspect or end task if this application is frozen or unneeded.",
+      value: `${sys.top_cpu_consumer.cpu_usage.toFixed(0)}%`,
+    });
+  }
+
+  if (sys.top_ram_consumer && sys.total_memory > 0) {
+    const ramPct = (sys.top_ram_consumer.memory_bytes / sys.total_memory) * 100;
+    if (ramPct >= 20 || sys.top_ram_consumer.memory_bytes >= 3 * 1024 * 1024 * 1024) {
+      alerts.push({
+        id: "app-heavy-ram",
+        severity: ramPct >= 35 ? "critical" : "warning",
+        category: "RAM",
+        title: `Top Memory Consumer: ${sys.top_ram_consumer.name}`,
+        detail: `${sys.top_ram_consumer.name} (PID: ${sys.top_ram_consumer.pid}) is consuming ${formatBytes(sys.top_ram_consumer.memory_bytes)} (${ramPct.toFixed(1)}% of total system RAM).`,
+        recommendation: "Close unneeded tabs or restart this application to reclaim RAM.",
+        value: formatBytes(sys.top_ram_consumer.memory_bytes),
+      });
+    }
   }
 
   // 3. Storage Drive Space Check

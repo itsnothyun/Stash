@@ -65,6 +65,30 @@ export interface ProcessStats {
   run_time_secs: number;
 }
 
+export interface AppProcessInfo {
+  pid: number;
+  name: string;
+  cpu_usage: number;
+  memory_bytes: number;
+  virtual_memory_bytes: number;
+  run_time_secs: number;
+  is_stash: boolean;
+}
+
+export interface NetworkTelemetry {
+  total_rx_bytes: number;
+  total_tx_bytes: number;
+  rx_rate_bytes_per_sec: number;
+  tx_rate_bytes_per_sec: number;
+  active_interfaces: number;
+}
+
+export interface ThermalTelemetry {
+  package_temp_celsius: number | null;
+  max_temp_celsius: number | null;
+  sensor_count: number;
+}
+
 export interface SystemPerformanceSnapshot {
   os_name: string;
   os_version: string;
@@ -88,6 +112,12 @@ export interface SystemPerformanceSnapshot {
   stash_process: ProcessStats | null;
   db_size_bytes: number;
   active_windows_count: number;
+  processes: AppProcessInfo[];
+  total_processes_count: number;
+  top_cpu_consumer: AppProcessInfo | null;
+  top_ram_consumer: AppProcessInfo | null;
+  network: NetworkTelemetry;
+  thermal: ThermalTelemetry;
 }
 
 export interface OptimizationResult {
@@ -713,7 +743,119 @@ export const stashIpc = {
       },
       db_size_bytes: 420 * 1024,
       active_windows_count: 1,
+      processes: [
+        {
+          pid: 22408,
+          name: "chrome.exe",
+          cpu_usage: 14.8,
+          memory_bytes: 1480 * 1024 * 1024,
+          virtual_memory_bytes: 3200 * 1024 * 1024,
+          run_time_secs: 14200,
+          is_stash: false,
+        },
+        {
+          pid: 18920,
+          name: "Code.exe",
+          cpu_usage: 6.2,
+          memory_bytes: 940 * 1024 * 1024,
+          virtual_memory_bytes: 2100 * 1024 * 1024,
+          run_time_secs: 18400,
+          is_stash: false,
+        },
+        {
+          pid: 15304,
+          name: "discord.exe",
+          cpu_usage: 2.1,
+          memory_bytes: 520 * 1024 * 1024,
+          virtual_memory_bytes: 1200 * 1024 * 1024,
+          run_time_secs: 26000,
+          is_stash: false,
+        },
+        {
+          pid: 9284,
+          name: "Spotify.exe",
+          cpu_usage: 1.1,
+          memory_bytes: 310 * 1024 * 1024,
+          virtual_memory_bytes: 840 * 1024 * 1024,
+          run_time_secs: 9400,
+          is_stash: false,
+        },
+        {
+          pid: 14208,
+          name: "stash.exe",
+          cpu_usage: 0.2,
+          memory_bytes: stashMem,
+          virtual_memory_bytes: stashMem * 3,
+          run_time_secs: 3600,
+          is_stash: true,
+        },
+        {
+          pid: 3120,
+          name: "dwm.exe",
+          cpu_usage: 1.8,
+          memory_bytes: 140 * 1024 * 1024,
+          virtual_memory_bytes: 500 * 1024 * 1024,
+          run_time_secs: 86400,
+          is_stash: false,
+        },
+        {
+          pid: 4892,
+          name: "explorer.exe",
+          cpu_usage: 0.6,
+          memory_bytes: 195 * 1024 * 1024,
+          virtual_memory_bytes: 620 * 1024 * 1024,
+          run_time_secs: 86400,
+          is_stash: false,
+        },
+        {
+          pid: 11024,
+          name: "steam.exe",
+          cpu_usage: 0.3,
+          memory_bytes: 240 * 1024 * 1024,
+          virtual_memory_bytes: 750 * 1024 * 1024,
+          run_time_secs: 34000,
+          is_stash: false,
+        },
+      ],
+      total_processes_count: 182,
+      top_cpu_consumer: {
+        pid: 22408,
+        name: "chrome.exe",
+        cpu_usage: 14.8,
+        memory_bytes: 1480 * 1024 * 1024,
+        virtual_memory_bytes: 3200 * 1024 * 1024,
+        run_time_secs: 14200,
+        is_stash: false,
+      },
+      top_ram_consumer: {
+        pid: 22408,
+        name: "chrome.exe",
+        cpu_usage: 14.8,
+        memory_bytes: 1480 * 1024 * 1024,
+        virtual_memory_bytes: 3200 * 1024 * 1024,
+        run_time_secs: 14200,
+        is_stash: false,
+      },
+      network: {
+        total_rx_bytes: 42 * 1024 * 1024 * 1024,
+        total_tx_bytes: 8 * 1024 * 1024 * 1024,
+        rx_rate_bytes_per_sec: 1420 * 1024, // 1.4 MB/s
+        tx_rate_bytes_per_sec: 180 * 1024,  // 180 KB/s
+        active_interfaces: 2,
+      },
+      thermal: {
+        package_temp_celsius: 54.2,
+        max_temp_celsius: 58.0,
+        sensor_count: 4,
+      },
     };
+  },
+
+  async killProcess(pid: number): Promise<boolean> {
+    if (isTauri()) {
+      return await invoke<boolean>("kill_process", { pid });
+    }
+    return true;
   },
 
   async optimizeStashSystem(): Promise<OptimizationResult> {
