@@ -651,3 +651,22 @@ pub fn open_microphone_settings() -> AppResult<()> {
     }
     Ok(())
 }
+
+/// Retrieves real-time PC hardware and Stash process performance diagnostics.
+#[tauri::command]
+pub async fn get_system_performance(
+    app: AppHandle,
+    perf: State<'_, crate::performance::PerformanceState>,
+) -> Result<crate::performance::SystemPerformanceSnapshot, String> {
+    Ok(crate::performance::collect_snapshot(&perf, &app))
+}
+
+/// Executes instant database compaction (VACUUM & PRAGMA optimize/shrink) and trims memory.
+#[tauri::command]
+pub async fn optimize_stash_system(
+    app: AppHandle,
+    db: State<'_, DbState>,
+) -> Result<crate::performance::OptimizationResult, String> {
+    crate::performance::optimize_stash_database(&app, &db)
+}
+

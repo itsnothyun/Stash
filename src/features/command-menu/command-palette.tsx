@@ -36,6 +36,10 @@ import {
   MagnifyingGlassMinus as ZoomOut,
   Globe,
   Palette,
+  Sparkle,
+  FileText,
+  Cpu,
+  Lightning,
 } from "@phosphor-icons/react";
 import { NOTE_TEMPLATES, getTemplateIconStyle } from "@/features/stash/templates";
 import { cn } from "@/lib/utils/cn";
@@ -43,6 +47,8 @@ import { stashIpc } from "@/lib/ipc/stash-ipc";
 
 interface CommandPaletteProps {
   onCapture: () => void | Promise<void>;
+  onOpenTemplateStudio?: () => void;
+  onQuickCapture?: () => void;
   currentNote?: Note | null;
   onOpenNote?: (id: string) => void;
   onDuplicateNote?: (note: Note) => void;
@@ -60,6 +66,8 @@ interface CommandPaletteProps {
  */
 export const CommandPalette: React.FC<CommandPaletteProps> = ({
   onCapture,
+  onOpenTemplateStudio,
+  onQuickCapture,
   currentNote,
   onOpenNote,
   onDuplicateNote,
@@ -101,6 +109,22 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             <span>New stash</span>
             <CommandShortcut>{formatShortcut(SHORTCUTS.quickCapture)}</CommandShortcut>
           </CommandItem>
+
+          {onQuickCapture && (
+            <CommandItem onSelect={() => run(onQuickCapture)}>
+              <Sparkle className="mr-2 h-4 w-4 text-amber-500" />
+              <span>Spotlight Quick Capture HUD…</span>
+              <CommandShortcut>Ctrl+Shift+Space</CommandShortcut>
+            </CommandItem>
+          )}
+
+          {onOpenTemplateStudio && (
+            <CommandItem onSelect={() => run(onOpenTemplateStudio)}>
+              <FileText className="mr-2 h-4 w-4 text-primary" />
+              <span>Explore Template Studio…</span>
+              <CommandShortcut>Ctrl+T</CommandShortcut>
+            </CommandItem>
+          )}
 
           <CommandItem
             onSelect={() => {
@@ -212,6 +236,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               { id: "todos", label: "To-dos", icon: ListChecks },
               { id: "pinned", label: "Pinned", icon: Pin },
               { id: "favorites", label: "Favorites", icon: Star },
+              { id: "performance", label: "PC Performance & Bottleneck Radar", icon: Cpu },
               { id: "archive", label: "Archive", icon: Archive },
               { id: "trash", label: "Trash", icon: Trash2 },
             ] as const
@@ -313,6 +338,24 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           <CommandItem onSelect={() => run(() => toggleIconSet())}>
             <Palette className="mr-2 h-4 w-4" />
             <span>Toggle icon set ({iconSet === "colorful" ? "Monochrome" : "Colorful"})</span>
+          </CommandItem>
+
+          <CommandItem
+            onSelect={() =>
+              run(async () => {
+                try {
+                  const res = await stashIpc.optimizeStashSystem();
+                  toast.show({
+                    message: `⚡ Stash Turbo Optimization Complete · ${res.message}`,
+                  });
+                } catch {
+                  toast.error("Optimization failed");
+                }
+              })
+            }
+          >
+            <Lightning className="mr-2 h-4 w-4 text-amber-500" weight="fill" />
+            <span>⚡ Turbo Optimize Stash & Compact Storage</span>
           </CommandItem>
 
           <CommandItem onSelect={() => run(() => setSettingsOpen(true))}>

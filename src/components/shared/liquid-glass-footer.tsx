@@ -15,6 +15,7 @@ import {
   Flame,
   ArrowsDownUp as ArrowDownUp,
   Check,
+  Cpu,
 } from "@phosphor-icons/react";
 import { StashLogo } from "@/components/shared/stash-logo";
 import { useUIStore } from "@/stores/ui-store";
@@ -260,6 +261,14 @@ export const LiquidGlassFooter: React.FC<LiquidGlassFooterProps> = ({
                 >
                   <Calendar className={cn("h-3.5 w-3.5", colorClass("text-purple-500", isColorful, "text-foreground/70"))} />
                   <span>Today's Stash</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveSection("performance")}
+                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-foreground/80 hover:text-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-all text-left"
+                >
+                  <Cpu className={cn("h-3.5 w-3.5", colorClass("text-amber-500", isColorful, "text-foreground/70"))} />
+                  <span>PC Performance</span>
                 </button>
               </div>
             </div>

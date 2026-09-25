@@ -3,6 +3,7 @@ mod models;
 mod db;
 mod repositories;
 mod commands;
+pub(crate) mod performance;
 #[cfg(test)]
 mod tests;
 
@@ -83,6 +84,7 @@ pub fn run() {
             let db_state = DbState::new(db_path)
                 .expect("Failed to initialize SQLite database migrations");
             app.manage(db_state);
+            app.manage(performance::PerformanceState::new());
 
             // Setup Tray Menu
             let quit_i = MenuItem::with_id(app, "quit", "Quit Stash", true, None::<&str>)?;
@@ -206,6 +208,8 @@ pub fn run() {
             commands::close_current_window_cmd,
             commands::get_system_username,
             commands::open_microphone_settings,
+            commands::get_system_performance,
+            commands::optimize_stash_system,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Stash application");

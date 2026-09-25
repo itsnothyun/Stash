@@ -38,7 +38,6 @@ import {
   PushPin as Pin,
   PushPinSlash as PinOff,
   ArrowClockwise as RefreshCw,
-  ArrowCounterClockwise as RotateCcw,
   Trash as Trash2,
   X,
   Plus,
@@ -109,6 +108,8 @@ import { NotePersonaModal } from "@/features/stash/components/note-persona-modal
 import { NoteExportImageModal } from "@/features/stash/components/note-export-image-modal";
 import { NoteWidgetsCanvas } from "@/features/widgets/components/note-widgets-canvas";
 import { NoteWidgetData, WidgetType } from "@/features/widgets/types";
+import { RevisionDiffViewer } from "@/features/stash/components/revision-diff-viewer";
+import { BacklinksPanel } from "@/features/stash/components/backlinks-panel";
 import {
   SimpleDropdown,
   SimpleDropdownItem,
@@ -138,7 +139,6 @@ import {
 } from "@/lib/tauri/window-manager";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { cn } from "@/lib/utils/cn";
-import { formatNoteDate } from "@/lib/utils/dates";
 
 export const POPULAR_SWAP_PAIRS = [
   { from: "USD", to: "EUR", label: "USD / EUR", name: "US Dollar / Euro" },
@@ -2055,6 +2055,14 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
               />
             </div>
 
+            {/* Bi-directional [[Wiki]] Backlinks Panel */}
+            <div className="relative z-10 px-4 pb-10 pt-1">
+              <BacklinksPanel
+                noteId={note.id}
+                noteTitle={note.title || title}
+              />
+            </div>
+
             {/* Interactive Note Statistics HUD */}
             <div className="fixed bottom-2.5 right-3 z-30 pointer-events-auto">
               <NoteStatsHud plainText={note.plainText || ""} />
@@ -2074,63 +2082,16 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
         aria-hidden="true"
       />
 
-      {/* Revision history */}
-      <Dialog open={revisionsOpen} onOpenChange={setRevisionsOpen}>
-        <DialogContent className="max-w-md gap-3 p-5">
-          <DialogHeader>
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <DialogTitle className="text-sm">Revision history</DialogTitle>
-                <DialogDescription>
-                  Checkpoints are kept when you close a stash or make edits.
-                </DialogDescription>
-              </div>
-              <button
-                type="button"
-                onClick={() => void handleCreateCheckpoint()}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-2xs shrink-0 cursor-pointer"
-              >
-                <Plus className="h-3.5 w-3.5" />
-                <span>Save Checkpoint</span>
-              </button>
-            </div>
-          </DialogHeader>
-
-          <div className="max-h-72 divide-y divide-border overflow-y-auto">
-            {revisions.length === 0 ? (
-              <p className="py-6 text-center text-xs text-muted-foreground">
-                No checkpoints yet.
-              </p>
-            ) : (
-              revisions.map((rev) => (
-                <div
-                  key={rev.id}
-                  className="flex items-center justify-between gap-3 py-2.5"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-xs font-medium text-foreground">
-                      {rev.title || "Untitled stash"}
-                    </div>
-                    <div className="text-2xs text-muted-foreground">
-                      v{rev.version} · {formatNoteDate(rev.createdAt)}
-                    </div>
-                    <div className="mt-0.5 truncate text-2xs text-subtle">
-                      {rev.plainText}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleRestoreRevision(rev.id)}
-                    className="flex shrink-0 items-center gap-1 rounded-sm border border-border bg-surface px-2 py-1 text-2xs font-medium transition-colors hover:bg-surface-hover"
-                  >
-                    <RotateCcw className="h-3 w-3" />
-                    Restore
-                  </button>
-                </div>
-              ))
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Time Machine Revision History Diff Viewer */}
+      <RevisionDiffViewer
+        open={revisionsOpen}
+        onOpenChange={setRevisionsOpen}
+        currentTitle={title}
+        currentPlainText={note?.plainText || ""}
+        revisions={revisions}
+        onRestore={handleRestoreRevision}
+        onCreateCheckpoint={handleCreateCheckpoint}
+      />
 
       {/* PIN configuration dialog */}
       <Dialog open={pinDialogOpen} onOpenChange={setPinDialogOpen}>

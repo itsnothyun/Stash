@@ -1,4 +1,9 @@
-import { CaretDown as ChevronDown, ClipboardText as Clipboard, Plus } from "@phosphor-icons/react";
+import {
+  CaretDown as ChevronDown,
+  ClipboardText as Clipboard,
+  Plus,
+  Sparkle,
+} from "@phosphor-icons/react";
 import { formatShortcut, SHORTCUTS } from "@/lib/keyboard/shortcuts";
 import {
   DropdownMenu,
@@ -15,11 +20,13 @@ import { cn } from "@/lib/utils/cn";
 
 interface NewStashMenuProps {
   onCreate: () => void;
+  onOpenTemplateStudio?: () => void;
   className?: string;
 }
 
 export const NewStashMenu: React.FC<NewStashMenuProps> = ({
   onCreate,
+  onOpenTemplateStudio,
   className,
 }) => {
   const iconSet = useUIStore((s) => s.iconSet);
@@ -116,6 +123,19 @@ export const NewStashMenu: React.FC<NewStashMenuProps> = ({
               </DropdownMenuItem>
             );
           })}
+
+          {onOpenTemplateStudio && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={onOpenTemplateStudio}
+                className="flex items-center gap-2 cursor-pointer font-medium text-primary py-2"
+              >
+                <Sparkle className="h-3.5 w-3.5" />
+                <span>Explore Template Studio…</span>
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

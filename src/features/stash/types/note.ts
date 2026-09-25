@@ -67,5 +67,6 @@ export type SidebarSection =
   | "pinned"
   | "favorites"
   | "tags"
+  | "performance"
   | "archive"
   | "trash";

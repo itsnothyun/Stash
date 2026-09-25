@@ -19,6 +19,9 @@ import { EmptyStash } from "@/features/stash/components/empty-stash";
 import { CommandPalette } from "@/features/command-menu/command-palette";
 import { SettingsModal } from "@/features/settings/settings-modal";
 import { NewStashMenu } from "@/features/capture/new-stash-menu";
+import { AmbientSoundBar } from "@/features/focus/ambient-sound-bar";
+import { QuickCaptureHud } from "@/features/capture/quick-capture-hud";
+import { TemplateModal } from "@/features/templates/template-modal";
 import { ConfirmDialog } from "@/components/ui/alert-dialog";
 import { toast } from "@/components/ui/toast";
 import { formatShortcut, SHORTCUTS, useShortcuts } from "@/lib/keyboard/shortcuts";
@@ -63,7 +66,10 @@ import {
   X,
   Funnel,
   ArrowCounterClockwise,
+  Lightning,
+  Cpu,
 } from "@phosphor-icons/react";
+import { PerformanceHub } from "@/features/performance/components/performance-hub";
 import {
   openOrCreateTodayStash,
   findTodayNote,
@@ -104,6 +110,12 @@ const NAV_GROUPS: { heading: string; items: NavItem[] }[] = [
     ],
   },
   {
+    heading: "System & Health",
+    items: [
+      { id: "performance", label: "PC Performance", icon: Cpu },
+    ],
+  },
+  {
     heading: "Storage",
     items: [
       { id: "archive", label: "Archive", icon: Archive },
@@ -118,6 +130,7 @@ const SECTION_TITLES: Record<SidebarSection, string> = {
   pinned: "Pinned",
   favorites: "Favorites",
   tags: "Tagged",
+  performance: "PC Performance & Bottleneck Radar",
   archive: "Archive",
   trash: "Trash",
 };
@@ -168,6 +181,8 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
   const [pendingDelete, setPendingDelete] = useState<Note | null>(null);
   const [confirmEmptyTrash, setConfirmEmptyTrash] = useState(false);
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
+  const [templateModalOpen, setTemplateModalOpen] = useState(false);
+  const [quickCaptureOpen, setQuickCaptureOpen] = useState(false);
   const [username, setUsername] = useState<string>("Friend");
 
   useEffect(() => {
@@ -559,6 +574,18 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
       keys: SHORTCUTS.archive,
       enabled: selectedNote !== null,
       run: () => selectedNote && handleArchive(selectedNote),
+    },
+    {
+      keys: "ctrl+shift+space",
+      run: () => setQuickCaptureOpen(true),
+    },
+    {
+      keys: "mod+shift+c",
+      run: () => setQuickCaptureOpen(true),
+    },
+    {
+      keys: "ctrl+t",
+      run: () => setTemplateModalOpen(true),
     },
   ]);
 
@@ -1014,8 +1041,14 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
           </div>
         </div>
 
-        {/* Page header */}
-        <div className="flex shrink-0 flex-wrap items-end justify-between gap-3 border-b border-border px-6 py-4">
+        {activeSection === "performance" ? (
+          <div className="relative flex-1 overflow-y-auto">
+            <PerformanceHub />
+          </div>
+        ) : (
+          <>
+            {/* Page header */}
+            <div className="flex shrink-0 flex-wrap items-end justify-between gap-3 border-b border-border px-6 py-4">
           <div className="min-w-0">
             {activeSection === "all" && !isSearching && !selectedTagId && !selectedColorFilter && showGreetingHeader ? (
               <>
@@ -1109,7 +1142,24 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
               onToggleIncludeArchived={setIncludeArchived}
             />
 
-            <NewStashMenu onCreate={() => void onCapture()} />
+            {/* Ambient Focus Soundscapes */}
+            <AmbientSoundBar />
+
+            {/* Quick Capture Spotlight Button */}
+            <button
+              type="button"
+              onClick={() => setQuickCaptureOpen(true)}
+              title="Quick Capture HUD (Ctrl+Shift+Space)"
+              className="flex h-8 items-center gap-1.5 px-2.5 rounded border border-border bg-surface hover:bg-surface-hover text-xs font-medium text-foreground transition-colors shadow-2xs cursor-pointer active:scale-95"
+            >
+              <Lightning className="h-3.5 w-3.5 text-amber-500" weight="fill" />
+              <span className="hidden sm:inline">Capture</span>
+            </button>
+
+            <NewStashMenu
+              onCreate={() => void onCapture()}
+              onOpenTemplateStudio={() => setTemplateModalOpen(true)}
+            />
           </div>
         </div>
 
@@ -1409,6 +1459,8 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             </ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>
+          </>
+        )}
 
         {/* Bulk action bar */}
         {bulkSelected.size > 0 && (
@@ -1461,6 +1513,8 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
 
       <CommandPalette
         onCapture={onCapture}
+        onOpenTemplateStudio={() => setTemplateModalOpen(true)}
+        onQuickCapture={() => setQuickCaptureOpen(true)}
         currentNote={selectedNote}
         onOpenNote={openFloating}
         onDuplicateNote={handleDuplicate}
@@ -1471,6 +1525,17 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
       />
 
       <SettingsModal />
+
+      <TemplateModal
+        open={templateModalOpen}
+        onOpenChange={setTemplateModalOpen}
+      />
+
+      <QuickCaptureHud
+        open={quickCaptureOpen}
+        onOpenChange={setQuickCaptureOpen}
+        onNoteCreated={() => void loadNotes()}
+      />
 
       <ConfirmDialog
         open={pendingDelete !== null}

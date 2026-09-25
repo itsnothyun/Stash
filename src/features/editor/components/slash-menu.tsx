@@ -31,6 +31,7 @@ import {
   Lightbulb,
   BookOpen,
   TrendUp as TrendingUp,
+  Link,
 } from "@phosphor-icons/react";
 import "@tiptap/extension-underline";
 import "@tiptap/extension-highlight";
@@ -175,6 +176,20 @@ const getSlashMenuItems = (isColorful: boolean): SlashMenuItem[] => [
     icon: <UnderlineIcon className="h-4 w-4" />,
     command: (editor) => {
       editor.chain().focus().toggleUnderline().run();
+    },
+  },
+  {
+    title: "Link to Stash",
+    description: "Insert a bi-directional [[note link]]",
+    category: "Blocks",
+    keywords: ["link", "wiki", "backlink", "reference", "note", "[["],
+    icon: (
+      <Link
+        className={cn("h-4 w-4", isColorful ? "text-indigo-500" : "text-foreground")}
+      />
+    ),
+    command: (editor) => {
+      editor.chain().focus().insertContent("[[Note Title]]").run();
     },
   },
   {

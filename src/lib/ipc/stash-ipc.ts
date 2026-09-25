@@ -41,6 +41,63 @@ export interface ExportData {
   windowStates: NoteWindowState[];
 }
 
+export interface CpuCoreInfo {
+  id: number;
+  name: string;
+  usage: number;
+  frequency: number;
+}
+
+export interface DiskInfo {
+  name: string;
+  mount_point: string;
+  total_space: number;
+  available_space: number;
+  is_removable: boolean;
+  file_system: string;
+}
+
+export interface ProcessStats {
+  pid: number;
+  memory_bytes: number;
+  virtual_memory_bytes: number;
+  cpu_usage: number;
+  run_time_secs: number;
+}
+
+export interface SystemPerformanceSnapshot {
+  os_name: string;
+  os_version: string;
+  kernel_version: string;
+  hostname: string;
+  uptime_secs: number;
+  cpu_brand: string;
+  cpu_vendor: string;
+  physical_core_count: number;
+  logical_core_count: number;
+  global_cpu_usage: number;
+  cpu_cores: CpuCoreInfo[];
+  total_memory: number;
+  used_memory: number;
+  free_memory: number;
+  available_memory: number;
+  total_swap: number;
+  used_swap: number;
+  free_swap: number;
+  disks: DiskInfo[];
+  stash_process: ProcessStats | null;
+  db_size_bytes: number;
+  active_windows_count: number;
+}
+
+export interface OptimizationResult {
+  success: boolean;
+  message: string;
+  db_size_before: number;
+  db_size_after: number;
+  memory_freed_estimate_bytes: number;
+}
+
 const MOCK_NOTES_KEY = "stash_mock_notes_v2";
 
 const DEFAULT_MOCK_NOTES: Note[] = [
@@ -594,6 +651,82 @@ export const stashIpc = {
         // Ignore browser protocol navigation block
       }
     }
+  },
+
+  async getSystemPerformance(): Promise<SystemPerformanceSnapshot> {
+    if (isTauri()) {
+      return await invoke<SystemPerformanceSnapshot>("get_system_performance");
+    }
+
+    // Web mock / browser fallback
+    const cores = typeof navigator !== "undefined" ? navigator.hardwareConcurrency || 8 : 8;
+    const deviceMem = typeof navigator !== "undefined" ? (navigator as any).deviceMemory || 16 : 16;
+    const totalBytes = deviceMem * 1024 * 1024 * 1024;
+    const usedBytes = Math.round(totalBytes * 0.42);
+
+    const perfMem = typeof performance !== "undefined" && (performance as any).memory
+      ? (performance as any).memory
+      : null;
+
+    const stashMem = perfMem ? perfMem.usedJSHeapSize : 54 * 1024 * 1024;
+
+    return {
+      os_name: "Windows 11 Pro",
+      os_version: "23H2",
+      kernel_version: "10.0.22631",
+      hostname: "DESKTOP-STASH",
+      uptime_secs: 86400 * 2 + 14320,
+      cpu_brand: "AMD Ryzen / Intel Core High-Performance Processor",
+      cpu_vendor: "AuthenticAMD",
+      physical_core_count: Math.max(1, Math.floor(cores / 2)),
+      logical_core_count: cores,
+      global_cpu_usage: 14.5 + Math.random() * 8,
+      cpu_cores: Array.from({ length: cores }, (_, i) => ({
+        id: i,
+        name: `Core #${i}`,
+        usage: Math.round((8 + Math.random() * 25) * 10) / 10,
+        frequency: 3200 + Math.round(Math.random() * 800),
+      })),
+      total_memory: totalBytes,
+      used_memory: usedBytes,
+      free_memory: totalBytes - usedBytes,
+      available_memory: totalBytes - usedBytes + Math.round(totalBytes * 0.1),
+      total_swap: Math.round(totalBytes * 0.5),
+      used_swap: Math.round(totalBytes * 0.08),
+      free_swap: Math.round(totalBytes * 0.42),
+      disks: [
+        {
+          name: "Local Disk (C:)",
+          mount_point: "C:\\",
+          total_space: 1024 * 1024 * 1024 * 1024,
+          available_space: 420 * 1024 * 1024 * 1024,
+          is_removable: false,
+          file_system: "NTFS",
+        },
+      ],
+      stash_process: {
+        pid: 14208,
+        memory_bytes: stashMem,
+        virtual_memory_bytes: stashMem * 3,
+        cpu_usage: 0.2,
+        run_time_secs: 3600,
+      },
+      db_size_bytes: 420 * 1024,
+      active_windows_count: 1,
+    };
+  },
+
+  async optimizeStashSystem(): Promise<OptimizationResult> {
+    if (isTauri()) {
+      return await invoke<OptimizationResult>("optimize_stash_system");
+    }
+    return {
+      success: true,
+      message: "Browser cache synchronized & memory pruned successfully.",
+      db_size_before: 480 * 1024,
+      db_size_after: 420 * 1024,
+      memory_freed_estimate_bytes: 60 * 1024,
+    };
   },
 
   async listenToEvent<T>(
