@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Mic, Check } from "lucide-react";
+import { Microphone as Mic, Check } from "@phosphor-icons/react";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils/cn";
 import { stashIpc } from "@/lib/ipc/stash-ipc";
@@ -222,13 +222,13 @@ export const VoiceDictationButton: React.FC<VoiceDictationButtonProps> = ({
         className={cn(
           iconButtonClass,
           isListening &&
-            "bg-rose-500/20 text-rose-600 dark:text-rose-400 hover:bg-rose-500/30 ring-1 ring-rose-500/40 animate-pulse"
+            "bg-foreground/15 text-foreground hover:bg-foreground/20 ring-1 ring-foreground/30 animate-pulse"
         )}
       >
         {isListening ? (
           <div className="relative flex items-center justify-center">
             <Mic className="h-3.5 w-3.5" />
-            <span className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-rose-500 animate-ping" />
+            <span className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-foreground animate-ping" />
           </div>
         ) : (
           <Mic className="h-3.5 w-3.5" />
@@ -237,10 +237,10 @@ export const VoiceDictationButton: React.FC<VoiceDictationButtonProps> = ({
 
       {/* Floating active dictation pill while listening */}
       {isListening && (
-        <div className="fixed bottom-14 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-full border border-rose-500/40 bg-background/95 px-3 py-1.5 shadow-xl backdrop-blur-md text-xs select-none">
+        <div className="fixed bottom-14 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-full border border-border/80 bg-background/95 px-3 py-1.5 shadow-xl backdrop-blur-md text-xs select-none">
           <div className="flex items-center gap-1">
-            <span className="h-2 w-2 rounded-full bg-rose-500 animate-ping" />
-            <span className="font-semibold text-rose-600 dark:text-rose-400">Listening…</span>
+            <span className="h-2 w-2 rounded-full bg-foreground animate-ping" />
+            <span className="font-semibold text-foreground">Listening…</span>
           </div>
 
           <div className="max-w-[200px] truncate text-[11px] text-muted-foreground italic">

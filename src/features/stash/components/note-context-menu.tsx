@@ -28,30 +28,29 @@ import {
   Check,
   Code,
   Copy,
-  CopyPlus,
-  ExternalLink,
-  FileDown,
+  CopySimple,
+  ArrowUpRight,
+  DownloadSimple,
   FileText,
-  FileUp,
+  UploadSimple,
   Hash,
   Palette,
-  Pin,
-  PinOff,
-  RotateCcw,
+  PushPin,
+  PushPinSlash,
+  ArrowCounterClockwise,
   Star,
   Tag as TagIcon,
-  Trash2,
+  Trash,
   Ghost,
-  Sparkles,
-  Smile,
-  Type,
+  Sparkle,
+  Smiley,
+  TextT,
   Square,
   Camera,
-  ListChecks,
-  CalendarClock,
-  Calendar,
-  Lock,
-  History,
+  CheckSquareOffset,
+  CalendarBlank,
+  LockSimple,
+  ClockCounterClockwise,
   Plus,
   Calculator as CalcIcon,
   Timer as TimerIcon,
@@ -64,9 +63,9 @@ import {
   Bug,
   Lightbulb,
   BookOpen,
-  ArrowUpDown,
-  TrendingUp,
-} from "lucide-react";
+  ArrowsDownUp,
+  TrendUp,
+} from "@phosphor-icons/react";
 import {
   getNoteOpacity,
   setNoteOpacity,
@@ -415,7 +414,7 @@ export const NoteMenuItems: React.FC<
     <>
       {/* Primary Action: Open floating stash */}
       <Item onClick={() => onOpenFloating(note.id)}>
-        <ExternalLink className="mr-2 h-3.5 w-3.5 text-primary" />
+        <ArrowUpRight className="mr-2 h-3.5 w-3.5 text-foreground" weight="bold" />
         <span>Open as floating stash</span>
         <Shortcut>Enter</Shortcut>
       </Item>
@@ -423,12 +422,12 @@ export const NoteMenuItems: React.FC<
       <Item onClick={() => onTogglePinned(note)}>
         {note.isPinned ? (
           <>
-            <PinOff className="mr-2 h-3.5 w-3.5 text-amber-500" />
+            <PushPinSlash className="mr-2 h-3.5 w-3.5 text-foreground" weight="regular" />
             <span>Unpin from top</span>
           </>
         ) : (
           <>
-            <Pin className="mr-2 h-3.5 w-3.5" />
+            <PushPin className="mr-2 h-3.5 w-3.5 text-foreground" weight="regular" />
             <span>Pin to top</span>
           </>
         )}
@@ -437,9 +436,10 @@ export const NoteMenuItems: React.FC<
       <Item onClick={() => onToggleFavorite(note)}>
         <Star
           className={cn(
-            "mr-2 h-3.5 w-3.5",
-            note.isFavorite ? "fill-amber-400 text-amber-400" : ""
+            "mr-2 h-3.5 w-3.5 text-foreground",
+            note.isFavorite ? "fill-current" : ""
           )}
+          weight={note.isFavorite ? "fill" : "regular"}
         />
         <span>{note.isFavorite ? "Remove favorite" : "Add to favorites"}</span>
       </Item>
@@ -449,7 +449,7 @@ export const NoteMenuItems: React.FC<
       {/* Personalization: Color Palette */}
       <Sub>
         <SubTrigger>
-          <Palette className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+          <Palette className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
           <span className="flex-1">Note Color</span>
           <span
             className="mr-1.5 h-2.5 w-2.5 rounded-full border border-black/10 dark:border-white/10"
@@ -476,7 +476,7 @@ export const NoteMenuItems: React.FC<
                   />
                   <span>{c.label}</span>
                 </div>
-                {isCurrent && <Check className="h-3 w-3 stroke-[2.5] text-primary" />}
+                {isCurrent && <Check className="h-3 w-3 text-foreground" weight="bold" />}
               </Item>
             );
           })}
@@ -486,7 +486,7 @@ export const NoteMenuItems: React.FC<
       {/* Ghost Mode Translucency */}
       <Sub>
         <SubTrigger>
-          <Ghost className="mr-2 h-3.5 w-3.5 text-primary" />
+          <Ghost className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
           <span>Ghost Mode ({noteOpacity}%)</span>
         </SubTrigger>
         <SubContent className="w-44">
@@ -512,7 +512,7 @@ export const NoteMenuItems: React.FC<
                 <span className="text-[10px] text-muted-foreground font-mono">({item.hint})</span>
               </div>
               {noteOpacity === item.val && (
-                <Check className="h-3.5 w-3.5 text-primary stroke-[2.5]" />
+                <Check className="h-3.5 w-3.5 text-foreground" weight="bold" />
               )}
             </Item>
           ))}
@@ -522,14 +522,14 @@ export const NoteMenuItems: React.FC<
       {/* Persona & Style */}
       <Sub>
         <SubTrigger>
-          <Sparkles className="mr-2 h-3.5 w-3.5 text-primary" />
+          <Sparkle className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
           <span>Persona & Style</span>
         </SubTrigger>
         <SubContent className="w-52">
           {/* Emoji Icon Submenu */}
           <Sub>
             <SubTrigger>
-              <Smile className="mr-2 h-3.5 w-3.5 text-amber-500" />
+              <Smiley className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
               <span>Icon {noteEmoji ? `(${noteEmoji})` : ""}</span>
             </SubTrigger>
             <SubContent className="w-48">
@@ -577,7 +577,7 @@ export const NoteMenuItems: React.FC<
           {/* Paper Pattern Submenu */}
           <Sub>
             <SubTrigger>
-              <FileText className="mr-2 h-3.5 w-3.5 text-blue-500" />
+              <FileText className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
               <span>Paper Texture</span>
             </SubTrigger>
             <SubContent className="w-44">
@@ -595,7 +595,7 @@ export const NoteMenuItems: React.FC<
                 >
                   <span>{p.label}</span>
                   {notePaper === p.id && (
-                    <Check className="h-3.5 w-3.5 text-primary stroke-[2.5]" />
+                    <Check className="h-3.5 w-3.5 text-foreground" weight="bold" />
                   )}
                 </Item>
               ))}
@@ -605,7 +605,7 @@ export const NoteMenuItems: React.FC<
           {/* Typography Submenu */}
           <Sub>
             <SubTrigger>
-              <Type className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+              <TextT className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
               <span>Typography</span>
             </SubTrigger>
             <SubContent className="w-44">
@@ -623,7 +623,7 @@ export const NoteMenuItems: React.FC<
                 >
                   <span className={f.fontClass}>{f.label}</span>
                   {noteFont === f.id && (
-                    <Check className="h-3.5 w-3.5 text-primary stroke-[2.5]" />
+                    <Check className="h-3.5 w-3.5 text-foreground" weight="bold" />
                   )}
                 </Item>
               ))}
@@ -633,7 +633,7 @@ export const NoteMenuItems: React.FC<
           {/* Window Frame Submenu */}
           <Sub>
             <SubTrigger>
-              <Square className="mr-2 h-3.5 w-3.5 text-purple-500" />
+              <Square className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
               <span>Window Frame</span>
             </SubTrigger>
             <SubContent className="w-44">
@@ -651,7 +651,7 @@ export const NoteMenuItems: React.FC<
                 >
                   <span>{fr.label}</span>
                   {noteFrame === fr.id && (
-                    <Check className="h-3.5 w-3.5 text-primary stroke-[2.5]" />
+                    <Check className="h-3.5 w-3.5 text-foreground" weight="bold" />
                   )}
                 </Item>
               ))}
@@ -664,7 +664,7 @@ export const NoteMenuItems: React.FC<
       {availableTags && availableTags.length > 0 && onToggleTag && (
         <Sub>
           <SubTrigger>
-            <TagIcon className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+            <TagIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Tags</span>
           </SubTrigger>
           <SubContent className="w-44">
@@ -680,7 +680,7 @@ export const NoteMenuItems: React.FC<
                   className="flex items-center justify-between py-1.5"
                 >
                   <span className="truncate">#{tag.name}</span>
-                  {hasTag && <Check className="h-3 w-3 stroke-[2.5] text-primary" />}
+                  {hasTag && <Check className="h-3 w-3 text-foreground" weight="bold" />}
                 </Item>
               );
             })}
@@ -691,24 +691,24 @@ export const NoteMenuItems: React.FC<
       {/* Copy & Clipboard */}
       <Sub>
         <SubTrigger>
-          <Copy className="mr-2 h-3.5 w-3.5 text-sky-500" />
+          <Copy className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
           <span>Copy & Share</span>
         </SubTrigger>
         <SubContent className="w-48">
           <Item onClick={() => setExportImageOpen(true)}>
-            <Camera className="mr-2 h-3.5 w-3.5 text-primary" />
+            <Camera className="mr-2 h-3.5 w-3.5 text-foreground" weight="regular" />
             <span>Share as Beautiful Image</span>
           </Item>
           <Item onClick={handleCopyText}>
-            <FileText className="mr-2 h-3.5 w-3.5" />
+            <FileText className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Copy Plain Text</span>
           </Item>
           <Item onClick={handleCopyMarkdown}>
-            <Copy className="mr-2 h-3.5 w-3.5" />
+            <Copy className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Copy as Markdown</span>
           </Item>
           <Item onClick={handleCopyId}>
-            <Hash className="mr-2 h-3.5 w-3.5" />
+            <Hash className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Copy Note ID</span>
           </Item>
         </SubContent>
@@ -717,7 +717,7 @@ export const NoteMenuItems: React.FC<
       {/* Attach Widget Submenu */}
       <Sub>
         <SubTrigger>
-          <Plus className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+          <Plus className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
           <span>Attach Widget</span>
         </SubTrigger>
         <SubContent className="w-56 max-h-[80vh] overflow-y-auto">
@@ -725,39 +725,39 @@ export const NoteMenuItems: React.FC<
             Interactive Tools
           </div>
           <Item onClick={() => handleAddWidget("calculator")}>
-            <CalcIcon className="mr-2 h-3.5 w-3.5 text-amber-500" />
+            <CalcIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Quick Calculator</span>
           </Item>
           <Item onClick={() => handleAddWidget("timer")}>
-            <TimerIcon className="mr-2 h-3.5 w-3.5 text-rose-500" />
+            <TimerIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Focus & Pomodoro</span>
           </Item>
           <Item onClick={() => handleAddWidget("swap")}>
-            <ArrowUpDown className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+            <ArrowsDownUp className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Currency Converter</span>
           </Item>
           <Item onClick={() => handleAddWidget("ticker")}>
-            <TrendingUp className="mr-2 h-3.5 w-3.5 text-blue-500" />
+            <TrendUp className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Market Tickers</span>
           </Item>
           <Item onClick={() => handleAddWidget("countdown")}>
-            <CalendarClock className="mr-2 h-3.5 w-3.5 text-orange-500" />
+            <CalendarBlank className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Countdown Timer</span>
           </Item>
           <Item onClick={() => handleAddWidget("worldclock")}>
-            <Globe className="mr-2 h-3.5 w-3.5 text-cyan-500" />
+            <Globe className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>World Clock</span>
           </Item>
           <Item onClick={() => handleAddWidget("unitconverter")}>
-            <Ruler className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+            <Ruler className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Unit Converter</span>
           </Item>
           <Item onClick={() => handleAddWidget("counter")}>
-            <Target className="mr-2 h-3.5 w-3.5 text-purple-500" />
+            <Target className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Tally Counter</span>
           </Item>
           <Item onClick={() => handleAddWidget("browser")}>
-            <Globe className="mr-2 h-3.5 w-3.5 text-cyan-500" />
+            <Globe className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Mini Web Browser</span>
           </Item>
 
@@ -766,35 +766,35 @@ export const NoteMenuItems: React.FC<
             Component Blocks
           </div>
           <Item onClick={() => handleAddWidget("scratchpad")}>
-            <Sun className="mr-2 h-3.5 w-3.5 text-amber-500" />
+            <Sun className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Daily Scratchpad</span>
           </Item>
           <Item onClick={() => handleAddWidget("meeting")}>
-            <Users className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+            <Users className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Meeting Minutes</span>
           </Item>
           <Item onClick={() => handleAddWidget("kanban")}>
-            <Kanban className="mr-2 h-3.5 w-3.5 text-blue-500" />
+            <Kanban className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Kanban Board</span>
           </Item>
           <Item onClick={() => handleAddWidget("habits")}>
-            <Sparkles className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+            <Sparkle className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>7-Day Habit Tracker</span>
           </Item>
           <Item onClick={() => handleAddWidget("bug")}>
-            <Bug className="mr-2 h-3.5 w-3.5 text-rose-500" />
+            <Bug className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Bug Blitz & Triage</span>
           </Item>
           <Item onClick={() => handleAddWidget("idea")}>
-            <Lightbulb className="mr-2 h-3.5 w-3.5 text-yellow-500" />
+            <Lightbulb className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Idea Incubator</span>
           </Item>
           <Item onClick={() => handleAddWidget("reading")}>
-            <BookOpen className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+            <BookOpen className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Book & Article Digest</span>
           </Item>
           <Item onClick={() => handleAddWidget("palette")}>
-            <Palette className="mr-2 h-3.5 w-3.5 text-pink-500" />
+            <Palette className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Color Palette</span>
           </Item>
         </SubContent>
@@ -802,37 +802,37 @@ export const NoteMenuItems: React.FC<
 
       {/* Personalize Note Persona Modal Trigger */}
       <Item onClick={() => setPersonaModalOpen(true)}>
-        <Sparkles className="mr-2 h-3.5 w-3.5 text-primary" />
+        <Sparkle className="mr-2 h-3.5 w-3.5 text-foreground" weight="regular" />
         <span>Personalize Note Persona</span>
       </Item>
 
       {/* Organize Checklist */}
       <Item onClick={handleOrganizeChecklist}>
-        <ListChecks className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+        <CheckSquareOffset className="mr-2 h-3.5 w-3.5 text-foreground" weight="regular" />
         <span>Organize Checklist (Done to bottom)</span>
       </Item>
 
       {/* Due Date & Reminder */}
       <Item onClick={() => setDueDateDialogOpen(true)}>
-        <CalendarClock className="mr-2 h-3.5 w-3.5 text-amber-500" />
+        <CalendarBlank className="mr-2 h-3.5 w-3.5 text-foreground" weight="regular" />
         <span>Due Date & Reminder</span>
       </Item>
 
       {/* PIN Protection */}
       <Item onClick={() => setPinDialogOpen(true)}>
-        <Lock className="mr-2 h-3.5 w-3.5 text-primary" />
+        <LockSimple className="mr-2 h-3.5 w-3.5 text-foreground" weight="regular" />
         <span>{hasPin ? "Change or Remove PIN" : "Protect Note with PIN"}</span>
       </Item>
 
       {/* Revision History */}
       <Item onClick={handleOpenRevisions}>
-        <History className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+        <ClockCounterClockwise className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
         <span>Revision History</span>
       </Item>
 
       {/* Import Markdown */}
       <Item onClick={handleImportMarkdown}>
-        <FileUp className="mr-2 h-3.5 w-3.5 text-sky-500" />
+        <UploadSimple className="mr-2 h-3.5 w-3.5 text-foreground" weight="regular" />
         <span>Import Markdown</span>
       </Item>
 
@@ -840,7 +840,7 @@ export const NoteMenuItems: React.FC<
 
       {/* Duplicate */}
       <Item onClick={() => onDuplicate(note)}>
-        <CopyPlus className="mr-2 h-3.5 w-3.5 text-blue-500" />
+        <CopySimple className="mr-2 h-3.5 w-3.5 text-foreground" weight="regular" />
         <span>Duplicate note</span>
         <Shortcut>Ctrl+D</Shortcut>
       </Item>
@@ -848,24 +848,24 @@ export const NoteMenuItems: React.FC<
       {/* Export Submenu */}
       <Sub>
         <SubTrigger>
-          <FileDown className="mr-2 h-3.5 w-3.5 text-purple-500" />
+          <DownloadSimple className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
           <span>Export Stash</span>
         </SubTrigger>
         <SubContent className="w-48">
           <Item onClick={() => setExportImageOpen(true)}>
-            <Camera className="mr-2 h-3.5 w-3.5 text-primary" />
+            <Camera className="mr-2 h-3.5 w-3.5 text-foreground" weight="regular" />
             <span>Image Card (.png)</span>
           </Item>
           <Item onClick={handleExportMarkdown}>
-            <FileDown className="mr-2 h-3.5 w-3.5" />
+            <DownloadSimple className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Markdown (.md)</span>
           </Item>
           <Item onClick={handleExportText}>
-            <FileText className="mr-2 h-3.5 w-3.5" />
+            <FileText className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Plain Text (.txt)</span>
           </Item>
           <Item onClick={handleExportJson}>
-            <Code className="mr-2 h-3.5 w-3.5" />
+            <Code className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Raw JSON (.json)</span>
           </Item>
         </SubContent>
@@ -878,7 +878,7 @@ export const NoteMenuItems: React.FC<
         <>
           {onRestore && (
             <Item onClick={() => onRestore(note)}>
-              <RotateCcw className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+              <ArrowCounterClockwise className="mr-2 h-3.5 w-3.5 text-foreground" weight="regular" />
               <span>Restore note</span>
             </Item>
           )}
@@ -887,7 +887,7 @@ export const NoteMenuItems: React.FC<
               onClick={() => onPermanentDelete(note)}
               className="text-destructive focus:bg-destructive/10 focus:text-destructive"
             >
-              <Trash2 className="mr-2 h-3.5 w-3.5" />
+              <Trash className="mr-2 h-3.5 w-3.5" weight="regular" />
               <span>Delete permanently</span>
             </Item>
           )}
@@ -895,14 +895,14 @@ export const NoteMenuItems: React.FC<
       ) : (
         <>
           <Item onClick={() => onArchive(note)}>
-            <Archive className="mr-2 h-3.5 w-3.5" />
+            <Archive className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>{note.isArchived ? "Restore from Archive" : "Archive note"}</span>
           </Item>
           <Item
             onClick={() => onTrash(note)}
             className="text-destructive focus:bg-destructive/10 focus:text-destructive"
           >
-            <Trash2 className="mr-2 h-3.5 w-3.5" />
+            <Trash className="mr-2 h-3.5 w-3.5" weight="regular" />
             <span>Move to Trash</span>
           </Item>
         </>
@@ -942,7 +942,7 @@ export const NoteMenuItems: React.FC<
         <DialogContent className="max-w-sm gap-3 p-5">
           <DialogHeader>
             <DialogTitle className="text-sm flex items-center gap-2">
-              <Lock className="h-4 w-4 text-primary" />
+              <LockSimple className="h-4 w-4 text-foreground" weight="regular" />
               {hasPin ? "Change or Remove PIN" : "Protect Note with PIN"}
             </DialogTitle>
             <DialogDescription>
@@ -995,7 +995,7 @@ export const NoteMenuItems: React.FC<
         <DialogContent className="max-w-sm gap-3 p-5">
           <DialogHeader>
             <DialogTitle className="text-sm flex items-center gap-2">
-              <CalendarClock className="h-4 w-4 text-amber-500" />
+              <CalendarBlank className="h-4 w-4 text-foreground" weight="regular" />
               Due Date & Reminder
             </DialogTitle>
             <DialogDescription>
@@ -1058,7 +1058,7 @@ export const NoteMenuItems: React.FC<
 
             <div className="border-t border-border/40 pt-2 flex flex-col gap-1.5">
               <label className="text-[11px] font-medium text-muted-foreground flex items-center gap-1">
-                <Calendar className="h-3 w-3" />
+                <CalendarBlank className="h-3 w-3" weight="regular" />
                 <span>Custom Date & Time</span>
               </label>
               <input
@@ -1155,7 +1155,7 @@ export const NoteMenuItems: React.FC<
                     onClick={() => void handleRestoreRevision(rev.id)}
                     className="flex shrink-0 items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-2xs font-medium transition-colors hover:bg-muted cursor-pointer"
                   >
-                    <RotateCcw className="h-3 w-3" />
+                    <ArrowCounterClockwise className="h-3 w-3" weight="regular" />
                     Restore
                   </button>
                 </div>

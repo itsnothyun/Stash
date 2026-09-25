@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowDownUp, Check, Copy, Ruler, Scale, Thermometer, HardDrive, ChevronDown } from "lucide-react";
+import { ArrowsDownUp as ArrowDownUp, Check, CopySimple as Copy, Ruler, Scales as Scale, Thermometer, HardDrive, CaretDown as ChevronDown } from "@phosphor-icons/react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -262,7 +262,7 @@ export const UnitConverterWidget: React.FC<UnitConverterWidgetProps> = ({
                     </span>
                     <span className="truncate">{def.label}</span>
                   </div>
-                  {isSelected && <Check className="h-3.5 w-3.5 text-primary stroke-[2.5]" />}
+                  {isSelected && <Check className="h-3.5 w-3.5 text-foreground" weight="bold" />}
                 </DropdownMenuItem>
               );
             })}
@@ -322,7 +322,7 @@ export const UnitConverterWidget: React.FC<UnitConverterWidgetProps> = ({
                     </span>
                     <span className="truncate">{def.label}</span>
                   </div>
-                  {isSelected && <Check className="h-3.5 w-3.5 text-primary stroke-[2.5]" />}
+                  {isSelected && <Check className="h-3.5 w-3.5 text-foreground" weight="bold" />}
                 </DropdownMenuItem>
               );
             })}
@@ -346,8 +346,8 @@ export const UnitConverterWidget: React.FC<UnitConverterWidgetProps> = ({
         >
           {copied ? (
             <>
-              <Check className="h-3 w-3 text-emerald-500" />
-              <span className="text-emerald-500 text-[11px]">Copied</span>
+              <Check className="h-3 w-3 text-foreground" weight="bold" />
+              <span className="text-foreground text-[11px]">Copied</span>
             </>
           ) : (
             <>

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Sparkles,
-  LogOut,
+  Sparkle,
+  SignOut,
   X,
   ShieldCheck,
-  RefreshCw,
+  ArrowClockwise,
   Coffee,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils/cn";
 
 interface QuirkyExitModalProps {
@@ -156,16 +156,16 @@ export const QuirkyExitModal: React.FC<QuirkyExitModalProps> = ({
             <div className="rounded-xl border border-border/60 bg-surface/60 p-3 flex flex-col gap-2 transition-all">
               <div className="flex items-center justify-between text-[11px] text-muted-foreground font-medium">
                 <span className="flex items-center gap-1.5">
-                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+                  <ShieldCheck className="h-3.5 w-3.5 text-foreground" />
                   <span>All stashes saved locally</span>
                 </span>
                 <button
                   type="button"
                   onClick={cycleExcuse}
-                  className="flex items-center gap-1 text-[10px] font-semibold text-primary hover:text-primary/80 transition-colors cursor-pointer"
+                  className="flex items-center gap-1 text-[10px] font-semibold text-foreground hover:text-foreground/80 transition-colors cursor-pointer"
                   title="Generate a funny excuse"
                 >
-                  <RefreshCw className="h-2.5 w-2.5" />
+                  <ArrowClockwise className="h-2.5 w-2.5" />
                   <span>Excuse generator</span>
                 </button>
               </div>
@@ -176,7 +176,7 @@ export const QuirkyExitModal: React.FC<QuirkyExitModalProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   className="rounded-lg bg-surface-hover/80 px-2.5 py-1.5 text-[11px] italic text-foreground/90 border border-border/40 flex items-center gap-2"
                 >
-                  <Coffee className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                  <Coffee className="h-3.5 w-3.5 text-foreground shrink-0" />
                   <span className="truncate">"{FUNNY_EXCUSES[excuseIndex]}"</span>
                 </motion.div>
               )}
@@ -194,7 +194,7 @@ export const QuirkyExitModal: React.FC<QuirkyExitModalProps> = ({
                   "active:scale-95"
                 )}
               >
-                <LogOut className="h-3.5 w-3.5" />
+                <SignOut className="h-3.5 w-3.5" />
                 <span>Yes, let me escape</span>
               </button>
 
@@ -211,7 +211,7 @@ export const QuirkyExitModal: React.FC<QuirkyExitModalProps> = ({
                   "shadow-[0_2px_8px_rgba(0,0,0,0.15)]"
                 )}
               >
-                <Sparkles className="h-3.5 w-3.5" />
+                <Sparkle className="h-3.5 w-3.5" />
                 <span>Never mind, stay in Stash!</span>
               </motion.button>
             </div>

@@ -3,21 +3,21 @@ import {
   Globe,
   ArrowLeft,
   ArrowRight,
-  RotateCw,
-  Home,
-  Pin,
-  PinOff,
+  ArrowClockwise as RotateCw,
+  House as Home,
+  PushPin as Pin,
+  PushPinSlash as PinOff,
   Magnet,
-  Copy,
+  CopySimple as Copy,
   Minus,
   Square,
   X,
   Plus,
-  Sliders,
-  Tv,
+  Faders as Sliders,
+  Television as Tv,
   Layout,
   Check,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import { stashIpc } from "@/lib/ipc/stash-ipc";
 import {
   closeCurrentWindow,
@@ -343,7 +343,7 @@ export const PipBrowserView: React.FC<PipBrowserViewProps> = ({
                   className="flex items-center justify-between text-xs"
                 >
                   <span>{op}% Opacity</span>
-                  {opacity === op && <Check className="h-3 w-3 text-primary stroke-[2.5]" />}
+                  {opacity === op && <Check className="h-3 w-3 text-foreground" weight="bold" />}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>

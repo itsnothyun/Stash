@@ -22,6 +22,7 @@ import { SlashMenu } from "./slash-menu";
 import { FloatingToolbar } from "./floating-toolbar";
 import { EditorContextMenu } from "./editor-context-menu";
 import { WidgetType } from "@/features/widgets/types";
+import { useUIStore } from "@/stores/ui-store";
 import { cn } from "@/lib/utils/cn";
 
 export interface TiptapEditorRef {
@@ -89,6 +90,12 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
   onRevisions,
   onRefreshNote,
 }) => {
+  const {
+    editorSpellcheck,
+    inlineMathEnabled,
+    directLinkClick,
+  } = useUIStore();
+
   const [slashMenuOpen, setSlashMenuOpen] = useState(false);
   const [slashMenuPos, setSlashMenuPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
 
@@ -145,7 +152,7 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
         nested: true,
       }),
       Link.configure({
-        openOnClick: false,
+        openOnClick: directLinkClick,
         HTMLAttributes: {
           class: "text-sky-500 underline underline-offset-2 hover:text-sky-600 cursor-pointer",
         },
@@ -186,8 +193,9 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
     autofocus: autoFocus ? "end" : false,
     editorProps: {
       attributes: {
+        spellcheck: editorSpellcheck ? "true" : "false",
         class:
-          "prose dark:prose-invert prose-sm max-w-none focus:outline-none min-h-full text-editor-foreground leading-relaxed text-sm",
+          "stash-tiptap-editor prose dark:prose-invert prose-sm max-w-none focus:outline-none min-h-full text-editor-foreground leading-relaxed text-sm",
       },
       handleClick: (view, _pos, event) => {
         const target = event.target as HTMLElement | null;
@@ -206,14 +214,16 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
         } else if (event.key === "Escape") {
           setSlashMenuOpen(false);
         } else if (event.key === "=") {
-          const { state } = view;
-          const { from } = state.selection;
-          const textBefore = state.doc.textBetween(Math.max(0, from - 80), from, "\n");
-          const calc = evaluateInlineMath(textBefore + "=");
-          if (calc) {
-            setTimeout(() => {
-              view.dispatch(view.state.tr.insertText(" " + calc.result));
-            }, 10);
+          if (inlineMathEnabled) {
+            const { state } = view;
+            const { from } = state.selection;
+            const textBefore = state.doc.textBetween(Math.max(0, from - 80), from, "\n");
+            const calc = evaluateInlineMath(textBefore + "=");
+            if (calc) {
+              setTimeout(() => {
+                view.dispatch(view.state.tr.insertText(" " + calc.result));
+              }, 10);
+            }
           }
         }
         return false;

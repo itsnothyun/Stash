@@ -1,17 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  CalendarClock,
+  CalendarBlank as CalendarClock,
   Calendar,
-  Pencil,
-  Copy,
+  PencilSimple as Pencil,
+  CopySimple as Copy,
   Check,
   Flame,
-  Zap,
-  PartyPopper,
-  Sparkles,
+  Lightning as Zap,
+  Confetti as PartyPopper,
+  Sparkle as Sparkles,
   X,
-  RotateCcw,
-} from "lucide-react";
+  ArrowCounterClockwise as RotateCcw,
+} from "@phosphor-icons/react";
 import { WidgetInsertButton } from "./widget-insert-button";
 import { cn } from "@/lib/utils/cn";
 
@@ -236,7 +236,7 @@ export const CountdownWidget: React.FC<CountdownWidgetProps> = ({
         {/* Form Header */}
         <div className="flex items-center justify-between pb-1 border-b border-border/50">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
-            <div className="flex h-5 w-5 items-center justify-center rounded-md bg-orange-500/10 text-orange-500">
+            <div className="flex h-5 w-5 items-center justify-center rounded-md bg-muted text-foreground">
               <CalendarClock className="h-3 w-3" />
             </div>
             <span>{targetIso ? "Edit Countdown" : "Set Countdown"}</span>
@@ -347,16 +347,7 @@ export const CountdownWidget: React.FC<CountdownWidgetProps> = ({
       <div className="flex items-center justify-between gap-1.5">
         <div className="flex items-center gap-1.5 min-w-0">
           <div
-            className={cn(
-              "flex h-5 w-5 items-center justify-center rounded-md shrink-0 transition-colors",
-              remaining.done
-                ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
-                : isUrgent
-                ? "bg-rose-500/15 text-rose-600 dark:text-rose-400 animate-pulse"
-                : isToday
-                ? "bg-amber-500/15 text-amber-600 dark:text-amber-400"
-                : "bg-orange-500/15 text-orange-600 dark:text-orange-400"
-            )}
+            className="flex h-5 w-5 items-center justify-center rounded-md shrink-0 bg-muted text-foreground"
           >
             {remaining.done ? (
               <PartyPopper className="h-3 w-3" />
@@ -502,8 +493,8 @@ export const CountdownWidget: React.FC<CountdownWidgetProps> = ({
         >
           {isCopied ? (
             <>
-              <Check className="h-3 w-3 text-emerald-500 stroke-[2.5]" />
-              <span className="text-emerald-500 font-medium">Copied</span>
+              <Check className="h-3 w-3 text-foreground" weight="bold" />
+              <span className="text-foreground font-medium">Copied</span>
             </>
           ) : (
             <>

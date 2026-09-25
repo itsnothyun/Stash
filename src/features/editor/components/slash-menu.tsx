@@ -1,37 +1,37 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Editor } from "@tiptap/react";
 import {
-  Text,
-  Heading1,
-  Heading2,
-  Heading3,
+  TextT as Text,
+  TextHOne as Heading1,
+  TextHTwo as Heading2,
+  TextHThree as Heading3,
   CheckSquare,
-  List,
-  ListOrdered,
-  Quote,
+  ListBullets as List,
+  ListNumbers as ListOrdered,
+  Quotes as Quote,
   Code,
-  Code2,
+  CodeBlock as Code2,
   Minus,
-  ArrowUpDown,
+  ArrowsDownUp as ArrowUpDown,
   Highlighter,
-  Underline as UnderlineIcon,
+  TextUnderline as UnderlineIcon,
   Table as TableIcon,
   Calculator as CalcIcon,
   Timer as TimerIcon,
   Globe,
   Ruler,
   Target,
-  CalendarClock,
+  CalendarBlank as CalendarClock,
   Kanban,
-  Sparkles,
+  Sparkle as Sparkles,
   Palette,
   Sun,
   Users,
   Bug,
   Lightbulb,
   BookOpen,
-  TrendingUp,
-} from "lucide-react";
+  TrendUp as TrendingUp,
+} from "@phosphor-icons/react";
 import "@tiptap/extension-underline";
 import "@tiptap/extension-highlight";
 import { WidgetType } from "@/features/widgets/types";
@@ -93,7 +93,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "Track tasks with checkable boxes",
     category: "Blocks",
     keywords: ["todo", "task", "check", "checklist", "box"],
-    icon: <CheckSquare className="h-4 w-4 text-emerald-500" />,
+    icon: <CheckSquare className="h-4 w-4 text-foreground" />,
     command: (editor) => {
       editor.chain().focus().toggleTaskList().run();
     },
@@ -153,7 +153,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "Emphasize words with color mark",
     category: "Blocks",
     keywords: ["highlight", "mark", "color"],
-    icon: <Highlighter className="h-4 w-4 text-amber-500" />,
+    icon: <Highlighter className="h-4 w-4 text-foreground" />,
     command: (editor) => {
       editor.chain().focus().toggleHighlight({ color: "#fef08a" }).run();
     },
@@ -173,7 +173,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "Insert a structured table",
     category: "Blocks",
     keywords: ["table", "grid", "rows", "columns"],
-    icon: <TableIcon className="h-4 w-4 text-primary" />,
+    icon: <TableIcon className="h-4 w-4 text-foreground" />,
     command: (editor) => {
       editor
         .chain()
@@ -189,7 +189,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "Interactive desktop math calculator",
     category: "Widgets",
     keywords: ["calculator", "calc", "math", "numbers", "widget"],
-    icon: <CalcIcon className="h-4 w-4 text-amber-500" />,
+    icon: <CalcIcon className="h-4 w-4 text-foreground" />,
     command: (_editor, onAddWidget) => {
       onAddWidget?.("calculator");
     },
@@ -199,7 +199,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "Focus timer and count-up stopwatch",
     category: "Widgets",
     keywords: ["timer", "pomodoro", "stopwatch", "focus", "time", "clock", "widget"],
-    icon: <TimerIcon className="h-4 w-4 text-rose-500" />,
+    icon: <TimerIcon className="h-4 w-4 text-foreground" />,
     command: (_editor, onAddWidget) => {
       onAddWidget?.("timer");
     },
@@ -209,7 +209,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "Instant token & currency swap exchange rates",
     category: "Widgets",
     keywords: ["swap", "currency", "crypto", "exchange", "rate", "usd", "eth", "widget"],
-    icon: <ArrowUpDown className="h-4 w-4 text-emerald-500" />,
+    icon: <ArrowUpDown className="h-4 w-4 text-foreground" />,
     command: (_editor, onAddWidget) => {
       onAddWidget?.("swap");
     },
@@ -219,7 +219,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "Live crypto and stock asset price tracker",
     category: "Widgets",
     keywords: ["ticker", "market", "stock", "crypto", "price", "btc", "widget"],
-    icon: <TrendingUp className="h-4 w-4 text-blue-500" />,
+    icon: <TrendingUp className="h-4 w-4 text-foreground" />,
     command: (_editor, onAddWidget) => {
       onAddWidget?.("ticker");
     },
@@ -229,7 +229,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "Count down to any deadline, launch, or event",
     category: "Widgets",
     keywords: ["countdown", "event", "deadline", "date", "launch", "widget"],
-    icon: <CalendarClock className="h-4 w-4 text-orange-500" />,
+    icon: <CalendarClock className="h-4 w-4 text-foreground" />,
     command: (_editor, onAddWidget) => {
       onAddWidget?.("countdown");
     },
@@ -239,7 +239,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "Multi-timezone clocks and global time offsets",
     category: "Widgets",
     keywords: ["world", "clock", "timezone", "gmt", "utc", "time", "widget"],
-    icon: <Globe className="h-4 w-4 text-cyan-500" />,
+    icon: <Globe className="h-4 w-4 text-foreground" />,
     command: (_editor, onAddWidget) => {
       onAddWidget?.("worldclock");
     },
@@ -249,7 +249,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "Length, mass, temperature, and digital data conversions",
     category: "Widgets",
     keywords: ["unit", "converter", "length", "weight", "metric", "imperial", "widget"],
-    icon: <Ruler className="h-4 w-4 text-indigo-500" />,
+    icon: <Ruler className="h-4 w-4 text-foreground" />,
     command: (_editor, onAddWidget) => {
       onAddWidget?.("unitconverter");
     },
@@ -259,7 +259,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "Click counter for habits, repetitions, and targets",
     category: "Widgets",
     keywords: ["counter", "tally", "goal", "habits", "reps", "widget"],
-    icon: <Target className="h-4 w-4 text-purple-500" />,
+    icon: <Target className="h-4 w-4 text-foreground" />,
     command: (_editor, onAddWidget) => {
       onAddWidget?.("counter");
     },
@@ -269,7 +269,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "Embedded browser with detachable Picture-in-Picture window",
     category: "Widgets",
     keywords: ["browser", "web", "pip", "url", "internet", "widget"],
-    icon: <Globe className="h-4 w-4 text-cyan-500" />,
+    icon: <Globe className="h-4 w-4 text-foreground" />,
     command: (_editor, onAddWidget) => {
       onAddWidget?.("browser");
     },
@@ -279,7 +279,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "Focus timer, streak badge, priorities & notes",
     category: "Widgets",
     keywords: ["scratchpad", "daily", "journal", "focus", "today", "widget"],
-    icon: <Sun className="h-4 w-4 text-amber-500" />,
+    icon: <Sun className="h-4 w-4 text-foreground" />,
     command: (_editor, onAddWidget) => {
       onAddWidget?.("scratchpad");
     },
@@ -289,7 +289,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "Agenda, attendee presence check, and action items",
     category: "Widgets",
     keywords: ["meeting", "agenda", "minutes", "attendees", "action", "widget"],
-    icon: <Users className="h-4 w-4 text-emerald-500" />,
+    icon: <Users className="h-4 w-4 text-foreground" />,
     command: (_editor, onAddWidget) => {
       onAddWidget?.("meeting");
     },
@@ -299,7 +299,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "3-column To Do, In Progress, Done card board",
     category: "Widgets",
     keywords: ["kanban", "board", "sprint", "cards", "tasks", "agile", "widget"],
-    icon: <Kanban className="h-4 w-4 text-blue-500" />,
+    icon: <Kanban className="h-4 w-4 text-foreground" />,
     command: (_editor, onAddWidget) => {
       onAddWidget?.("kanban");
     },
@@ -309,7 +309,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "Weekly consistency streak checkboxes",
     category: "Widgets",
     keywords: ["habit", "habits", "tracker", "streak", "weekly", "routine", "widget"],
-    icon: <Sparkles className="h-4 w-4 text-emerald-500" />,
+    icon: <Sparkles className="h-4 w-4 text-foreground" />,
     command: (_editor, onAddWidget) => {
       onAddWidget?.("habits");
     },
@@ -319,7 +319,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "Severity tags, status toggles, repro steps & bug count",
     category: "Widgets",
     keywords: ["bug", "issue", "triage", "severity", "p0", "p1", "dev", "widget"],
-    icon: <Bug className="h-4 w-4 text-rose-500" />,
+    icon: <Bug className="h-4 w-4 text-foreground" />,
     command: (_editor, onAddWidget) => {
       onAddWidget?.("bug");
     },
@@ -329,7 +329,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "Confidence slider, pros/cons, and validation steps",
     category: "Widgets",
     keywords: ["idea", "incubator", "brainstorm", "confidence", "hypothesis", "widget"],
-    icon: <Lightbulb className="h-4 w-4 text-yellow-500" />,
+    icon: <Lightbulb className="h-4 w-4 text-foreground" />,
     command: (_editor, onAddWidget) => {
       onAddWidget?.("idea");
     },
@@ -339,7 +339,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "Endpoint method pill, JSON payload schema & cURL command",
     category: "Widgets",
     keywords: ["api", "tech", "endpoint", "curl", "json", "code", "widget"],
-    icon: <Code2 className="h-4 w-4 text-blue-500" />,
+    icon: <Code2 className="h-4 w-4 text-foreground" />,
     command: (_editor, onAddWidget) => {
       onAddWidget?.("api");
     },
@@ -349,7 +349,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "5-star rating, takeaways, key quotes & summary notes",
     category: "Widgets",
     keywords: ["reading", "book", "article", "rating", "quote", "summary", "widget"],
-    icon: <BookOpen className="h-4 w-4 text-indigo-500" />,
+    icon: <BookOpen className="h-4 w-4 text-foreground" />,
     command: (_editor, onAddWidget) => {
       onAddWidget?.("reading");
     },
@@ -359,7 +359,7 @@ const ITEMS: SlashMenuItem[] = [
     description: "HEX swatch palette with one-click copy to clipboard",
     category: "Widgets",
     keywords: ["palette", "color", "hex", "swatches", "design", "rgb", "widget"],
-    icon: <Palette className="h-4 w-4 text-pink-500" />,
+    icon: <Palette className="h-4 w-4 text-foreground" />,
     command: (_editor, onAddWidget) => {
       onAddWidget?.("palette");
     },

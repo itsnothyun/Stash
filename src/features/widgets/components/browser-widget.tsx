@@ -4,14 +4,14 @@ import {
   Globe,
   ArrowLeft,
   ArrowRight,
-  RotateCw,
-  Home,
-  ExternalLink,
+  ArrowClockwise as RotateCw,
+  House as Home,
+  ArrowSquareOut as ExternalLink,
   Magnet,
-  Copy,
-  Tv,
-  Sparkles,
-} from "lucide-react";
+  CopySimple as Copy,
+  Television as Tv,
+  Sparkle as Sparkles,
+} from "@phosphor-icons/react";
 import { WidgetInsertButton } from "./widget-insert-button";
 import { NoteWidgetData } from "../types";
 import { stashIpc } from "@/lib/ipc/stash-ipc";
@@ -407,7 +407,7 @@ export const BrowserWidget: React.FC<BrowserWidgetProps> = ({
             onClick={handleReload}
             className={cn(
               "p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors",
-              isLoading ? "animate-spin text-primary" : ""
+              isLoading ? "animate-spin text-foreground" : ""
             )}
             title="Reload"
           >
@@ -460,10 +460,10 @@ export const BrowserWidget: React.FC<BrowserWidgetProps> = ({
           <button
             type="button"
             onClick={() => handleDetachToPip()}
-            className="flex items-center gap-1 px-2.5 h-7 rounded-md bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 text-[11px] font-medium transition-all group shadow-2xs"
+            className="flex items-center gap-1 px-2.5 h-7 rounded-md bg-muted hover:bg-muted/80 text-foreground border border-border text-[11px] font-medium transition-all group shadow-2xs"
             title="Detach into native floating Picture-in-Picture window"
           >
-            <Magnet className="h-3 w-3 group-hover:rotate-45 transition-transform text-primary" />
+            <Magnet className="h-3 w-3 group-hover:rotate-45 transition-transform text-foreground" />
             <span>Pop out PiP</span>
             <ExternalLink className="h-2.5 w-2.5 opacity-70" />
           </button>
@@ -507,8 +507,8 @@ export const BrowserWidget: React.FC<BrowserWidgetProps> = ({
         {/* If the current site strictly rejects iframe embedding, show the native PiP Portal Card */}
         {isBlocked ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-gradient-to-b from-card via-background to-card text-center">
-            <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 text-primary mb-3 shadow-sm">
-              <Tv className="h-6 w-6 text-primary" />
+            <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-muted border border-border text-foreground mb-3 shadow-sm">
+              <Tv className="h-6 w-6 text-foreground" />
             </div>
             <h4 className="text-sm font-semibold text-foreground tracking-tight">
               Native PiP Desktop Mode
@@ -542,7 +542,7 @@ export const BrowserWidget: React.FC<BrowserWidgetProps> = ({
             {isLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-background/40 backdrop-blur-xs z-10 pointer-events-none">
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-popover/90 border border-border shadow-sm text-xs text-foreground">
-                  <RotateCw className="h-3 w-3 animate-spin text-primary" />
+                  <RotateCw className="h-3 w-3 animate-spin text-foreground" />
                   <span>Loading embed player…</span>
                 </div>
               </div>

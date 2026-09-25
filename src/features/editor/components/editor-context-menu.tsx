@@ -13,40 +13,40 @@ import {
 } from "@/components/ui/context-menu";
 import { toast } from "@/components/ui/toast";
 import {
-  Bold,
+  TextB as Bold,
   Check,
-  ClipboardPaste,
+  ClipboardText as ClipboardPaste,
   Code,
-  Code2,
-  Copy,
+  CodeBlock as Code2,
+  CopySimple as Copy,
   Eraser,
-  Heading1,
-  Heading2,
-  Heading3,
+  TextHOne as Heading1,
+  TextHTwo as Heading2,
+  TextHThree as Heading3,
   Highlighter,
-  Italic,
-  List,
-  ListOrdered,
-  ListTodo,
+  TextItalic as Italic,
+  ListBullets as List,
+  ListNumbers as ListOrdered,
+  CheckSquare as ListTodo,
   Minus,
-  Pilcrow,
+  Paragraph as Pilcrow,
   PlusCircle,
-  Quote,
-  Redo2,
+  Quotes as Quote,
+  ArrowUUpRight as Redo2,
   Scissors,
-  Strikethrough,
+  TextStrikethrough as Strikethrough,
   Table as TableIcon,
-  Type,
-  Underline as UnderlineIcon,
-  Undo2,
-  Sparkles,
-  ListChecks,
-  CalendarClock,
-  Lock,
-  FileDown,
-  FileUp,
-  History,
-  RefreshCw,
+  TextT as Type,
+  TextUnderline as UnderlineIcon,
+  ArrowUUpLeft as Undo2,
+  Sparkle as Sparkles,
+  CheckSquareOffset as ListChecks,
+  CalendarBlank as CalendarClock,
+  LockSimple as Lock,
+  DownloadSimple as FileDown,
+  UploadSimple as FileUp,
+  ClockCounterClockwise as History,
+  ArrowClockwise as RefreshCw,
   Plus,
   Calculator as CalcIcon,
   Timer as TimerIcon,
@@ -60,9 +60,9 @@ import {
   Bug,
   Lightbulb,
   BookOpen,
-  ArrowUpDown,
-  TrendingUp,
-} from "lucide-react";
+  ArrowsDownUp as ArrowUpDown,
+  TrendUp as TrendingUp,
+} from "@phosphor-icons/react";
 import { WidgetType } from "@/features/widgets/types";
 
 export interface EditorContextMenuProps {
@@ -161,19 +161,19 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
 
         {/* Cut / Copy / Paste */}
         <ContextMenuItem disabled={!hasSelection} onClick={handleCut}>
-          <Scissors className="mr-2 h-3.5 w-3.5 text-amber-500" />
+          <Scissors className="mr-2 h-3.5 w-3.5 text-foreground/80" />
           <span>Cut</span>
           <ContextMenuShortcut>Ctrl+X</ContextMenuShortcut>
         </ContextMenuItem>
 
         <ContextMenuItem onClick={handleCopy}>
-          <Copy className="mr-2 h-3.5 w-3.5 text-sky-500" />
+          <Copy className="mr-2 h-3.5 w-3.5 text-foreground/80" />
           <span>Copy</span>
           <ContextMenuShortcut>Ctrl+C</ContextMenuShortcut>
         </ContextMenuItem>
 
         <ContextMenuItem onClick={handlePaste}>
-          <ClipboardPaste className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+          <ClipboardPaste className="mr-2 h-3.5 w-3.5 text-foreground/80" />
           <span>Paste</span>
           <ContextMenuShortcut>Ctrl+V</ContextMenuShortcut>
         </ContextMenuItem>
@@ -183,7 +183,7 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
         {/* Text Formatting Submenu */}
         <ContextMenuSub>
           <ContextMenuSubTrigger>
-            <Type className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+            <Type className="mr-2 h-3.5 w-3.5 text-foreground/80" />
             <span>Format Text</span>
           </ContextMenuSubTrigger>
           <ContextMenuSubContent className="w-48">
@@ -198,7 +198,7 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
               <div className="flex items-center gap-1.5">
                 <ContextMenuShortcut>Ctrl+B</ContextMenuShortcut>
                 {editor.isActive("bold") && (
-                  <Check className="h-3 w-3 stroke-[2.5] text-primary" />
+                  <Check className="h-3 w-3 text-foreground" weight="bold" />
                 )}
               </div>
             </ContextMenuItem>
@@ -214,7 +214,7 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
               <div className="flex items-center gap-1.5">
                 <ContextMenuShortcut>Ctrl+I</ContextMenuShortcut>
                 {editor.isActive("italic") && (
-                  <Check className="h-3 w-3 stroke-[2.5] text-primary" />
+                  <Check className="h-3 w-3 text-foreground" weight="bold" />
                 )}
               </div>
             </ContextMenuItem>
@@ -230,7 +230,7 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
               <div className="flex items-center gap-1.5">
                 <ContextMenuShortcut>Ctrl+U</ContextMenuShortcut>
                 {editor.isActive("underline") && (
-                  <Check className="h-3 w-3 stroke-[2.5] text-primary" />
+                  <Check className="h-3 w-3 text-foreground" weight="bold" />
                 )}
               </div>
             </ContextMenuItem>
@@ -244,7 +244,7 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
                 <span className="line-through">Strikethrough</span>
               </div>
               {editor.isActive("strike") && (
-                <Check className="h-3 w-3 stroke-[2.5] text-primary" />
+                <Check className="h-3 w-3 text-foreground" weight="bold" />
               )}
             </ContextMenuItem>
 
@@ -253,11 +253,11 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
               className="flex items-center justify-between"
             >
               <div className="flex items-center">
-                <Highlighter className="mr-2 h-3.5 w-3.5 text-amber-500" />
+                <Highlighter className="mr-2 h-3.5 w-3.5 text-foreground/80" />
                 <span>Highlight</span>
               </div>
               {editor.isActive("highlight") && (
-                <Check className="h-3 w-3 stroke-[2.5] text-primary" />
+                <Check className="h-3 w-3 text-foreground" weight="bold" />
               )}
             </ContextMenuItem>
 
@@ -270,7 +270,7 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
                 <span className="font-mono text-2xs">Inline Code</span>
               </div>
               {editor.isActive("code") && (
-                <Check className="h-3 w-3 stroke-[2.5] text-primary" />
+                <Check className="h-3 w-3 text-foreground" weight="bold" />
               )}
             </ContextMenuItem>
           </ContextMenuSubContent>
@@ -279,7 +279,7 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
         {/* Structure / Heading Submenu */}
         <ContextMenuSub>
           <ContextMenuSubTrigger>
-            <Heading1 className="mr-2 h-3.5 w-3.5 text-purple-500" />
+            <Heading1 className="mr-2 h-3.5 w-3.5 text-foreground/80" />
             <span>Style & Headings</span>
           </ContextMenuSubTrigger>
           <ContextMenuSubContent className="w-48">
@@ -294,7 +294,7 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
                 <span className="font-bold">Heading 1</span>
               </div>
               {editor.isActive("heading", { level: 1 }) && (
-                <Check className="h-3 w-3 stroke-[2.5] text-primary" />
+                <Check className="h-3 w-3 text-foreground" weight="bold" />
               )}
             </ContextMenuItem>
 
@@ -309,7 +309,7 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
                 <span className="font-semibold">Heading 2</span>
               </div>
               {editor.isActive("heading", { level: 2 }) && (
-                <Check className="h-3 w-3 stroke-[2.5] text-primary" />
+                <Check className="h-3 w-3 text-foreground" weight="bold" />
               )}
             </ContextMenuItem>
 
@@ -324,7 +324,7 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
                 <span className="font-medium">Heading 3</span>
               </div>
               {editor.isActive("heading", { level: 3 }) && (
-                <Check className="h-3 w-3 stroke-[2.5] text-primary" />
+                <Check className="h-3 w-3 text-foreground" weight="bold" />
               )}
             </ContextMenuItem>
 
@@ -337,7 +337,7 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
                 <span>Paragraph</span>
               </div>
               {editor.isActive("paragraph") && (
-                <Check className="h-3 w-3 stroke-[2.5] text-primary" />
+                <Check className="h-3 w-3 text-foreground" weight="bold" />
               )}
             </ContextMenuItem>
 
@@ -350,7 +350,7 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
                 <span>Quote</span>
               </div>
               {editor.isActive("blockquote") && (
-                <Check className="h-3 w-3 stroke-[2.5] text-primary" />
+                <Check className="h-3 w-3 text-foreground" weight="bold" />
               )}
             </ContextMenuItem>
 
@@ -363,7 +363,7 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
                 <span>Code Block</span>
               </div>
               {editor.isActive("codeBlock") && (
-                <Check className="h-3 w-3 stroke-[2.5] text-primary" />
+                <Check className="h-3 w-3 text-foreground" weight="bold" />
               )}
             </ContextMenuItem>
           </ContextMenuSubContent>
@@ -372,14 +372,14 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
         {/* Insert Elements Submenu */}
         <ContextMenuSub>
           <ContextMenuSubTrigger>
-            <PlusCircle className="mr-2 h-3.5 w-3.5 text-blue-500" />
+            <PlusCircle className="mr-2 h-3.5 w-3.5 text-foreground/80" />
             <span>Insert</span>
           </ContextMenuSubTrigger>
           <ContextMenuSubContent className="w-48">
             <ContextMenuItem
               onClick={() => editor.chain().focus().toggleTaskList().run()}
             >
-              <ListTodo className="mr-2 h-3.5 w-3.5 text-primary" />
+              <ListTodo className="mr-2 h-3.5 w-3.5 text-foreground/80" />
               <span>To-do Checklist</span>
             </ContextMenuItem>
 
@@ -427,7 +427,7 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
             editor.chain().focus().unsetAllMarks().clearNodes().run()
           }
         >
-          <Eraser className="mr-2 h-3.5 w-3.5 text-rose-500" />
+          <Eraser className="mr-2 h-3.5 w-3.5 text-foreground/80" />
           <span>Clear Formatting</span>
         </ContextMenuItem>
 
@@ -450,47 +450,47 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
             {onAddWidget && (
               <ContextMenuSub>
                 <ContextMenuSubTrigger>
-                  <Plus className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+                  <Plus className="mr-2 h-3.5 w-3.5 text-foreground/80" />
                   <span>Attach Widget</span>
                 </ContextMenuSubTrigger>
-                <ContextMenuSubContent className="w-56">
+                <ContextMenuSubContent className="w-56 max-h-[70vh] overflow-y-auto">
                   <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border/40">
                     Interactive Tools
                   </div>
                   <ContextMenuItem onClick={() => onAddWidget("calculator")}>
-                    <CalcIcon className="mr-2 h-3.5 w-3.5 text-amber-500" />
+                    <CalcIcon className="mr-2 h-3.5 w-3.5 text-foreground" />
                     <span>Quick Calculator</span>
                   </ContextMenuItem>
                   <ContextMenuItem onClick={() => onAddWidget("timer")}>
-                    <TimerIcon className="mr-2 h-3.5 w-3.5 text-rose-500" />
+                    <TimerIcon className="mr-2 h-3.5 w-3.5 text-foreground" />
                     <span>Focus & Pomodoro</span>
                   </ContextMenuItem>
                   <ContextMenuItem onClick={() => onAddWidget("swap")}>
-                    <ArrowUpDown className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+                    <ArrowUpDown className="mr-2 h-3.5 w-3.5 text-foreground" />
                     <span>Currency Converter</span>
                   </ContextMenuItem>
                   <ContextMenuItem onClick={() => onAddWidget("ticker")}>
-                    <TrendingUp className="mr-2 h-3.5 w-3.5 text-blue-500" />
+                    <TrendingUp className="mr-2 h-3.5 w-3.5 text-foreground" />
                     <span>Market Tickers</span>
                   </ContextMenuItem>
                   <ContextMenuItem onClick={() => onAddWidget("countdown")}>
-                    <CalendarClock className="mr-2 h-3.5 w-3.5 text-orange-500" />
+                    <CalendarClock className="mr-2 h-3.5 w-3.5 text-foreground" />
                     <span>Countdown Timer</span>
                   </ContextMenuItem>
                   <ContextMenuItem onClick={() => onAddWidget("worldclock")}>
-                    <Globe className="mr-2 h-3.5 w-3.5 text-cyan-500" />
+                    <Globe className="mr-2 h-3.5 w-3.5 text-foreground" />
                     <span>World Clock</span>
                   </ContextMenuItem>
                   <ContextMenuItem onClick={() => onAddWidget("unitconverter")}>
-                    <Ruler className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+                    <Ruler className="mr-2 h-3.5 w-3.5 text-foreground" />
                     <span>Unit Converter</span>
                   </ContextMenuItem>
                   <ContextMenuItem onClick={() => onAddWidget("counter")}>
-                    <Target className="mr-2 h-3.5 w-3.5 text-purple-500" />
+                    <Target className="mr-2 h-3.5 w-3.5 text-foreground" />
                     <span>Tally Counter</span>
                   </ContextMenuItem>
                   <ContextMenuItem onClick={() => onAddWidget("browser")}>
-                    <Globe className="mr-2 h-3.5 w-3.5 text-cyan-500" />
+                    <Globe className="mr-2 h-3.5 w-3.5 text-foreground" />
                     <span>Mini Web Browser</span>
                   </ContextMenuItem>
 
@@ -499,35 +499,39 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
                     Component Blocks
                   </div>
                   <ContextMenuItem onClick={() => onAddWidget("scratchpad")}>
-                    <Sun className="mr-2 h-3.5 w-3.5 text-amber-500" />
+                    <Sun className="mr-2 h-3.5 w-3.5 text-foreground" />
                     <span>Daily Scratchpad</span>
                   </ContextMenuItem>
                   <ContextMenuItem onClick={() => onAddWidget("meeting")}>
-                    <Users className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+                    <Users className="mr-2 h-3.5 w-3.5 text-foreground" />
                     <span>Meeting Minutes</span>
                   </ContextMenuItem>
                   <ContextMenuItem onClick={() => onAddWidget("kanban")}>
-                    <Kanban className="mr-2 h-3.5 w-3.5 text-blue-500" />
+                    <Kanban className="mr-2 h-3.5 w-3.5 text-foreground" />
                     <span>Kanban Board</span>
                   </ContextMenuItem>
                   <ContextMenuItem onClick={() => onAddWidget("habits")}>
-                    <Sparkles className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+                    <Sparkles className="mr-2 h-3.5 w-3.5 text-foreground" />
                     <span>7-Day Habit Tracker</span>
                   </ContextMenuItem>
                   <ContextMenuItem onClick={() => onAddWidget("bug")}>
-                    <Bug className="mr-2 h-3.5 w-3.5 text-rose-500" />
+                    <Bug className="mr-2 h-3.5 w-3.5 text-foreground" />
                     <span>Bug Blitz & Triage</span>
                   </ContextMenuItem>
                   <ContextMenuItem onClick={() => onAddWidget("idea")}>
-                    <Lightbulb className="mr-2 h-3.5 w-3.5 text-yellow-500" />
+                    <Lightbulb className="mr-2 h-3.5 w-3.5 text-foreground" />
                     <span>Idea Incubator</span>
                   </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("api")}>
+                    <Code2 className="mr-2 h-3.5 w-3.5 text-foreground" />
+                    <span>API & Tech Blueprint</span>
+                  </ContextMenuItem>
                   <ContextMenuItem onClick={() => onAddWidget("reading")}>
-                    <BookOpen className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+                    <BookOpen className="mr-2 h-3.5 w-3.5 text-foreground" />
                     <span>Book & Article Digest</span>
                   </ContextMenuItem>
                   <ContextMenuItem onClick={() => onAddWidget("palette")}>
-                    <Palette className="mr-2 h-3.5 w-3.5 text-pink-500" />
+                    <Palette className="mr-2 h-3.5 w-3.5 text-foreground" />
                     <span>Color Palette</span>
                   </ContextMenuItem>
                 </ContextMenuSubContent>
@@ -536,28 +540,28 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
 
             {onPersonalizePersona && (
               <ContextMenuItem onClick={onPersonalizePersona}>
-                <Sparkles className="mr-2 h-3.5 w-3.5 text-primary" />
+                <Sparkles className="mr-2 h-3.5 w-3.5 text-foreground" />
                 <span>Personalize Note Persona</span>
               </ContextMenuItem>
             )}
 
             {onOrganizeChecklist && (
               <ContextMenuItem onClick={onOrganizeChecklist}>
-                <ListChecks className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+                <ListChecks className="mr-2 h-3.5 w-3.5 text-foreground" />
                 <span>Organize Checklist (Done to bottom)</span>
               </ContextMenuItem>
             )}
 
             {onDueDate && (
               <ContextMenuItem onClick={onDueDate}>
-                <CalendarClock className="mr-2 h-3.5 w-3.5 text-amber-500" />
+                <CalendarClock className="mr-2 h-3.5 w-3.5 text-foreground" />
                 <span>Set Due Date & Reminder</span>
               </ContextMenuItem>
             )}
 
             {onPin && (
               <ContextMenuItem onClick={onPin}>
-                <Lock className="mr-2 h-3.5 w-3.5 text-primary" />
+                <Lock className="mr-2 h-3.5 w-3.5 text-foreground" />
                 <span>Protect Note with PIN</span>
               </ContextMenuItem>
             )}
@@ -571,21 +575,21 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
 
             {onExportMarkdown && (
               <ContextMenuItem onClick={onExportMarkdown}>
-                <FileDown className="mr-2 h-3.5 w-3.5 text-purple-500" />
+                <FileDown className="mr-2 h-3.5 w-3.5 text-foreground" />
                 <span>Export as Markdown</span>
               </ContextMenuItem>
             )}
 
             {onImportMarkdown && (
               <ContextMenuItem onClick={onImportMarkdown}>
-                <FileUp className="mr-2 h-3.5 w-3.5 text-sky-500" />
+                <FileUp className="mr-2 h-3.5 w-3.5 text-foreground" />
                 <span>Import Markdown</span>
               </ContextMenuItem>
             )}
 
             {onRefreshNote && (
               <ContextMenuItem onClick={onRefreshNote}>
-                <RefreshCw className="mr-2 h-3.5 w-3.5 text-primary" />
+                <RefreshCw className="mr-2 h-3.5 w-3.5 text-foreground" />
                 <span>Refresh Note</span>
               </ContextMenuItem>
             )}

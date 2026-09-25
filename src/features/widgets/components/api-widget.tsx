@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Check, Copy, ShieldCheck, Binary, Terminal } from "lucide-react";
+import { Check, CopySimple as Copy, ShieldCheck, Binary, Terminal } from "@phosphor-icons/react";
 import { WidgetInsertButton } from "./widget-insert-button";
 import { cn } from "@/lib/utils/cn";
 
@@ -31,11 +31,11 @@ export const ApiWidget: React.FC<ApiWidgetProps> = ({
   };
 
   const methodColors: Record<HttpMethod, string> = {
-    GET: "bg-emerald-500 text-black",
-    POST: "bg-blue-500 text-white",
-    PUT: "bg-amber-500 text-black",
-    DELETE: "bg-rose-500 text-white",
-    IPC: "bg-purple-500 text-white",
+    GET: "bg-foreground text-background",
+    POST: "bg-foreground text-background",
+    PUT: "bg-foreground text-background",
+    DELETE: "bg-foreground text-background",
+    IPC: "bg-foreground text-background",
   };
 
   const handleInsertSummary = () => {
@@ -67,8 +67,8 @@ export const ApiWidget: React.FC<ApiWidgetProps> = ({
             ))}
           </div>
 
-          <div className="flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
-            <ShieldCheck className="h-3 w-3" />
+          <div className="flex items-center gap-1 rounded-full bg-muted/60 border border-border px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+            <ShieldCheck className="h-3 w-3 text-foreground" />
             <span>AES-256 GCM</span>
           </div>
         </div>
@@ -89,8 +89,8 @@ export const ApiWidget: React.FC<ApiWidgetProps> = ({
           >
             {copiedUrl ? (
               <>
-                <Check className="h-2.5 w-2.5 text-emerald-400 stroke-[3]" />
-                <span className="text-emerald-400">Copied</span>
+                <Check className="h-2.5 w-2.5 text-foreground" weight="bold" />
+                <span className="text-foreground">Copied</span>
               </>
             ) : (
               <>
@@ -126,7 +126,7 @@ export const ApiWidget: React.FC<ApiWidgetProps> = ({
       <div className="rounded-lg border border-border bg-background/60 p-2 space-y-1.5">
         <div className="flex items-center justify-between text-[10px]">
           <span className="font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-            <Binary className="h-3 w-3 text-cyan-500" />
+            <Binary className="h-3 w-3 text-foreground" />
             <span>Quick Base Converter</span>
           </span>
           <span className="font-mono text-[10px] text-muted-foreground">DEC / HEX / BIN</span>

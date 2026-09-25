@@ -1,9 +1,15 @@
 import React, { useEffect, useRef } from "react";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import {
+  MagnifyingGlass as Search,
+  Faders as SlidersHorizontal,
+  Terminal,
+  X,
+} from "@phosphor-icons/react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { NOTE_COLORS, NoteColor } from "@/features/stash/types/color";
 import { Tag } from "@/features/stash/types/note";
 import { formatShortcut, SHORTCUTS } from "@/lib/keyboard/shortcuts";
+import { useUIStore } from "@/stores/ui-store";
 import { cn } from "@/lib/utils/cn";
 
 interface SearchBarProps {
@@ -36,6 +42,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const firstRender = useRef(true);
+  const { theme, terminalSettings } = useUIStore();
+  const isTerminal =
+    theme === "terminal" ||
+    theme === "amber-crt" ||
+    theme === "cyberpunk" ||
+    theme === "e-ink";
 
   useEffect(() => {
     if (firstRender.current) {
@@ -52,7 +64,16 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div className="flex items-center gap-1.5">
       <div className="relative flex items-center">
-        <Search className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-muted-foreground" />
+        {isTerminal ? (
+          <span className="pointer-events-none absolute left-2 font-mono text-[11px] font-bold text-brand select-none flex items-center gap-1">
+            <Terminal className="h-3 w-3 shrink-0 opacity-75" />
+            <span className="text-[10px] hidden sm:inline opacity-90">
+              {terminalSettings.promptSymbol || "$"}
+            </span>
+          </span>
+        ) : (
+          <Search className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-muted-foreground" />
+        )}
         <input
           ref={inputRef}
           type="text"
@@ -64,12 +85,22 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               else inputRef.current?.blur();
             }
           }}
-          placeholder="Search your stash..."
+          placeholder={
+            isTerminal ? 'grep -i "stashes"...' : "Search your stash..."
+          }
           aria-label="Search your stash"
-          className="h-8 w-52 rounded border border-border bg-surface pl-8 pr-14 text-xs text-foreground placeholder:text-muted-foreground transition-[width,border-color,box-shadow] duration-200 ease-soft focus:w-64 focus:border-ring/60 focus:bg-surface-elevated focus:outline-none focus:ring-2 focus:ring-ring/20 lg:w-64 lg:focus:w-72"
+          className={cn(
+            "h-8 rounded border border-border bg-surface pr-14 text-xs text-foreground placeholder:text-muted-foreground transition-[width,border-color,box-shadow] duration-200 ease-soft focus:border-ring/60 focus:bg-surface-elevated focus:outline-none focus:ring-2 focus:ring-ring/20",
+            isTerminal
+              ? "pl-14 sm:pl-22 font-mono text-[11px] w-56 focus:w-68 lg:w-68 lg:focus:w-76"
+              : "w-52 pl-8 focus:w-64 lg:w-64 lg:focus:w-72"
+          )}
         />
 
-        <div className="absolute right-2 flex items-center">
+        <div className="absolute right-2 flex items-center gap-1">
+          {isTerminal && terminalSettings.blinkingBlockCursor && !query && (
+            <span className="terminal-cursor-block text-brand text-[10px] opacity-80" />
+          )}
           {query ? (
             <button
               onClick={() => onQueryChange("")}

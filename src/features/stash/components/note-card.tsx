@@ -16,17 +16,17 @@ import { useUIStore } from "@/stores/ui-store";
 import { formatDistanceToNow } from "date-fns";
 import {
   Check,
-  CheckCircle2,
-  ExternalLink,
-  MoreHorizontal,
+  CheckCircle,
+  ArrowUpRight,
+  DotsThree,
   Palette,
-  Pin,
+  PushPin,
   Star,
-  Lock,
-  CalendarClock,
+  LockSimple,
+  CalendarBlank,
   Ghost,
-  Sparkles,
-} from "lucide-react";
+  Sparkle,
+} from "@phosphor-icons/react";
 import { extractWidgets } from "@/features/editor/stash-content";
 import { NoteWidgetData } from "@/features/widgets/types";
 import {
@@ -102,12 +102,18 @@ export const NoteCard: React.FC<NoteCardProps> = ({
   const isToday = useMemo(() => isTodayTitle(note.title), [note.title]);
 
   const {
+    theme,
     cardDensity,
     showWordCount,
     showRelativeTime,
     showColorRibbon,
     showWidgetBadges,
   } = useUIStore();
+  const isTerminal =
+    theme === "terminal" ||
+    theme === "amber-crt" ||
+    theme === "cyberpunk" ||
+    theme === "e-ink";
 
   const displayDate = useMemo(() => {
     if (!showRelativeTime) return formatNoteDate(note.updatedAt);
@@ -156,6 +162,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
           aria-selected={isSelected}
           className={cn(
             "group relative flex cursor-pointer select-none flex-col justify-between rounded-lg border overflow-hidden",
+            isTerminal && "font-mono border-opacity-70",
             cardDensity === "compact"
               ? "min-h-[116px] p-3"
               : cardDensity === "spacious"
@@ -184,7 +191,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
           {/* Bulk-select indicator */}
           {isBulkSelected && (
             <span className="absolute left-2 top-2 z-10">
-              <CheckCircle2 className="h-4 w-4 text-primary drop-shadow-sm" />
+              <CheckCircle className="h-4 w-4 text-foreground drop-shadow-sm" weight="fill" />
             </span>
           )}
           {/* Title row */}
@@ -196,31 +203,40 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                     {emoji}
                   </span>
                 )}
-                <span className="truncate">{displayTitle}</span>
+                <span className="truncate">
+                  {isTerminal ? `> ${displayTitle}` : displayTitle}
+                </span>
               </h3>
               <div className="flex shrink-0 items-center gap-1 opacity-60">
                 {isLocked && (
                   <span title={isUnlocked ? "PIN protected (unlocked)" : "PIN locked"}>
-                    <Lock className="h-3 w-3" />
+                    <LockSimple className="h-3 w-3" weight="regular" />
                   </span>
                 )}
                 {opacity < 100 && (
-                  <span title={`Ghost Mode (${opacity}%)`} className="text-primary">
-                    <Ghost className="h-3 w-3" />
+                  <span title={`Ghost Mode (${opacity}%)`} className="text-foreground">
+                    <Ghost className="h-3 w-3" weight="regular" />
                   </span>
                 )}
-                {note.isPinned && <Pin className="h-3 w-3 fill-current" />}
+                {note.isPinned && <PushPin className="h-3 w-3" weight="fill" />}
                 {note.isFavorite && (
-                  <Star className="h-3 w-3 fill-current text-warning opacity-100" />
+                  <Star className="h-3 w-3 text-foreground" weight="fill" />
                 )}
               </div>
             </div>
 
             {isLocked && !isUnlocked ? (
-              <p className="flex items-center gap-1.5 text-2xs italic opacity-60 py-1">
-                <Lock className="h-3 w-3 shrink-0" />
-                <span>Protected stash · PIN locked</span>
-              </p>
+              <div className="flex flex-col items-center justify-center gap-1.5 py-3.5 px-2 my-1 rounded-md bg-foreground/[0.04] border border-foreground/10 text-center select-none backdrop-blur-[2px]">
+                <div className="h-6 w-6 rounded-full bg-foreground/[0.08] flex items-center justify-center text-foreground/80 shadow-xs">
+                  <LockSimple className="h-3 w-3" weight="regular" />
+                </div>
+                <span className="text-[11px] font-medium tracking-tight text-foreground/85">
+                  Confidential Stash
+                </span>
+                <span className="text-[10px] text-muted-foreground/75">
+                  Double-click to unlock with PIN
+                </span>
+              </div>
             ) : tasks.length > 0 ? (
               <ul className="space-y-1">
                 {tasks.slice(0, 4).map((item, index) => (
@@ -234,7 +250,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                           : "border-current opacity-35"
                       )}
                     >
-                      {item.done && <Check className="h-2 w-2 stroke-[3]" />}
+                      {item.done && <Check className="h-2 w-2" weight="bold" />}
                     </span>
                     <span
                       className={cn(
@@ -306,32 +322,30 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                     className={cn(
                       "shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-tight",
                       dueDateStatus.isOverdue
-                        ? "bg-destructive/20 text-destructive font-semibold"
-                        : dueDateStatus.isToday
-                        ? "bg-amber-500/20 text-amber-700 dark:text-amber-300"
-                        : "bg-current/10 opacity-75"
+                        ? "bg-foreground/15 text-foreground font-semibold border border-foreground/20"
+                        : "bg-foreground/10 text-foreground/80 border border-foreground/10"
                     )}
                     title={`Due: ${dueDateStatus.label}`}
                   >
-                    <CalendarClock className="h-2.5 w-2.5" />
+                    <CalendarBlank className="h-2.5 w-2.5" weight="regular" />
                     <span>{dueDateStatus.label}</span>
                   </span>
                 )}
                 {showWidgetBadges && opacity < 100 && (
                   <span
-                    className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-tight bg-primary/15 text-primary border border-primary/20"
+                    className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-tight bg-foreground/10 text-foreground border border-foreground/15"
                     title={`Ghost Mode (${opacity}%)`}
                   >
-                    <Ghost className="h-2.5 w-2.5" />
+                    <Ghost className="h-2.5 w-2.5" weight="regular" />
                     <span>{opacity}%</span>
                   </span>
                 )}
                 {showWidgetBadges && attachedWidgets.length > 0 && (
                   <span
-                    className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-tight bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25"
+                    className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-tight bg-foreground/10 text-foreground border border-foreground/15"
                     title={`${attachedWidgets.length} attached widget${attachedWidgets.length > 1 ? "s" : ""}: ${attachedWidgets.map((w) => w.title).join(", ")}`}
                   >
-                    <Sparkles className="h-2.5 w-2.5" />
+                    <Sparkle className="h-2.5 w-2.5" weight="regular" />
                     <span>{attachedWidgets.length} {attachedWidgets.length === 1 ? "widget" : "widgets"}</span>
                   </span>
                 )}
@@ -369,7 +383,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                   aria-label="Open as floating stash"
                   className="flex h-6 w-6 items-center justify-center rounded-xs opacity-60 transition-[background-color,opacity] hover:bg-current/10 hover:opacity-100"
                 >
-                  <ExternalLink className="h-3 w-3" />
+                  <ArrowUpRight className="h-3 w-3" weight="bold" />
                 </button>
 
                 <ColorPicker
@@ -382,7 +396,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                     aria-label="Change color"
                     className="flex h-6 w-6 items-center justify-center rounded-xs opacity-60 transition-[background-color,opacity] hover:bg-current/10 hover:opacity-100"
                   >
-                    <Palette className="h-3 w-3" />
+                    <Palette className="h-3 w-3" weight="regular" />
                   </button>
                 </ColorPicker>
 
@@ -393,7 +407,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                       aria-label="More actions"
                       className="flex h-6 w-6 items-center justify-center rounded-xs opacity-60 transition-[background-color,opacity] hover:bg-current/10 hover:opacity-100"
                     >
-                      <MoreHorizontal className="h-3.5 w-3.5" />
+                      <DotsThree className="h-3.5 w-3.5" weight="bold" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">

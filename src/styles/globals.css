@@ -1,4 +1,5 @@
 @import "./swap.css";
+@import "./themes.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -695,6 +696,24 @@
 
 .ProseMirror table .selectedCell {
   background: hsl(var(--brand) / 0.08);
+}
+
+/* --------------------------------------------------------------------------
+   Dynamic Stash Editor customization
+   -------------------------------------------------------------------------- */
+:root {
+  --stash-editor-font-size: 14px;
+  --stash-editor-line-height: 1.625;
+}
+
+.stash-tiptap-editor .ProseMirror {
+  font-size: var(--stash-editor-font-size, 14px) !important;
+  line-height: var(--stash-editor-line-height, 1.625) !important;
+}
+
+.stash-tiptap-editor .ProseMirror p,
+.stash-tiptap-editor .ProseMirror li {
+  line-height: var(--stash-editor-line-height, 1.625) !important;
 }
 
 /* ==========================================================================

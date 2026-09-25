@@ -101,6 +101,49 @@ export function lockNoteInSession(noteId: string): void {
   dispatchMetaChangeEvent(noteId);
 }
 
+export function lockAllProtectedNotes(): void {
+  unlockedInSession.clear();
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(
+      new CustomEvent("stash:note-meta-changed", { detail: { noteId: "all" } })
+    );
+    void stashIpc.emitEvent("stash://note-meta-changed", { noteId: "all" });
+  }
+}
+
+export function getProtectedNotesCount(): number {
+  if (typeof window === "undefined" || typeof localStorage === "undefined") return 0;
+  let count = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith(PIN_PREFIX) && localStorage.getItem(key)) {
+      count++;
+    }
+  }
+  return count;
+}
+
+export function getUnlockedInSessionCount(): number {
+  return unlockedInSession.size;
+}
+
+export function clearAllNotePins(): void {
+  if (typeof window === "undefined" || typeof localStorage === "undefined") return;
+  const toRemove: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith(PIN_PREFIX)) {
+      toRemove.push(key);
+    }
+  }
+  toRemove.forEach((k) => localStorage.removeItem(k));
+  unlockedInSession.clear();
+  window.dispatchEvent(
+    new CustomEvent("stash:note-meta-changed", { detail: { noteId: "all" } })
+  );
+  void stashIpc.emitEvent("stash://note-meta-changed", { noteId: "all" });
+}
+
 /* ------------------------------ DUE DATES ------------------------------- */
 
 export function getNoteDueDate(noteId: string): string | null {
@@ -170,12 +213,21 @@ export function getDueDateStatus(dateIso: string | null): DueDateStatus | null {
 
 /* ------------------------------- OPACITY -------------------------------- */
 
+export const DEFAULT_OPACITY_KEY = "stash_default_opacity";
+
 export function getNoteOpacity(noteId: string): number {
   if (typeof window === "undefined") return 100;
   const saved = localStorage.getItem(`${OPACITY_PREFIX}${noteId}`);
-  if (!saved) return 100;
-  const parsed = parseInt(saved, 10);
-  return isNaN(parsed) ? 100 : Math.max(30, Math.min(100, parsed));
+  if (saved) {
+    const parsed = parseInt(saved, 10);
+    return isNaN(parsed) ? 100 : Math.max(30, Math.min(100, parsed));
+  }
+  const defaultOpacity = localStorage.getItem(DEFAULT_OPACITY_KEY);
+  if (defaultOpacity) {
+    const parsed = parseInt(defaultOpacity, 10);
+    return isNaN(parsed) ? 100 : Math.max(30, Math.min(100, parsed));
+  }
+  return 100;
 }
 
 export function setNoteOpacity(noteId: string, opacity: number): void {
@@ -210,6 +262,8 @@ export function setNoteEmoji(noteId: string, emoji: string | null): void {
 
 /* --------------------------- PAPER TEXTURE / PATTERN --------------------- */
 
+export const DEFAULT_PAPER_KEY = "stash_default_paper";
+
 export type PaperPattern = "plain" | "dots" | "lines" | "grid" | "blueprint";
 
 export const PAPER_PATTERNS: { id: PaperPattern; label: string; description: string }[] = [
@@ -225,6 +279,10 @@ export function getNotePaper(noteId: string): PaperPattern {
   const saved = localStorage.getItem(`${PAPER_PREFIX}${noteId}`);
   if (saved && ["plain", "dots", "lines", "grid", "blueprint"].includes(saved)) {
     return saved as PaperPattern;
+  }
+  const defaultPaper = localStorage.getItem(DEFAULT_PAPER_KEY);
+  if (defaultPaper && ["plain", "dots", "lines", "grid", "blueprint"].includes(defaultPaper)) {
+    return defaultPaper as PaperPattern;
   }
   return "plain";
 }
@@ -271,6 +329,8 @@ export function getPaperPatternStyle(pattern: PaperPattern): React.CSSProperties
 
 /* --------------------------- TYPOGRAPHY PERSONA -------------------------- */
 
+export const DEFAULT_FONT_PERSONA_KEY = "stash_default_font_persona";
+
 export type NoteFontPersona = "sans" | "serif" | "mono" | "casual";
 
 export const FONT_PERSONAS: { id: NoteFontPersona; label: string; preview: string; fontClass: string }[] = [
@@ -286,6 +346,10 @@ export function getNoteFont(noteId: string): NoteFontPersona {
   if (saved && ["sans", "serif", "mono", "casual"].includes(saved)) {
     return saved as NoteFontPersona;
   }
+  const defaultFont = localStorage.getItem(DEFAULT_FONT_PERSONA_KEY);
+  if (defaultFont && ["sans", "serif", "mono", "casual"].includes(defaultFont)) {
+    return defaultFont as NoteFontPersona;
+  }
   return "sans";
 }
 
@@ -296,6 +360,8 @@ export function setNoteFont(noteId: string, font: NoteFontPersona): void {
 }
 
 /* -------------------------- FRAME & ACCENT STYLE ------------------------- */
+
+export const DEFAULT_FRAME_KEY = "stash_default_frame";
 
 export type NoteFrameStyle = "default" | "acrylic" | "neon" | "minimal";
 
@@ -311,6 +377,10 @@ export function getNoteFrame(noteId: string): NoteFrameStyle {
   const saved = localStorage.getItem(`${FRAME_PREFIX}${noteId}`);
   if (saved && ["default", "acrylic", "neon", "minimal"].includes(saved)) {
     return saved as NoteFrameStyle;
+  }
+  const defaultFrame = localStorage.getItem(DEFAULT_FRAME_KEY);
+  if (defaultFrame && ["default", "acrylic", "neon", "minimal"].includes(defaultFrame)) {
+    return defaultFrame as NoteFrameStyle;
   }
   return "default";
 }

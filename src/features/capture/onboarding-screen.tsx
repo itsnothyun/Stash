@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Check, Pin } from "lucide-react";
+import { ArrowRight, Check, PushPin as Pin } from "@phosphor-icons/react";
 import { StashLogo } from "@/components/shared/stash-logo";
 import { WindowControls } from "@/components/desktop/window-controls";
 import { formatShortcut, SHORTCUTS } from "@/lib/keyboard/shortcuts";
@@ -239,7 +239,7 @@ const FloatDemo: React.FC = () => {
         <div className="flex items-center justify-between">
           <span className="text-xs font-medium">Above the editor</span>
           <span className="flex h-5 w-5 items-center justify-center rounded-sm bg-foreground/10">
-            <Pin className="h-3 w-3 fill-current" />
+            <Pin className="h-3 w-3" weight="fill" />
           </span>
         </div>
         <div className="mt-2 space-y-1">
@@ -280,7 +280,7 @@ const TasksDemo: React.FC = () => {
                     : "border-foreground/30"
                 )}
               >
-                {task.done && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
+                {task.done && <Check className="h-2.5 w-2.5" weight="bold" />}
               </span>
               <span
                 className={cn(

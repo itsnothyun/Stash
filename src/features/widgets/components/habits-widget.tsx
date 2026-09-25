@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, X, Flame, Check } from "lucide-react";
+import { Plus, X, Flame, Check } from "@phosphor-icons/react";
 import { WidgetInsertButton } from "./widget-insert-button";
 import { cn } from "@/lib/utils/cn";
 
@@ -137,8 +137,8 @@ ${rows}
                   {habit.name}
                 </span>
                 {streak > 0 && (
-                  <span className="flex items-center gap-0.5 rounded-full bg-amber-500/10 px-1.5 py-0.2 text-[9px] font-mono font-medium text-amber-600 dark:text-amber-400 shrink-0">
-                    <Flame className="h-2.5 w-2.5 fill-current" /> {streak}d
+                  <span className="flex items-center gap-0.5 rounded-full bg-muted px-1.5 py-0.2 text-[9px] font-mono font-medium text-foreground shrink-0">
+                    <Flame className="h-2.5 w-2.5" weight="fill" /> {streak}d
                   </span>
                 )}
               </div>
@@ -153,11 +153,11 @@ ${rows}
                     className={cn(
                       "flex h-4 w-4 items-center justify-center rounded-full text-[9px] transition-colors",
                       checked
-                        ? "bg-emerald-500 text-white font-bold shadow-xs"
+                        ? "bg-foreground text-background font-bold shadow-xs"
                         : "border border-border/80 hover:border-primary/60 bg-muted/30 text-transparent"
                     )}
                   >
-                    <Check className="h-2.5 w-2.5 stroke-[3]" />
+                    <Check className="h-2.5 w-2.5" weight="bold" />
                   </button>
                 ))}
 

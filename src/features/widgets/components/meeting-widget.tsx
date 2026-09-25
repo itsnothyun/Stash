@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Check, Play, Pause, RotateCcw, Clock, Users, Trash2, Tag } from "lucide-react";
+import { Plus, Check, Play, Pause, ArrowCounterClockwise as RotateCcw, Clock, Users, Trash as Trash2, Tag } from "@phosphor-icons/react";
 import { WidgetInsertButton } from "./widget-insert-button";
 import { cn } from "@/lib/utils/cn";
 
@@ -140,9 +140,9 @@ export const MeetingWidget: React.FC<MeetingWidgetProps> = ({
   return (
     <div className={cn("flex flex-col gap-3 p-3 text-xs", className)}>
       {/* Top Header & Meeting Duration Timer */}
-      <div className="flex items-center justify-between gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-3 py-2">
+      <div className="flex items-center justify-between gap-2 rounded-xl bg-card border border-border/70 px-3 py-2 shadow-xs">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-500">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted text-foreground">
             <Clock className="h-3.5 w-3.5" />
           </div>
           <div>
@@ -150,9 +150,9 @@ export const MeetingWidget: React.FC<MeetingWidgetProps> = ({
               type="text"
               value={meetingTitle}
               onChange={(e) => setMeetingTitle(e.target.value)}
-              className="bg-transparent font-semibold text-foreground focus:outline-none border-b border-transparent focus:border-emerald-500 text-xs w-48"
+              className="bg-transparent font-semibold text-foreground focus:outline-none border-b border-transparent focus:border-primary text-xs w-48"
             />
-            <div className="font-mono text-xs font-semibold tracking-tight text-emerald-500">
+            <div className="font-mono text-xs font-semibold tracking-tight text-foreground">
               {mins}:{secs} remaining
             </div>
           </div>
@@ -168,7 +168,7 @@ export const MeetingWidget: React.FC<MeetingWidgetProps> = ({
                 className={cn(
                   "px-1.5 py-0.5 rounded font-mono transition-colors",
                   durationMinutes === m
-                    ? "bg-emerald-500 text-black font-bold shadow-2xs"
+                    ? "bg-foreground text-background font-bold shadow-2xs"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
@@ -180,16 +180,16 @@ export const MeetingWidget: React.FC<MeetingWidgetProps> = ({
           <button
             type="button"
             onClick={() => setIsRunning((r) => !r)}
-            className="flex h-7 px-2.5 items-center gap-1 rounded-md bg-emerald-500 text-black font-semibold text-[11px] shadow-xs hover:bg-emerald-400 active:scale-95 transition-all"
+            className="flex h-7 px-2.5 items-center gap-1 rounded-md bg-foreground text-background font-semibold text-[11px] shadow-xs hover:opacity-90 active:scale-95 transition-all"
           >
             {isRunning ? (
               <>
-                <Pause className="h-3 w-3 fill-current" />
+                <Pause className="h-3 w-3" weight="fill" />
                 <span>Pause</span>
               </>
             ) : (
               <>
-                <Play className="h-3 w-3 fill-current" />
+                <Play className="h-3 w-3" weight="fill" />
                 <span>Start</span>
               </>
             )}
@@ -292,11 +292,11 @@ export const MeetingWidget: React.FC<MeetingWidgetProps> = ({
                   className={cn(
                     "flex h-4 w-4 shrink-0 items-center justify-center rounded-md border transition-colors",
                     act.completed
-                      ? "bg-emerald-500 border-emerald-500 text-black shadow-xs"
+                      ? "bg-foreground border-foreground text-background shadow-xs"
                       : "border-muted-foreground/40 bg-muted/20 hover:border-foreground"
                   )}
                 >
-                  {act.completed && <Check className="h-2.5 w-2.5 stroke-[3]" />}
+                  {act.completed && <Check className="h-2.5 w-2.5" weight="bold" />}
                 </div>
                 <span
                   className={cn(
@@ -335,22 +335,22 @@ export const MeetingWidget: React.FC<MeetingWidgetProps> = ({
               onChange={(e) => setNewActionText(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && addAction()}
               placeholder="Add action item... (press Enter)"
-              className="flex-1 rounded-md border border-border bg-background/60 px-2.5 py-1 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-emerald-500 shadow-2xs"
+              className="flex-1 rounded-md border border-border bg-background/60 px-2.5 py-1 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-primary/40 shadow-2xs"
             />
             <input
               type="text"
               value={newActionAssignee}
               onChange={(e) => setNewActionAssignee(e.target.value)}
               placeholder="Assignee"
-              className="w-20 rounded-md border border-border bg-background/60 px-2 py-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-emerald-500 shadow-2xs"
+              className="w-20 rounded-md border border-border bg-background/60 px-2 py-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 shadow-2xs"
             />
             <button
               type="button"
               onClick={addAction}
               disabled={!newActionText.trim()}
-              className="flex h-7 w-7 items-center justify-center rounded-md bg-emerald-500 text-black font-semibold disabled:opacity-40 transition-colors shadow-2xs"
+              className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground text-background font-semibold disabled:opacity-40 transition-colors shadow-2xs cursor-pointer"
             >
-              <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
+              <Plus className="h-3.5 w-3.5" weight="bold" />
             </button>
           </div>
         </div>

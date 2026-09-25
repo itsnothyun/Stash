@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Calculator as CalcIcon, Delete } from "lucide-react";
+import { Calculator as CalcIcon, Backspace } from "@phosphor-icons/react";
 import { WidgetInsertButton } from "./widget-insert-button";
 import { cn } from "@/lib/utils/cn";
 
@@ -112,7 +112,7 @@ ${equationLine}- **Result**: **\`${display}\`**\n`;
       <div className="flex items-center justify-between pb-1.5 border-b border-border/40">
         {!className?.includes("border-0") ? (
           <div className="flex items-center gap-1.5 font-semibold text-foreground">
-            <CalcIcon className="h-3.5 w-3.5 text-primary" />
+            <CalcIcon className="h-3.5 w-3.5 text-foreground" />
             <span>Quick Calculator</span>
           </div>
         ) : (
@@ -140,7 +140,7 @@ ${equationLine}- **Result**: **\`${display}\`**\n`;
 
       {/* Keypad */}
       <div className="grid grid-cols-4 gap-1.5">
-        <button onClick={handleClear} className={`${btnClass} bg-red-500/10 text-red-600 font-bold hover:bg-red-500/20`}>
+        <button onClick={handleClear} className={`${btnClass} bg-muted text-foreground font-bold hover:bg-muted/80`}>
           C
         </button>
         <button
@@ -153,7 +153,7 @@ ${equationLine}- **Result**: **\`${display}\`**\n`;
           }}
           className={`${btnClass} bg-muted text-muted-foreground hover:text-foreground`}
         >
-          <Delete className="h-3.5 w-3.5" />
+          <Backspace className="h-3.5 w-3.5" />
         </button>
         <button
           onClick={() => {

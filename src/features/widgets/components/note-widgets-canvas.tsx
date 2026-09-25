@@ -2,33 +2,33 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
-  ChevronDown,
-  ChevronUp,
-  ChevronLeft,
-  ChevronRight,
-  ArrowUpDown,
-  TrendingUp,
+  CaretDown as ChevronDown,
+  CaretUp as ChevronUp,
+  CaretLeft as ChevronLeft,
+  CaretRight as ChevronRight,
+  ArrowsDownUp as ArrowUpDown,
+  TrendUp as TrendingUp,
   Calculator as CalcIcon,
   Timer as TimerIcon,
   Globe,
   Ruler,
   Target,
-  CalendarClock,
-  MoveHorizontal,
+  CalendarBlank as CalendarClock,
+  ArrowsLeftRight as MoveHorizontal,
   Check,
   Kanban,
-  Sparkles,
+  Sparkle as Sparkles,
   Palette,
-  RotateCcw,
-  ArrowLeftRight,
-  Trash2,
+  ArrowCounterClockwise as RotateCcw,
+  ArrowsLeftRight as ArrowLeftRight,
+  Trash as Trash2,
   Sun,
   Users,
   Bug,
   Lightbulb,
-  Code2,
+  CodeBlock as Code2,
   BookOpen,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -189,41 +189,41 @@ export const NoteWidgetsCanvas: React.FC<NoteWidgetsCanvasProps> = ({
   const getWidgetIcon = (type: NoteWidgetData["type"]) => {
     switch (type) {
       case "swap":
-        return <ArrowUpDown className="h-3.5 w-3.5 text-emerald-500" />;
+        return <ArrowUpDown className="h-3.5 w-3.5 text-foreground" />;
       case "ticker":
-        return <TrendingUp className="h-3.5 w-3.5 text-blue-500" />;
+        return <TrendingUp className="h-3.5 w-3.5 text-foreground" />;
       case "calculator":
-        return <CalcIcon className="h-3.5 w-3.5 text-amber-500" />;
+        return <CalcIcon className="h-3.5 w-3.5 text-foreground" />;
       case "timer":
-        return <TimerIcon className="h-3.5 w-3.5 text-rose-500" />;
+        return <TimerIcon className="h-3.5 w-3.5 text-foreground" />;
       case "worldclock":
-        return <Globe className="h-3.5 w-3.5 text-cyan-500" />;
+        return <Globe className="h-3.5 w-3.5 text-foreground" />;
       case "unitconverter":
-        return <Ruler className="h-3.5 w-3.5 text-indigo-500" />;
+        return <Ruler className="h-3.5 w-3.5 text-foreground" />;
       case "counter":
-        return <Target className="h-3.5 w-3.5 text-purple-500" />;
+        return <Target className="h-3.5 w-3.5 text-foreground" />;
       case "countdown":
-        return <CalendarClock className="h-3.5 w-3.5 text-orange-500" />;
+        return <CalendarClock className="h-3.5 w-3.5 text-foreground" />;
       case "kanban":
-        return <Kanban className="h-3.5 w-3.5 text-blue-500" />;
+        return <Kanban className="h-3.5 w-3.5 text-foreground" />;
       case "habits":
-        return <Sparkles className="h-3.5 w-3.5 text-emerald-500" />;
+        return <Sparkles className="h-3.5 w-3.5 text-foreground" />;
       case "palette":
-        return <Palette className="h-3.5 w-3.5 text-pink-500" />;
+        return <Palette className="h-3.5 w-3.5 text-foreground" />;
       case "browser":
-        return <Globe className="h-3.5 w-3.5 text-cyan-500" />;
+        return <Globe className="h-3.5 w-3.5 text-foreground" />;
       case "scratchpad":
-        return <Sun className="h-3.5 w-3.5 text-amber-500" />;
+        return <Sun className="h-3.5 w-3.5 text-foreground" />;
       case "meeting":
-        return <Users className="h-3.5 w-3.5 text-emerald-500" />;
+        return <Users className="h-3.5 w-3.5 text-foreground" />;
       case "bug":
-        return <Bug className="h-3.5 w-3.5 text-rose-500" />;
+        return <Bug className="h-3.5 w-3.5 text-foreground" />;
       case "idea":
-        return <Lightbulb className="h-3.5 w-3.5 text-yellow-500" />;
+        return <Lightbulb className="h-3.5 w-3.5 text-foreground" />;
       case "api":
-        return <Code2 className="h-3.5 w-3.5 text-blue-500" />;
+        return <Code2 className="h-3.5 w-3.5 text-foreground" />;
       case "reading":
-        return <BookOpen className="h-3.5 w-3.5 text-indigo-500" />;
+        return <BookOpen className="h-3.5 w-3.5 text-foreground" />;
     }
   };
 
@@ -351,7 +351,7 @@ export const NoteWidgetsCanvas: React.FC<NoteWidgetsCanvasProps> = ({
                             className="flex items-center justify-between text-xs cursor-pointer py-1.5"
                           >
                             <span>{p.label}</span>
-                            {isActive && <Check className="h-3.5 w-3.5 text-primary stroke-[2.5]" />}
+                            {isActive && <Check className="h-3.5 w-3.5 text-foreground" weight="bold" />}
                           </DropdownMenuItem>
                         );
                       })}
@@ -573,7 +573,7 @@ export const NoteWidgetsCanvas: React.FC<NoteWidgetsCanvasProps> = ({
 
             <ContextMenuSub>
               <ContextMenuSubTrigger>
-                <MoveHorizontal className="mr-2 h-3.5 w-3.5 text-primary" />
+                <MoveHorizontal className="mr-2 h-3.5 w-3.5 text-foreground" />
                 <span>Widget Size</span>
               </ContextMenuSubTrigger>
               <ContextMenuSubContent className="w-40">
@@ -593,7 +593,7 @@ export const NoteWidgetsCanvas: React.FC<NoteWidgetsCanvasProps> = ({
                       className="flex items-center justify-between"
                     >
                       <span>{p.label}</span>
-                      {isActive && <Check className="h-3.5 w-3.5 stroke-[2.5] text-primary" />}
+                      {isActive && <Check className="h-3.5 w-3.5 text-foreground" weight="bold" />}
                     </ContextMenuItem>
                   );
                 })}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TrendingUp, TrendingDown, Plus, RotateCw } from "lucide-react";
+import { TrendUp as TrendingUp, TrendDown as TrendingDown, Plus, ArrowClockwise as RotateCw } from "@phosphor-icons/react";
 import { WidgetInsertButton } from "./widget-insert-button";
 import { cn } from "@/lib/utils/cn";
 
@@ -102,7 +102,7 @@ ${lines}\n`;
       {!className?.includes("border-0") ? (
         <div className="flex items-center justify-between pb-2 border-b border-border/60">
           <div className="flex items-center gap-1.5 font-semibold text-foreground">
-            <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
+            <TrendingUp className="h-3.5 w-3.5 text-foreground" />
             <span>Market Tickers</span>
           </div>
           <button
@@ -150,11 +150,7 @@ ${lines}\n`;
 
             <div className="flex items-center gap-1.5">
               <span
-                className={`flex items-center gap-0.5 text-[10px] font-medium px-1.5 py-0.5 rounded ${
-                  t.isPositive
-                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                    : "bg-red-500/10 text-red-600 dark:text-red-400"
-                }`}
+                className="flex items-center gap-0.5 text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-foreground"
               >
                 {t.isPositive ? (
                   <TrendingUp className="h-2.5 w-2.5" />

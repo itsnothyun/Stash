@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle } from "@phosphor-icons/react";
 import { Note } from "@/features/stash/types/note";
 import { taskSummary } from "@/features/stash/task-summary";
 import { cn } from "@/lib/utils/cn";
@@ -79,8 +79,8 @@ export const TodayStashGlassPill: React.FC<TodayStashGlassPillProps> = ({
             className={cn(
               "absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full border border-background shadow-xs",
               isLive
-                ? "glass-active-beacon bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"
-                : "bg-primary/30 group-hover:bg-primary transition-colors"
+                ? "glass-active-beacon bg-foreground shadow-[0_0_8px_rgba(255,255,255,0.35)]"
+                : "bg-muted-foreground/30 group-hover:bg-foreground/60 transition-colors"
             )}
             title={isLive ? "Today's Stash is active" : "Today's Stash ready to create"}
           />
@@ -97,10 +97,10 @@ export const TodayStashGlassPill: React.FC<TodayStashGlassPillProps> = ({
         {/* Task progress chip if tasks exist */}
         {taskStats && (
           <div
-            className="flex items-center gap-1 rounded-full bg-primary/10 dark:bg-primary/20 px-1.5 py-0.5 text-[10px] font-medium text-primary shrink-0"
+            className="flex items-center gap-1 rounded-full bg-surface border border-border/60 px-1.5 py-0.5 text-[10px] font-medium text-foreground shrink-0"
             title={`${taskStats.done} of ${taskStats.total} tasks completed`}
           >
-            <CheckCircle2 className="h-2.5 w-2.5" />
+            <CheckCircle className="h-2.5 w-2.5" />
             <span className="font-mono">
               {taskStats.done}/{taskStats.total}
             </span>

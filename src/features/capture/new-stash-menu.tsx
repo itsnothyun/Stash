@@ -1,4 +1,4 @@
-import { ChevronDown, Clipboard, Plus } from "lucide-react";
+import { CaretDown as ChevronDown, ClipboardText as Clipboard, Plus } from "@phosphor-icons/react";
 import { formatShortcut, SHORTCUTS } from "@/lib/keyboard/shortcuts";
 import {
   DropdownMenu,
@@ -72,11 +72,11 @@ export const NewStashMenu: React.FC<NewStashMenuProps> = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-64 text-xs">
           <DropdownMenuItem onClick={onCreate}>
-            <Plus className="mr-2 h-3.5 w-3.5 text-primary" />
+            <Plus className="mr-2 h-3.5 w-3.5 text-foreground" />
             <span>Blank Stash</span>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => void handleClipboard()}>
-            <Clipboard className="mr-2 h-3.5 w-3.5 text-sky-500" />
+            <Clipboard className="mr-2 h-3.5 w-3.5 text-foreground" />
             <span>Capture clipboard</span>
           </DropdownMenuItem>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Play, Pause, RotateCcw, Clock, Coffee } from "lucide-react";
+import { Play, Pause, ArrowCounterClockwise as RotateCcw, Clock, Coffee } from "@phosphor-icons/react";
 import { WidgetInsertButton } from "./widget-insert-button";
 import { cn } from "@/lib/utils/cn";
 
@@ -17,22 +17,22 @@ const MODE_CONFIG: Record<
   pomodoro: {
     label: "Pomodoro",
     defaultSeconds: 25 * 60,
-    icon: <Clock className="h-3 w-3 text-red-500" />,
+    icon: <Clock className="h-3 w-3 text-foreground" />,
   },
   shortBreak: {
     label: "Break",
     defaultSeconds: 5 * 60,
-    icon: <Coffee className="h-3 w-3 text-emerald-500" />,
+    icon: <Coffee className="h-3 w-3 text-foreground" />,
   },
   longBreak: {
     label: "Rest",
     defaultSeconds: 15 * 60,
-    icon: <Coffee className="h-3 w-3 text-blue-500" />,
+    icon: <Coffee className="h-3 w-3 text-foreground" />,
   },
   stopwatch: {
     label: "Stopwatch",
     defaultSeconds: 0,
-    icon: <Clock className="h-3 w-3 text-amber-500" />,
+    icon: <Clock className="h-3 w-3 text-foreground" />,
   },
 };
 
@@ -206,12 +206,12 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
         >
           {isRunning ? (
             <>
-              <Pause className="h-3.5 w-3.5 fill-current" />
+              <Pause className="h-3.5 w-3.5" weight="fill" />
               <span>Pause</span>
             </>
           ) : (
             <>
-              <Play className="h-3.5 w-3.5 fill-current" />
+              <Play className="h-3.5 w-3.5" weight="fill" />
               <span>Start</span>
             </>
           )}

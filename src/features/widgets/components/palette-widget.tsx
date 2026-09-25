@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, X, Copy, Check, Sparkles } from "lucide-react";
+import { Plus, X, CopySimple as Copy, Check, Sparkle as Sparkles } from "@phosphor-icons/react";
 import { WidgetInsertButton } from "./widget-insert-button";
 import { toast } from "@/components/ui/toast";
 
@@ -122,7 +122,7 @@ ${swatches}\n`;
             >
               <span>{c.hex}</span>
               {copiedId === c.id ? (
-                <Check className="h-2.5 w-2.5 text-emerald-500" />
+                <Check className="h-2.5 w-2.5 text-foreground" weight="bold" />
               ) : (
                 <Copy className="h-2.5 w-2.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
               )}
@@ -164,7 +164,7 @@ ${swatches}\n`;
             className="flex items-center gap-1 text-2xs text-muted-foreground hover:text-foreground transition-colors"
             title="Generate random palette"
           >
-            <Sparkles className="h-3 w-3 text-amber-500" />
+            <Sparkles className="h-3 w-3 text-foreground" />
             Shuffle
           </button>
 

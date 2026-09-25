@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ContextMenuPrimitive from "@radix-ui/react-context-menu";
-import { Check, ChevronRight, Circle } from "lucide-react";
+import { Check, CaretRight as ChevronRight, Circle } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils/cn";
 
 const ContextMenu = ContextMenuPrimitive.Root;
@@ -104,7 +104,7 @@ const ContextMenuCheckboxItem = React.forwardRef<
   >
     <span className="absolute left-2.5 flex h-3.5 w-3.5 items-center justify-center">
       <ContextMenuPrimitive.ItemIndicator>
-        <Check className="h-3.5 w-3.5 stroke-[2.5]" />
+        <Check className="h-3.5 w-3.5" weight="bold" />
       </ContextMenuPrimitive.ItemIndicator>
     </span>
     {children}
@@ -127,7 +127,7 @@ const ContextMenuRadioItem = React.forwardRef<
   >
     <span className="absolute left-2.5 flex h-3.5 w-3.5 items-center justify-center">
       <ContextMenuPrimitive.ItemIndicator>
-        <Circle className="h-2 w-2 fill-current" />
+        <Circle className="h-2 w-2" weight="fill" />
       </ContextMenuPrimitive.ItemIndicator>
     </span>
     {children}

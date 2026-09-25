@@ -3,7 +3,20 @@ import { Note } from "@/features/stash/types/note";
 import { NoteColor } from "@/features/stash/types/color";
 import { NoteWidgetData } from "@/features/widgets/types";
 import { emptyDoc, serializeStashContent, stashContentFromPlainText } from "@/features/editor/stash-content";
-import { setNoteEmoji, setNotePaper, PaperPattern } from "@/features/stash/note-meta";
+import {
+  setNoteEmoji,
+  setNotePaper,
+  setNoteFont,
+  setNoteFrame,
+  setNoteOpacity,
+  PaperPattern,
+} from "@/features/stash/note-meta";
+import {
+  readDefaultPaper,
+  readDefaultFontPersona,
+  readDefaultFrame,
+  readDefaultOpacity,
+} from "@/stores/ui-store";
 
 export interface CaptureRequest {
   /** Falls back to the user's default colour. */
@@ -55,8 +68,29 @@ export async function createAndOpenStash(
   }
   if (request.paper !== undefined) {
     setNotePaper(note.id, request.paper);
+  } else {
+    const defaultPaper = readDefaultPaper();
+    if (defaultPaper && defaultPaper !== "plain") {
+      setNotePaper(note.id, defaultPaper);
+    }
+  }
+
+  const defaultFont = readDefaultFontPersona();
+  if (defaultFont && defaultFont !== "sans") {
+    setNoteFont(note.id, defaultFont);
+  }
+
+  const defaultFrame = readDefaultFrame();
+  if (defaultFrame && defaultFrame !== "default") {
+    setNoteFrame(note.id, defaultFrame);
+  }
+
+  const defaultOpacity = readDefaultOpacity();
+  if (defaultOpacity && defaultOpacity < 100) {
+    setNoteOpacity(note.id, defaultOpacity);
   }
 
   await stashIpc.openFloatingStash(note.id);
   return note;
 }
+

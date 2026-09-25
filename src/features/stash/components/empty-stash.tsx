@@ -1,5 +1,5 @@
 import React from "react";
-import { Plus } from "lucide-react";
+import { Plus } from "@phosphor-icons/react";
 import { SidebarSection } from "@/features/stash/types/note";
 import { formatShortcut, SHORTCUTS } from "@/lib/keyboard/shortcuts";
 

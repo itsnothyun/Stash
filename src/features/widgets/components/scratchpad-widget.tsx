@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Check, Trash2, Play, Pause, RotateCcw, Flame, Sparkles } from "lucide-react";
+import { Plus, Check, Trash as Trash2, Play, Pause, ArrowCounterClockwise as RotateCcw, Flame, Sparkle as Sparkles } from "@phosphor-icons/react";
 import { WidgetInsertButton } from "./widget-insert-button";
 import { cn } from "@/lib/utils/cn";
 
@@ -86,13 +86,13 @@ export const ScratchpadWidget: React.FC<ScratchpadWidgetProps> = ({
   return (
     <div className={cn("flex flex-col gap-3 p-3 text-xs", className)}>
       {/* Top Banner: Pomodoro Timer & Streak */}
-      <div className="flex items-center justify-between gap-2 rounded-xl bg-amber-500/10 border border-amber-500/20 px-3 py-2">
+      <div className="flex items-center justify-between gap-2 rounded-xl bg-card border border-border/70 px-3 py-2 shadow-xs">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/20 text-amber-500 font-mono font-bold">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted text-foreground font-mono font-bold">
             <Sparkles className="h-3.5 w-3.5" />
           </div>
           <div>
-            <div className="text-[10px] uppercase font-bold tracking-wider text-amber-500">
+            <div className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
               Focus Pomodoro
             </div>
             <div className="font-mono text-sm font-semibold tracking-tight text-foreground">
@@ -105,16 +105,16 @@ export const ScratchpadWidget: React.FC<ScratchpadWidgetProps> = ({
           <button
             type="button"
             onClick={() => setTimerRunning((r) => !r)}
-            className="flex h-7 px-2.5 items-center gap-1 rounded-md bg-amber-500 text-black font-semibold text-[11px] shadow-xs hover:bg-amber-400 active:scale-95 transition-all"
+            className="flex h-7 px-2.5 items-center gap-1 rounded-md bg-foreground text-background font-semibold text-[11px] shadow-xs hover:opacity-90 active:scale-95 transition-all"
           >
             {timerRunning ? (
               <>
-                <Pause className="h-3 w-3 fill-current" />
+                <Pause className="h-3 w-3" weight="fill" />
                 <span>Pause</span>
               </>
             ) : (
               <>
-                <Play className="h-3 w-3 fill-current" />
+                <Play className="h-3 w-3" weight="fill" />
                 <span>Focus</span>
               </>
             )}
@@ -131,8 +131,8 @@ export const ScratchpadWidget: React.FC<ScratchpadWidgetProps> = ({
             <RotateCcw className="h-3 w-3" />
           </button>
           <div className="h-4 w-px bg-border/40 mx-0.5" />
-          <div className="flex items-center gap-1 rounded-full bg-orange-500/15 border border-orange-500/30 px-2 py-0.5 text-[10px] font-semibold text-orange-500">
-            <Flame className="h-3 w-3 fill-current" />
+          <div className="flex items-center gap-1 rounded-full bg-muted border border-border px-2 py-0.5 text-[10px] font-semibold text-foreground">
+            <Flame className="h-3 w-3" weight="fill" />
             <span>5d Streak</span>
           </div>
         </div>
@@ -177,11 +177,11 @@ export const ScratchpadWidget: React.FC<ScratchpadWidgetProps> = ({
                 className={cn(
                   "flex h-4 w-4 shrink-0 items-center justify-center rounded-md border transition-colors",
                   task.completed
-                    ? "bg-emerald-500 border-emerald-500 text-black shadow-xs"
+                    ? "bg-foreground border-foreground text-background shadow-xs"
                     : "border-muted-foreground/40 bg-muted/20 hover:border-foreground"
                 )}
               >
-                {task.completed && <Check className="h-2.5 w-2.5 stroke-[3]" />}
+                {task.completed && <Check className="h-2.5 w-2.5" weight="bold" />}
               </div>
               <span
                 className={cn(
@@ -214,15 +214,15 @@ export const ScratchpadWidget: React.FC<ScratchpadWidgetProps> = ({
             onChange={(e) => setNewTaskInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && addTask()}
             placeholder="Add priority task... (press Enter)"
-            className="flex-1 rounded-md border border-border bg-background/60 px-2.5 py-1 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-amber-500 shadow-2xs"
+            className="flex-1 rounded-md border border-border bg-background/60 px-2.5 py-1 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-primary/40 shadow-2xs"
           />
           <button
             type="button"
             onClick={addTask}
             disabled={!newTaskInput.trim()}
-            className="flex h-7 w-7 items-center justify-center rounded-md bg-amber-500 text-black font-semibold disabled:opacity-40 transition-colors shadow-2xs"
+            className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground text-background font-semibold disabled:opacity-40 transition-colors shadow-2xs cursor-pointer"
           >
-            <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
+            <Plus className="h-3.5 w-3.5" weight="bold" />
           </button>
         </div>
       </div>

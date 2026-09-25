@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Minus, Square, Copy, X } from "lucide-react";
+import { Minus, Square, CopySimple, X } from "@phosphor-icons/react";
 import {
   closeCurrentWindow,
   minimizeCurrentWindow,
@@ -111,7 +111,7 @@ export const WindowControls: React.FC<WindowControlsProps> = ({
             className={buttonClass}
           >
             {maximized ? (
-              <Copy className="h-3 w-3 -scale-y-100 rotate-90" />
+              <CopySimple className="h-3 w-3 -scale-y-100 rotate-90" />
             ) : (
               <Square className="h-2.5 w-2.5" />
             )}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, Star, BookOpen, Quote, Trash2 } from "lucide-react";
+import { Plus, Star, BookOpen, Quotes as Quote, Trash as Trash2 } from "@phosphor-icons/react";
 import { WidgetInsertButton } from "./widget-insert-button";
 import { cn } from "@/lib/utils/cn";
 
@@ -49,10 +49,10 @@ export const ReadingWidget: React.FC<ReadingWidgetProps> = ({
   return (
     <div className={cn("flex flex-col gap-3 p-3 text-xs", className)}>
       {/* Top Banner: Book Title, Author, Star Rating */}
-      <div className="flex flex-col gap-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 p-2.5">
+      <div className="flex flex-col gap-2 rounded-xl bg-card border border-border/70 p-2.5 shadow-xs">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground">
               <BookOpen className="h-4 w-4" />
             </div>
             <div className="flex flex-col flex-1 min-w-0">
@@ -86,10 +86,11 @@ export const ReadingWidget: React.FC<ReadingWidgetProps> = ({
                   className="p-0.5 cursor-pointer transition-transform hover:scale-110"
                 >
                   <Star
+                    weight={active ? "fill" : "regular"}
                     className={cn(
                       "h-3.5 w-3.5 transition-colors",
                       active
-                        ? "fill-amber-400 text-amber-400 drop-shadow-xs"
+                        ? "text-foreground drop-shadow-xs"
                         : "text-muted-foreground/40"
                     )}
                   />
@@ -100,12 +101,12 @@ export const ReadingWidget: React.FC<ReadingWidgetProps> = ({
         </div>
 
         {/* Reading Progress Slider */}
-        <div className="space-y-1 pt-1 border-t border-indigo-500/20">
+        <div className="space-y-1 pt-1 border-t border-border/40">
           <div className="flex justify-between items-center text-[10px]">
             <span className="font-semibold uppercase tracking-wider text-muted-foreground">
               Reading Progress
             </span>
-            <span className="font-mono font-bold text-indigo-400">{progressPct}%</span>
+            <span className="font-mono font-bold text-foreground">{progressPct}%</span>
           </div>
           <input
             type="range"
@@ -113,7 +114,7 @@ export const ReadingWidget: React.FC<ReadingWidgetProps> = ({
             max={100}
             value={progressPct}
             onChange={(e) => setProgressPct(Number(e.target.value))}
-            className="w-full accent-indigo-500 h-1.5 bg-muted rounded-lg cursor-pointer"
+            className="w-full accent-foreground h-1.5 bg-muted rounded-lg cursor-pointer"
           />
         </div>
       </div>
@@ -121,7 +122,7 @@ export const ReadingWidget: React.FC<ReadingWidgetProps> = ({
       {/* Standout Quote Callout */}
       <div className="relative rounded-lg border border-border bg-background/60 p-2.5 shadow-2xs space-y-1">
         <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          <Quote className="h-3 w-3 text-indigo-400" />
+          <Quote className="h-3 w-3 text-foreground" />
           <span>Standout Pull Quote</span>
         </div>
         <textarea
@@ -146,7 +147,7 @@ export const ReadingWidget: React.FC<ReadingWidgetProps> = ({
               className="group flex items-center justify-between gap-2 rounded-lg border border-border bg-background/70 px-2.5 py-1.5 shadow-2xs"
             >
               <div className="flex items-center gap-2 flex-1 min-w-0">
-                <div className="h-1.5 w-1.5 rounded-full bg-indigo-400 shrink-0" />
+                <div className="h-1.5 w-1.5 rounded-full bg-foreground shrink-0" />
                 <span className="text-xs text-foreground truncate">{point}</span>
               </div>
               <button
@@ -167,15 +168,15 @@ export const ReadingWidget: React.FC<ReadingWidgetProps> = ({
               onChange={(e) => setNewTakeaway(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && addTakeaway()}
               placeholder="Add key takeaway... (press Enter)"
-              className="flex-1 rounded-md border border-border bg-background/60 px-2.5 py-1 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-indigo-500 shadow-2xs"
+              className="flex-1 rounded-md border border-border bg-background/60 px-2.5 py-1 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-primary/40 shadow-2xs"
             />
             <button
               type="button"
               onClick={addTakeaway}
               disabled={!newTakeaway.trim()}
-              className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-500 text-white font-semibold disabled:opacity-40 transition-colors shadow-2xs"
+              className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground text-background font-semibold disabled:opacity-40 transition-colors shadow-2xs cursor-pointer"
             >
-              <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
+              <Plus className="h-3.5 w-3.5" weight="bold" />
             </button>
           </div>
         </div>

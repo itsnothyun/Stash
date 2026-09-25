@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, Minus, RotateCcw, Target } from "lucide-react";
+import { Plus, Minus, ArrowCounterClockwise as RotateCcw, Target } from "@phosphor-icons/react";
 import { WidgetInsertButton } from "./widget-insert-button";
 import { cn } from "@/lib/utils/cn";
 
@@ -69,7 +69,7 @@ export const CounterWidget: React.FC<CounterWidgetProps> = ({
         />
 
         <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-          <Target className="h-3 w-3 text-primary" />
+          <Target className="h-3 w-3 text-foreground" />
           <span>Goal:</span>
           <input
             type="number"

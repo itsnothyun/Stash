@@ -21,10 +21,10 @@ import { toBlob, toPng } from "html-to-image";
 import { toast } from "@/components/ui/toast";
 import {
   Camera,
-  Copy,
-  Download,
+  CopySimple as Copy,
+  DownloadSimple as Download,
   Check,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils/cn";
 import { StashLogo } from "@/components/shared/stash-logo";
 
@@ -396,7 +396,7 @@ export const NoteExportImageModal: React.FC<NoteExportImageModalProps> = ({
                                     : "border-current/40"
                                 )}
                               >
-                                {isTodoDone && <Check className="h-2 w-2 stroke-[3]" />}
+                                {isTodoDone && <Check className="h-2 w-2" weight="bold" />}
                               </span>
                               <span
                                 className={cn(

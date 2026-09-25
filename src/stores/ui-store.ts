@@ -1,6 +1,21 @@
 import { create } from "zustand";
 import { NoteColor } from "@/features/stash/types/color";
 import { SidebarSection } from "@/features/stash/types/note";
+import {
+  PaperPattern,
+  NoteFontPersona,
+  NoteFrameStyle,
+  DEFAULT_PAPER_KEY,
+  DEFAULT_FONT_PERSONA_KEY,
+  DEFAULT_FRAME_KEY,
+  DEFAULT_OPACITY_KEY,
+} from "@/features/stash/note-meta";
+import {
+  AppTheme,
+  TerminalUXSettings,
+  DEFAULT_TERMINAL_SETTINGS,
+  THEMES_LIST,
+} from "@/lib/themes/theme-definitions";
 
 const VIEW_MODE_KEY = "stash_view_mode";
 const SIDEBAR_KEY = "stash_sidebar_collapsed";
@@ -18,6 +33,21 @@ export const WIDGET_BADGES_KEY = "stash_show_widget_badges";
 export const USER_NAME_KEY = "stash_user_display_name";
 export const GREETING_KEY = "stash_show_greeting_header";
 
+// New settings keys
+export const EDITOR_FONT_SIZE_KEY = "stash_editor_font_size";
+export const EDITOR_LINE_HEIGHT_KEY = "stash_editor_line_height";
+export const EDITOR_SPELLCHECK_KEY = "stash_editor_spellcheck";
+export const AUTO_TITLE_KEY = "stash_auto_title_first_line";
+export const INLINE_MATH_KEY = "stash_inline_math_enabled";
+export const DIRECT_LINK_CLICK_KEY = "stash_direct_link_click";
+export const DEFAULT_WINDOW_SIZE_KEY = "stash_default_window_size";
+export const MASK_LOCKED_PREVIEWS_KEY = "stash_mask_locked_previews";
+export const AUTO_LOCK_TIMEOUT_KEY = "stash_auto_lock_timeout";
+export const THEME_KEY = "stash_app_theme";
+export const TERMINAL_SETTINGS_KEY = "stash_terminal_settings";
+
+export type { AppTheme, TerminalUXSettings };
+
 export const DEFAULT_ZOOM = 100;
 export const MIN_ZOOM = 70;
 export const MAX_ZOOM = 200;
@@ -27,6 +57,21 @@ export const ZOOM_PRESETS = [75, 90, 100, 110, 125, 150] as const;
 export type SortField = "updatedAt" | "createdAt" | "title" | "color" | "words";
 export type SortDir = "desc" | "asc";
 export type GroupBy = "none" | "color" | "month" | "pinned";
+
+export type SettingsTab =
+  | "general"
+  | "appearance"
+  | "personalization"
+  | "editor"
+  | "notes"
+  | "security"
+  | "shortcuts"
+  | "data"
+  | "about";
+
+export type EditorFontSize = "13px" | "14px" | "16px" | "18px";
+export type EditorLineHeight = "tight" | "normal" | "relaxed";
+export type DefaultWindowSize = "compact" | "standard" | "spacious";
 
 export type AccentColor =
   | "indigo"
@@ -222,6 +267,140 @@ export function readShowGreetingHeader(): boolean {
   return v !== "false";
 }
 
+export function readEditorFontSize(): EditorFontSize {
+  if (typeof localStorage === "undefined") return "14px";
+  const v = localStorage.getItem(EDITOR_FONT_SIZE_KEY);
+  return (v as EditorFontSize) || "14px";
+}
+
+export function readEditorLineHeight(): EditorLineHeight {
+  if (typeof localStorage === "undefined") return "normal";
+  const v = localStorage.getItem(EDITOR_LINE_HEIGHT_KEY);
+  return (v as EditorLineHeight) || "normal";
+}
+
+export function readEditorSpellcheck(): boolean {
+  if (typeof localStorage === "undefined") return true;
+  return localStorage.getItem(EDITOR_SPELLCHECK_KEY) !== "false";
+}
+
+export function readAutoTitle(): boolean {
+  if (typeof localStorage === "undefined") return true;
+  return localStorage.getItem(AUTO_TITLE_KEY) !== "false";
+}
+
+export function readInlineMath(): boolean {
+  if (typeof localStorage === "undefined") return true;
+  return localStorage.getItem(INLINE_MATH_KEY) !== "false";
+}
+
+export function readDirectLinkClick(): boolean {
+  if (typeof localStorage === "undefined") return false;
+  return localStorage.getItem(DIRECT_LINK_CLICK_KEY) === "true";
+}
+
+export function readDefaultPaper(): PaperPattern {
+  if (typeof localStorage === "undefined") return "plain";
+  const v = localStorage.getItem(DEFAULT_PAPER_KEY);
+  return (v as PaperPattern) || "plain";
+}
+
+export function readDefaultFontPersona(): NoteFontPersona {
+  if (typeof localStorage === "undefined") return "sans";
+  const v = localStorage.getItem(DEFAULT_FONT_PERSONA_KEY);
+  return (v as NoteFontPersona) || "sans";
+}
+
+export function readDefaultFrame(): NoteFrameStyle {
+  if (typeof localStorage === "undefined") return "default";
+  const v = localStorage.getItem(DEFAULT_FRAME_KEY);
+  return (v as NoteFrameStyle) || "default";
+}
+
+export function readDefaultOpacity(): number {
+  if (typeof localStorage === "undefined") return 100;
+  const v = localStorage.getItem(DEFAULT_OPACITY_KEY);
+  const parsed = v ? parseInt(v, 10) : 100;
+  return isNaN(parsed) ? 100 : parsed;
+}
+
+export function readDefaultWindowSize(): DefaultWindowSize {
+  if (typeof localStorage === "undefined") return "standard";
+  const v = localStorage.getItem(DEFAULT_WINDOW_SIZE_KEY);
+  return (v as DefaultWindowSize) || "standard";
+}
+
+export function readMaskLockedPreviews(): boolean {
+  if (typeof localStorage === "undefined") return true;
+  return localStorage.getItem(MASK_LOCKED_PREVIEWS_KEY) !== "false";
+}
+
+export function readAutoLockTimeout(): number {
+  if (typeof localStorage === "undefined") return 15;
+  const v = localStorage.getItem(AUTO_LOCK_TIMEOUT_KEY);
+  const parsed = v ? parseInt(v, 10) : 15;
+  return isNaN(parsed) ? 15 : parsed;
+}
+
+export function readTheme(): AppTheme {
+  if (typeof localStorage === "undefined") return "dark";
+  const v = localStorage.getItem(THEME_KEY);
+  return (v as AppTheme) || "dark";
+}
+
+export function readTerminalSettings(): TerminalUXSettings {
+  if (typeof localStorage === "undefined") return DEFAULT_TERMINAL_SETTINGS;
+  try {
+    const raw = localStorage.getItem(TERMINAL_SETTINGS_KEY);
+    if (raw) return { ...DEFAULT_TERMINAL_SETTINGS, ...JSON.parse(raw) };
+  } catch {
+    /* ignore */
+  }
+  return DEFAULT_TERMINAL_SETTINGS;
+}
+
+export function applyThemeToDocument(theme: AppTheme, terminalSettings?: TerminalUXSettings) {
+  if (typeof document === "undefined") return;
+  const root = document.documentElement;
+
+  let effectiveTheme = theme;
+  if (theme === "system") {
+    const prefersDark =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    effectiveTheme = prefersDark ? "dark" : "light";
+  }
+
+  root.setAttribute("data-theme", effectiveTheme);
+
+  const themeDef = THEMES_LIST.find((t) => t.id === effectiveTheme);
+  const isDark = themeDef ? themeDef.isDark : effectiveTheme !== "light";
+
+  if (isDark) {
+    root.classList.add("dark");
+  } else {
+    root.classList.remove("dark");
+  }
+
+  const tSettings = terminalSettings || readTerminalSettings();
+  if (tSettings.sharpBorders || themeDef?.isTerminalStyle) {
+    root.setAttribute("data-terminal-sharp", "true");
+  } else {
+    root.removeAttribute("data-terminal-sharp");
+  }
+
+  if (tSettings.glowEffects) {
+    root.setAttribute("data-terminal-glow", "true");
+  } else {
+    root.removeAttribute("data-terminal-glow");
+  }
+
+  if (themeDef?.recommendedFont && (effectiveTheme === "terminal" || effectiveTheme === "amber-crt")) {
+    root.setAttribute("data-font", "mono");
+  }
+}
+
 export function applyAccentToDocument(accent: AccentColor) {
   if (typeof document === "undefined") return;
   const def = ACCENT_COLORS.find((a) => a.id === accent) || ACCENT_COLORS[0];
@@ -244,11 +423,29 @@ export function applyDensityToDocument(density: CardDensity) {
   document.documentElement.setAttribute("data-density", density);
 }
 
+export function applyEditorStylesToDocument(fontSize: EditorFontSize, lineHeight: EditorLineHeight) {
+  if (typeof document === "undefined") return;
+  const root = document.documentElement;
+  root.style.setProperty("--stash-editor-font-size", fontSize);
+  const lhMap: Record<EditorLineHeight, string> = {
+    tight: "1.375",
+    normal: "1.625",
+    relaxed: "1.875",
+  };
+  root.style.setProperty("--stash-editor-line-height", lhMap[lineHeight] || "1.625");
+}
+
 export function applyZoomToDocument(level: number) {
   const factor = level / 100;
+  const isTauriRuntime = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 
-  // 1. Native Tauri webview zoom (hardware-accelerated Webview2 scaling)
-  if (typeof window !== "undefined" && "__TAURI_INTERNALS__" in window) {
+  if (isTauriRuntime) {
+    // Native Tauri webview zoom (hardware-accelerated Webview2 scaling). This
+    // scales pointer hit-testing along with rendering, so it must be the only
+    // zoom mechanism in Tauri — stacking CSS zoom on top double-compounds the
+    // scale and desyncs click coordinates from Radix Portal content (dropdown
+    // menus render at their trigger's getBoundingClientRect(), computed once,
+    // and go stale against a second, independently-timed zoom layer).
     import("@tauri-apps/api/webview")
       .then(({ getCurrentWebview }) => {
         const webview = getCurrentWebview();
@@ -257,9 +454,10 @@ export function applyZoomToDocument(level: number) {
         }
       })
       .catch(() => {});
+    return;
   }
 
-  // 2. CSS zoom applied to both documentElement and body
+  // Browser fallback: no native zoom API, so use CSS zoom instead.
   if (typeof document !== "undefined") {
     const zoomStr = String(factor);
     document.documentElement.style.zoom = zoomStr;
@@ -274,6 +472,8 @@ applyZoomToDocument(readZoomLevel());
 applyAccentToDocument(readAccentColor());
 applyFontToDocument(readFontFamily());
 applyDensityToDocument(readCardDensity());
+applyEditorStylesToDocument(readEditorFontSize(), readEditorLineHeight());
+applyThemeToDocument(readTheme(), readTerminalSettings());
 
 // Broadcast channel to sync UI preferences across open Tauri windows
 let syncChannel: BroadcastChannel | null = null;
@@ -300,7 +500,8 @@ interface UIState {
   selectedNoteId: string | null;
   commandPaletteOpen: boolean;
   settingsOpen: boolean;
-  theme: "system" | "light" | "dark";
+  theme: AppTheme;
+  terminalSettings: TerminalUXSettings;
   zoomLevel: number;
   sortField: SortField;
   sortDir: SortDir;
@@ -320,6 +521,28 @@ interface UIState {
   userDisplayName: string;
   showGreetingHeader: boolean;
 
+  // New Editor & Writing settings
+  editorFontSize: EditorFontSize;
+  editorLineHeight: EditorLineHeight;
+  editorSpellcheck: boolean;
+  autoTitleFromFirstLine: boolean;
+  inlineMathEnabled: boolean;
+  directLinkClick: boolean;
+
+  // New Note & Floating Window defaults
+  defaultPaper: PaperPattern;
+  defaultFontPersona: NoteFontPersona;
+  defaultFrame: NoteFrameStyle;
+  defaultOpacity: number;
+  defaultWindowSize: DefaultWindowSize;
+
+  // New Security & Privacy settings
+  maskLockedPreviews: boolean;
+  autoLockTimeout: number;
+
+  // Settings initial tab navigation
+  settingsInitialTab: SettingsTab | null;
+
   setRoute: (route: LibraryRoute) => void;
   setActiveSection: (section: SidebarSection) => void;
   setSelectedTagId: (tagId: string | null) => void;
@@ -331,7 +554,10 @@ interface UIState {
   setSelectedNoteId: (id: string | null) => void;
   setCommandPaletteOpen: (open: boolean) => void;
   setSettingsOpen: (open: boolean) => void;
-  setTheme: (theme: "system" | "light" | "dark") => void;
+  setSettingsInitialTab: (tab: SettingsTab | null) => void;
+  openSettingsToTab: (tab: SettingsTab) => void;
+  setTheme: (theme: AppTheme, broadcast?: boolean) => void;
+  setTerminalSettings: (settings: Partial<TerminalUXSettings>, broadcast?: boolean) => void;
   setZoomLevel: (level: number, broadcast?: boolean) => void;
   zoomIn: () => void;
   zoomOut: () => void;
@@ -353,6 +579,25 @@ interface UIState {
   setShowWidgetBadges: (show: boolean) => void;
   setUserDisplayName: (name: string) => void;
   setShowGreetingHeader: (show: boolean) => void;
+
+  // Editor setters
+  setEditorFontSize: (size: EditorFontSize, broadcast?: boolean) => void;
+  setEditorLineHeight: (height: EditorLineHeight, broadcast?: boolean) => void;
+  setEditorSpellcheck: (spellcheck: boolean, broadcast?: boolean) => void;
+  setAutoTitleFromFirstLine: (autoTitle: boolean) => void;
+  setInlineMathEnabled: (enabled: boolean) => void;
+  setDirectLinkClick: (direct: boolean) => void;
+
+  // Note default setters
+  setDefaultPaper: (paper: PaperPattern) => void;
+  setDefaultFontPersona: (font: NoteFontPersona) => void;
+  setDefaultFrame: (frame: NoteFrameStyle) => void;
+  setDefaultOpacity: (opacity: number) => void;
+  setDefaultWindowSize: (size: DefaultWindowSize) => void;
+
+  // Security setters
+  setMaskLockedPreviews: (mask: boolean, broadcast?: boolean) => void;
+  setAutoLockTimeout: (timeout: number) => void;
 }
 
 export const useUIStore = create<UIState>((set, get) => ({
@@ -367,7 +612,9 @@ export const useUIStore = create<UIState>((set, get) => ({
   selectedNoteId: null,
   commandPaletteOpen: false,
   settingsOpen: false,
-  theme: "system",
+  settingsInitialTab: null,
+  theme: readTheme(),
+  terminalSettings: readTerminalSettings(),
   zoomLevel: readZoomLevel(),
   sortField: readSort().field,
   sortDir: readSort().dir,
@@ -385,6 +632,22 @@ export const useUIStore = create<UIState>((set, get) => ({
   showWidgetBadges: readShowWidgetBadges(),
   userDisplayName: readUserDisplayName(),
   showGreetingHeader: readShowGreetingHeader(),
+
+  editorFontSize: readEditorFontSize(),
+  editorLineHeight: readEditorLineHeight(),
+  editorSpellcheck: readEditorSpellcheck(),
+  autoTitleFromFirstLine: readAutoTitle(),
+  inlineMathEnabled: readInlineMath(),
+  directLinkClick: readDirectLinkClick(),
+
+  defaultPaper: readDefaultPaper(),
+  defaultFontPersona: readDefaultFontPersona(),
+  defaultFrame: readDefaultFrame(),
+  defaultOpacity: readDefaultOpacity(),
+  defaultWindowSize: readDefaultWindowSize(),
+
+  maskLockedPreviews: readMaskLockedPreviews(),
+  autoLockTimeout: readAutoLockTimeout(),
 
   setRoute: (route) => set({ route }),
   setActiveSection: (section) =>
@@ -411,16 +674,27 @@ export const useUIStore = create<UIState>((set, get) => ({
   setSelectedNoteId: (selectedNoteId) => set({ selectedNoteId }),
   setCommandPaletteOpen: (commandPaletteOpen) => set({ commandPaletteOpen }),
   setSettingsOpen: (settingsOpen) => set({ settingsOpen }),
-  setTheme: (theme) => {
+  setSettingsInitialTab: (tab) => set({ settingsInitialTab: tab }),
+  openSettingsToTab: (tab) => set({ settingsOpen: true, settingsInitialTab: tab }),
+  setTheme: (theme, broadcast = true) => {
     set({ theme });
-    const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else if (theme === "light") {
-      root.classList.remove("dark");
-    } else {
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      root.classList.toggle("dark", prefersDark);
+    applyThemeToDocument(theme, get().terminalSettings);
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(THEME_KEY, theme);
+    }
+    if (broadcast && syncChannel) {
+      syncChannel.postMessage({ type: "theme", theme });
+    }
+  },
+  setTerminalSettings: (patch, broadcast = true) => {
+    const updated = { ...get().terminalSettings, ...patch };
+    set({ terminalSettings: updated });
+    applyThemeToDocument(get().theme, updated);
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(TERMINAL_SETTINGS_KEY, JSON.stringify(updated));
+    }
+    if (broadcast && syncChannel) {
+      syncChannel.postMessage({ type: "terminalSettings", terminalSettings: updated });
     }
   },
   setZoomLevel: (level, broadcast = true) => {
@@ -544,6 +818,119 @@ export const useUIStore = create<UIState>((set, get) => ({
     }
     set({ showGreetingHeader: show });
   },
+
+  setEditorFontSize: (fontSize, broadcast = true) => {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(EDITOR_FONT_SIZE_KEY, fontSize);
+    }
+    applyEditorStylesToDocument(fontSize, get().editorLineHeight);
+    if (broadcast && syncChannel) {
+      syncChannel.postMessage({
+        type: "editor_styles",
+        fontSize,
+        lineHeight: get().editorLineHeight,
+      });
+    }
+    set({ editorFontSize: fontSize });
+  },
+
+  setEditorLineHeight: (lineHeight, broadcast = true) => {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(EDITOR_LINE_HEIGHT_KEY, lineHeight);
+    }
+    applyEditorStylesToDocument(get().editorFontSize, lineHeight);
+    if (broadcast && syncChannel) {
+      syncChannel.postMessage({
+        type: "editor_styles",
+        fontSize: get().editorFontSize,
+        lineHeight,
+      });
+    }
+    set({ editorLineHeight: lineHeight });
+  },
+
+  setEditorSpellcheck: (spellcheck, broadcast = true) => {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(EDITOR_SPELLCHECK_KEY, String(spellcheck));
+    }
+    if (broadcast && syncChannel) {
+      syncChannel.postMessage({ type: "editor_spellcheck", spellcheck });
+    }
+    set({ editorSpellcheck: spellcheck });
+  },
+
+  setAutoTitleFromFirstLine: (autoTitle) => {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(AUTO_TITLE_KEY, String(autoTitle));
+    }
+    set({ autoTitleFromFirstLine: autoTitle });
+  },
+
+  setInlineMathEnabled: (enabled) => {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(INLINE_MATH_KEY, String(enabled));
+    }
+    set({ inlineMathEnabled: enabled });
+  },
+
+  setDirectLinkClick: (direct) => {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(DIRECT_LINK_CLICK_KEY, String(direct));
+    }
+    set({ directLinkClick: direct });
+  },
+
+  setDefaultPaper: (paper) => {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(DEFAULT_PAPER_KEY, paper);
+    }
+    set({ defaultPaper: paper });
+  },
+
+  setDefaultFontPersona: (font) => {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(DEFAULT_FONT_PERSONA_KEY, font);
+    }
+    set({ defaultFontPersona: font });
+  },
+
+  setDefaultFrame: (frame) => {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(DEFAULT_FRAME_KEY, frame);
+    }
+    set({ defaultFrame: frame });
+  },
+
+  setDefaultOpacity: (opacity) => {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(DEFAULT_OPACITY_KEY, String(opacity));
+    }
+    set({ defaultOpacity: opacity });
+  },
+
+  setDefaultWindowSize: (size) => {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(DEFAULT_WINDOW_SIZE_KEY, size);
+    }
+    set({ defaultWindowSize: size });
+  },
+
+  setMaskLockedPreviews: (mask, broadcast = true) => {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(MASK_LOCKED_PREVIEWS_KEY, String(mask));
+    }
+    if (broadcast && syncChannel) {
+      syncChannel.postMessage({ type: "mask_previews", mask });
+    }
+    set({ maskLockedPreviews: mask });
+  },
+
+  setAutoLockTimeout: (timeout) => {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(AUTO_LOCK_TIMEOUT_KEY, String(timeout));
+    }
+    set({ autoLockTimeout: timeout });
+  },
 }));
 
 if (syncChannel) {
@@ -562,6 +949,24 @@ if (syncChannel) {
     } else if (data.type === "density" && typeof data.cardDensity === "string") {
       applyDensityToDocument(data.cardDensity);
       useUIStore.setState({ cardDensity: data.cardDensity });
+    } else if (data.type === "editor_styles") {
+      applyEditorStylesToDocument(data.fontSize, data.lineHeight);
+      useUIStore.setState({
+        editorFontSize: data.fontSize,
+        editorLineHeight: data.lineHeight,
+      });
+    } else if (data.type === "editor_spellcheck") {
+      useUIStore.setState({ editorSpellcheck: data.spellcheck });
+    } else if (data.type === "mask_previews") {
+      useUIStore.setState({ maskLockedPreviews: data.mask });
+    } else if (data.type === "theme" && typeof data.theme === "string") {
+      const currentTerminal = useUIStore.getState().terminalSettings;
+      applyThemeToDocument(data.theme as AppTheme, currentTerminal);
+      useUIStore.setState({ theme: data.theme as AppTheme });
+    } else if (data.type === "terminalSettings" && data.terminalSettings) {
+      const currentTheme = useUIStore.getState().theme;
+      applyThemeToDocument(currentTheme, data.terminalSettings);
+      useUIStore.setState({ terminalSettings: data.terminalSettings });
     }
   };
 }

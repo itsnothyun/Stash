@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, Check } from "lucide-react";
+import { Plus, Check } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils/cn";
 
 interface WidgetInsertButtonProps {
@@ -29,7 +29,7 @@ export const WidgetInsertButton: React.FC<WidgetInsertButtonProps> = ({
   };
 
   const defaultIcon = icon || (
-    <Plus className="h-3.5 w-3.5 stroke-[2.5] shrink-0" />
+    <Plus className="h-3.5 w-3.5 shrink-0" weight="bold" />
   );
 
   if (variant === "compact") {
@@ -46,7 +46,7 @@ export const WidgetInsertButton: React.FC<WidgetInsertButtonProps> = ({
       >
         {isInserted ? (
           <>
-            <Check className="h-3 w-3 text-emerald-400 stroke-[2.5] animate-in zoom-in-75 shrink-0" />
+            <Check className="h-3 w-3 text-background animate-in zoom-in-75 shrink-0" weight="bold" />
             <span className="font-semibold">{insertedLabel}</span>
           </>
         ) : (
@@ -68,14 +68,14 @@ export const WidgetInsertButton: React.FC<WidgetInsertButtonProps> = ({
         className={cn(
           "group flex items-center gap-1 text-[11px] font-medium transition-colors select-none cursor-pointer",
           isInserted
-            ? "text-emerald-500 font-semibold"
+            ? "text-foreground font-semibold"
             : "text-muted-foreground hover:text-foreground underline decoration-muted-foreground/40 hover:decoration-foreground",
           className
         )}
       >
         {isInserted ? (
           <>
-            <Check className="h-3 w-3 text-emerald-500 stroke-[2.5] shrink-0" />
+            <Check className="h-3 w-3 text-foreground shrink-0" weight="bold" />
             <span>{insertedLabel}</span>
           </>
         ) : (
@@ -100,7 +100,7 @@ export const WidgetInsertButton: React.FC<WidgetInsertButtonProps> = ({
     >
       {isInserted ? (
         <span className="flex items-center gap-1.5 animate-in fade-in zoom-in-90 duration-150">
-          <Check className="h-3.5 w-3.5 text-emerald-400 stroke-[2.5] shrink-0" />
+          <Check className="h-3.5 w-3.5 text-background shrink-0" weight="bold" />
           <span className="font-semibold">{insertedLabel}</span>
         </span>
       ) : (

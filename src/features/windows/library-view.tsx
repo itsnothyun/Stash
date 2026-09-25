@@ -38,36 +38,44 @@ import {
 } from "@/components/ui/context-menu";
 import {
   Archive,
-  Calendar,
+  CalendarBlank,
   Check,
-  Clipboard,
+  ClipboardText,
+  DownloadSimple,
   FileText,
-  Layers2,
-  LayoutGrid,
-  Layers,
+  Keyboard,
+  SquaresFour,
   List as ListIcon,
-  ListChecks,
-  ListTodo,
+  Stack,
+  CheckSquareOffset,
+  LockSimple,
   Palette,
-  PanelLeft,
-  Pin,
+  SidebarSimple,
+  PushPin,
   Plus,
-  RefreshCw,
-  Settings as SettingsIcon,
-  SortAsc,
-  SortDesc,
+  ArrowClockwise,
+  GearSix,
+  SortAscending,
+  SortDescending,
   Star,
-  Trash2,
+  Trash,
   X,
-  Filter,
-  RotateCcw,
-} from "lucide-react";
+  Funnel,
+  ArrowCounterClockwise,
+} from "@phosphor-icons/react";
 import {
   openOrCreateTodayStash,
   findTodayNote,
   isTodayTitle,
 } from "@/features/stash/daily-stash";
-import { hasNotePin, hasNoteWidgets } from "@/features/stash/note-meta";
+import {
+  hasNotePin,
+  hasNoteWidgets,
+  getProtectedNotesCount,
+  lockAllProtectedNotes,
+} from "@/features/stash/note-meta";
+import { downloadMarkdownArchive } from "@/lib/utils/markdown-export";
+import { playClickSound } from "@/lib/utils/sound-effects";
 import { FilterSortControl } from "./components/filter-sort-control";
 import { getSystemUsername, getQuirkyGreeting } from "@/lib/utils/greetings";
 import { cn } from "@/lib/utils/cn";
@@ -80,7 +88,7 @@ interface LibraryViewProps {
 interface NavItem {
   id: SidebarSection;
   label: string;
-  icon: typeof Layers;
+  icon: React.ComponentType<{ className?: string; weight?: any }>;
 }
 
 /** Grouped like the rest of the shell: what you keep, then where it goes. */
@@ -88,9 +96,9 @@ const NAV_GROUPS: { heading: string; items: NavItem[] }[] = [
   {
     heading: "Library",
     items: [
-      { id: "all", label: "All Notes", icon: Layers },
-      { id: "todos", label: "To-dos", icon: ListChecks },
-      { id: "pinned", label: "Pinned", icon: Pin },
+      { id: "all", label: "All Notes", icon: Stack },
+      { id: "todos", label: "To-dos", icon: CheckSquareOffset },
+      { id: "pinned", label: "Pinned", icon: PushPin },
       { id: "favorites", label: "Favorites", icon: Star },
     ],
   },
@@ -98,7 +106,7 @@ const NAV_GROUPS: { heading: string; items: NavItem[] }[] = [
     heading: "Storage",
     items: [
       { id: "archive", label: "Archive", icon: Archive },
-      { id: "trash", label: "Trash", icon: Trash2 },
+      { id: "trash", label: "Trash", icon: Trash },
     ],
   },
 ];
@@ -118,6 +126,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
   onCapture,
 }) => {
   const {
+    theme,
     activeSection,
     setActiveSection,
     selectedTagId,
@@ -134,6 +143,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
     selectedNoteId,
     setSelectedNoteId,
     setSettingsOpen,
+    openSettingsToTab,
     sortField,
     sortDir,
     setSort,
@@ -151,6 +161,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
   const [tags, setTags] = useState<Tag[]>([]);
   const [includeArchived, setIncludeArchived] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [protectedNotesCount, setProtectedNotesCount] = useState<number>(() => getProtectedNotesCount());
   const [pendingDelete, setPendingDelete] = useState<Note | null>(null);
   const [confirmEmptyTrash, setConfirmEmptyTrash] = useState(false);
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
@@ -162,6 +173,11 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
 
   const activeUsername = (userDisplayName && userDisplayName.trim().length > 0) ? userDisplayName.trim() : username;
   const quirkyGreeting = useMemo(() => getQuirkyGreeting(activeUsername), [activeUsername]);
+  const isTerminal =
+    theme === "terminal" ||
+    theme === "amber-crt" ||
+    theme === "cyberpunk" ||
+    theme === "e-ink";
 
   const isSearching = searchQuery.trim().length > 0;
 
@@ -266,6 +282,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
 
     const handleMeta = () => {
       setNotes((prev) => [...prev]);
+      setProtectedNotesCount(getProtectedNotesCount());
     };
     window.addEventListener("stash:note-meta-changed", handleMeta);
 
@@ -716,14 +733,14 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                               "h-4 w-4 shrink-0",
                               isActive ? "text-foreground" : "text-muted-foreground"
                             )}
-                            strokeWidth={1.75}
+                            weight={isActive ? "bold" : "regular"}
                           />
                           {!sidebarCollapsed && <span>{item.label}</span>}
                         </button>
                       </ContextMenuTrigger>
                       <ContextMenuContent className="w-48">
                         <div className="flex items-center gap-1.5 px-2.5 py-1.5 border-b border-border/50 text-[11px] font-semibold text-foreground truncate select-none">
-                          <Icon className="h-3.5 w-3.5 text-primary shrink-0" />
+                          <Icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" weight="regular" />
                           <span>{item.label}</span>
                         </div>
                         <ContextMenuItem onClick={() => goToSection(item.id)}>
@@ -731,7 +748,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                           <span>Open {item.label}</span>
                         </ContextMenuItem>
                         <ContextMenuItem onClick={() => void handleRefreshLibrary()}>
-                          <RefreshCw className="mr-2 h-3.5 w-3.5 text-primary" />
+                          <ArrowClockwise className="mr-2 h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
                           <span>Refresh Library</span>
                           <ContextMenuShortcut>F5</ContextMenuShortcut>
                         </ContextMenuItem>
@@ -743,7 +760,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                               onClick={() => setConfirmEmptyTrash(true)}
                               className="text-destructive focus:bg-destructive/10 focus:text-destructive"
                             >
-                              <Trash2 className="mr-2 h-3.5 w-3.5" />
+                              <Trash className="mr-2 h-3.5 w-3.5" />
                               <span>Empty Trash</span>
                             </ContextMenuItem>
                           </>
@@ -766,7 +783,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                                 }
                               }}
                             >
-                              <Plus className="mr-2 h-3.5 w-3.5 text-primary" />
+                              <Plus className="mr-2 h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
                               <span>New Note here</span>
                             </ContextMenuItem>
                           </>
@@ -793,18 +810,57 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
           )}
         </nav>
 
-        <div className="border-t border-sidebar-border p-2.5">
+        <div className="border-t border-sidebar-border p-2.5 space-y-1">
+          {protectedNotesCount > 0 && (
+            <button
+              onClick={() => {
+                lockAllProtectedNotes();
+                playClickSound();
+                toast.show({
+                  message: "Vault locked",
+                  description: "All protected stashes are now locked.",
+                });
+              }}
+              title={sidebarCollapsed ? "Lock all protected stashes" : undefined}
+              className={cn(
+                "flex w-full items-center gap-2.5 rounded-sm px-2 py-[7px] text-xs font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-hover hover:text-foreground",
+                sidebarCollapsed && "justify-center px-0"
+              )}
+            >
+              <LockSimple className="h-4 w-4 shrink-0 text-muted-foreground" />
+              {!sidebarCollapsed && (
+                <>
+                  <span>Lock Vault</span>
+                  <span className="ml-auto rounded-xs bg-muted text-foreground/80 px-1.5 py-0.2 font-mono text-[9px] font-semibold border border-border/50">
+                    {protectedNotesCount}
+                  </span>
+                </>
+              )}
+            </button>
+          )}
+
           <button
-            onClick={() => setSettingsOpen(true)}
+            onClick={() => openSettingsToTab("shortcuts")}
+            title={sidebarCollapsed ? "Keyboard Shortcuts" : undefined}
+            className={cn(
+                "flex w-full items-center gap-2.5 rounded-sm px-2 py-[7px] text-xs font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-hover hover:text-foreground",
+              sidebarCollapsed && "justify-center px-0"
+            )}
+          >
+            <Keyboard className="h-4 w-4 shrink-0 text-muted-foreground" />
+            {!sidebarCollapsed && <span>Shortcuts</span>}
+          </button>
+
+          <button
+            onClick={() => openSettingsToTab("general")}
             title={sidebarCollapsed ? "Settings" : undefined}
             className={cn(
               "flex w-full items-center gap-2.5 rounded-sm px-2 py-[7px] text-xs font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-hover hover:text-foreground",
               sidebarCollapsed && "justify-center px-0"
             )}
           >
-            <SettingsIcon
+            <GearSix
               className="h-4 w-4 shrink-0 text-muted-foreground"
-              strokeWidth={1.75}
             />
             {!sidebarCollapsed && (
               <>
@@ -826,7 +882,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
       </div>
 
       <ContextMenuItem onClick={() => void handleRefreshLibrary()}>
-        <RefreshCw className="mr-2 h-3.5 w-3.5 text-primary" />
+        <ArrowClockwise className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
         <span>Refresh Library</span>
         <ContextMenuShortcut>F5</ContextMenuShortcut>
       </ContextMenuItem>
@@ -834,20 +890,20 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
       <ContextMenuSeparator />
 
       <ContextMenuItem onClick={() => void onCapture()}>
-        <Plus className="mr-2 h-3.5 w-3.5 text-primary" />
+        <Plus className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
         <span>New Stash Note</span>
         <ContextMenuShortcut>Ctrl+N</ContextMenuShortcut>
       </ContextMenuItem>
 
       <ContextMenuItem onClick={handleOpenTodayStash}>
-        <Calendar className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+        <CalendarBlank className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
         <span>Today's Daily Stash</span>
       </ContextMenuItem>
 
       {/* Templates */}
       <ContextMenuSub>
         <ContextMenuSubTrigger>
-          <FileText className="mr-2 h-3.5 w-3.5 text-purple-500" />
+          <FileText className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
           <span>New from Template</span>
         </ContextMenuSubTrigger>
         <ContextMenuSubContent className="w-52">
@@ -873,13 +929,8 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 }}
                 className="flex items-center gap-2 cursor-pointer py-1.5"
               >
-                <div
-                  className={cn(
-                    "flex h-5 w-5 shrink-0 items-center justify-center rounded",
-                    tmpl.iconBg
-                  )}
-                >
-                  <Icon className={cn("h-3.5 w-3.5", tmpl.iconColor)} />
+                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-muted/60 text-foreground">
+                  <Icon className="h-3.5 w-3.5 text-foreground/80" />
                 </div>
                 <span>{tmpl.name}</span>
               </ContextMenuItem>
@@ -893,7 +944,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
       {/* Quick Navigation Submenu */}
       <ContextMenuSub>
         <ContextMenuSubTrigger>
-          <Layers className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+          <Stack className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
           <span>Go to View</span>
         </ContextMenuSubTrigger>
         <ContextMenuSubContent className="w-48">
@@ -912,7 +963,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                   <span>{item.label}</span>
                 </div>
                 {isActive && (
-                  <Check className="h-3 w-3 stroke-[2.5] text-primary" />
+                  <Check className="h-3 w-3 text-foreground" />
                 )}
               </ContextMenuItem>
             );
@@ -921,14 +972,14 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
       </ContextMenuSub>
 
       <ContextMenuItem onClick={toggleSidebar}>
-        <PanelLeft className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+        <SidebarSimple className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
         <span>{sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}</span>
       </ContextMenuItem>
 
       <ContextMenuSeparator />
 
       <ContextMenuItem onClick={() => setSettingsOpen(true)}>
-        <SettingsIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+        <GearSix className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
         <span>Settings</span>
         <ContextMenuShortcut>Ctrl+,</ContextMenuShortcut>
       </ContextMenuItem>
@@ -948,7 +999,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
               aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
               className="flex h-7 w-7 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
             >
-              <PanelLeft className="h-3.5 w-3.5" />
+              <SidebarSimple className="h-3.5 w-3.5" />
             </button>
             <span className="truncate text-xs font-medium text-muted-foreground">
               {sectionTitle}
@@ -982,9 +1033,17 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
               </>
             ) : (
               <>
-                <h1 className="text-[1.375rem] font-semibold tracking-tight">
-                  {sectionTitle}
-                </h1>
+                <div className="flex items-center gap-2.5">
+                  <h1 className="text-[1.375rem] font-semibold tracking-tight">
+                    {isTerminal ? `> ${sectionTitle.toLowerCase()}` : sectionTitle}
+                  </h1>
+                  {isTerminal && (
+                    <span className="font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 rounded border border-brand/40 bg-brand/10 text-brand font-semibold select-none flex items-center gap-1.5 shadow-xs">
+                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand animate-pulse" />
+                      <span>TTY: STASH-SHELL</span>
+                    </span>
+                  )}
+                </div>
                 <p className="mt-0.5 text-xs text-muted-foreground">
                   {isLoading
                     ? "Loading…"
@@ -1065,7 +1124,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 ) : (
                   <div className="flex flex-col items-center justify-center py-20 text-center">
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted/60 text-muted-foreground mb-3">
-                      <Filter className="h-6 w-6 stroke-[1.5]" />
+                      <Funnel className="h-6 w-6 text-muted-foreground/60" />
                     </div>
                     <p className="text-sm font-medium text-foreground">No stashes match your filters</p>
                     <p className="text-xs text-muted-foreground mt-1 max-w-xs">
@@ -1080,7 +1139,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                       }}
                       className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors cursor-pointer"
                     >
-                      <RotateCcw className="h-3.5 w-3.5" />
+                      <ArrowCounterClockwise className="h-3.5 w-3.5" />
                       Reset All Filters
                     </button>
                   </div>
@@ -1112,7 +1171,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
 
           <ContextMenuContent className="w-56">
             <ContextMenuItem onClick={() => void handleRefreshLibrary()}>
-              <RefreshCw className="mr-2 h-3.5 w-3.5 text-primary" />
+              <ArrowClockwise className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
               <span>Refresh Library</span>
               <ContextMenuShortcut>F5</ContextMenuShortcut>
             </ContextMenuItem>
@@ -1120,7 +1179,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             <ContextMenuSeparator />
 
             <ContextMenuItem onClick={() => void onCapture()}>
-              <Plus className="mr-2 h-3.5 w-3.5 text-primary" />
+              <Plus className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
               <span>New Stash Note</span>
               <ContextMenuShortcut>Ctrl+N</ContextMenuShortcut>
             </ContextMenuItem>
@@ -1133,7 +1192,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 });
               }}
             >
-              <ListTodo className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+              <CheckSquareOffset className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
               <span>New To-do Checklist</span>
             </ContextMenuItem>
 
@@ -1152,14 +1211,14 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 }
               }}
             >
-              <Clipboard className="mr-2 h-3.5 w-3.5 text-sky-500" />
+              <ClipboardText className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
               <span>Paste from Clipboard</span>
             </ContextMenuItem>
 
             {/* Templates */}
             <ContextMenuSub>
               <ContextMenuSubTrigger>
-                <FileText className="mr-2 h-3.5 w-3.5 text-purple-500" />
+                <FileText className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                 <span>Note Templates</span>
               </ContextMenuSubTrigger>
               <ContextMenuSubContent className="w-52">
@@ -1185,13 +1244,8 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                       }}
                       className="flex items-center gap-2 cursor-pointer py-1.5"
                     >
-                      <div
-                        className={cn(
-                          "flex h-5 w-5 shrink-0 items-center justify-center rounded",
-                          tmpl.iconBg
-                        )}
-                      >
-                        <Icon className={cn("h-3.5 w-3.5", tmpl.iconColor)} />
+                      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-muted/60 text-foreground">
+                        <Icon className="h-3.5 w-3.5 text-foreground/80" />
                       </div>
                       <span>{tmpl.name}</span>
                     </ContextMenuItem>
@@ -1205,7 +1259,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             {/* View Mode */}
             <ContextMenuSub>
               <ContextMenuSubTrigger>
-                <LayoutGrid className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+                <SquaresFour className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                 <span>View Mode</span>
               </ContextMenuSubTrigger>
               <ContextMenuSubContent className="w-36">
@@ -1214,20 +1268,20 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                   className="flex items-center justify-between"
                 >
                   <div className="flex items-center">
-                    <LayoutGrid className="mr-2 h-3.5 w-3.5" />
+                    <SquaresFour className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                     <span>Grid View</span>
                   </div>
-                  {viewMode === "grid" && <Check className="h-3.5 w-3.5 text-primary stroke-[2.5]" />}
+                  {viewMode === "grid" && <Check className="h-3.5 w-3.5 text-foreground" />}
                 </ContextMenuItem>
                 <ContextMenuItem
                   onClick={() => setViewMode("list")}
                   className="flex items-center justify-between"
                 >
                   <div className="flex items-center">
-                    <ListIcon className="mr-2 h-3.5 w-3.5" />
+                    <ListIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                     <span>List View</span>
                   </div>
-                  {viewMode === "list" && <Check className="h-3.5 w-3.5 text-primary stroke-[2.5]" />}
+                  {viewMode === "list" && <Check className="h-3.5 w-3.5 text-foreground" />}
                 </ContextMenuItem>
               </ContextMenuSubContent>
             </ContextMenuSub>
@@ -1235,7 +1289,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             {/* Sort Submenu */}
             <ContextMenuSub>
               <ContextMenuSubTrigger>
-                <SortAsc className="mr-2 h-3.5 w-3.5 text-amber-500" />
+                <SortAscending className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                 <span>Sort Notes</span>
               </ContextMenuSubTrigger>
               <ContextMenuSubContent className="w-44">
@@ -1264,9 +1318,9 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                     <span>{label}</span>
                     {sortField === field && (
                       sortDir === "asc" ? (
-                        <SortAsc className="h-3 w-3 text-primary" />
+                        <SortAscending className="h-3 w-3 text-foreground" />
                       ) : (
-                        <SortDesc className="h-3 w-3 text-primary" />
+                        <SortDescending className="h-3 w-3 text-foreground" />
                       )
                     )}
                   </ContextMenuItem>
@@ -1277,7 +1331,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             {/* Group By Submenu */}
             <ContextMenuSub>
               <ContextMenuSubTrigger>
-                <Layers2 className="mr-2 h-3.5 w-3.5 text-teal-500" />
+                <Stack className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                 <span>Group By</span>
               </ContextMenuSubTrigger>
               <ContextMenuSubContent className="w-40">
@@ -1294,7 +1348,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                         ? "By Color"
                         : "By Month"}
                     </span>
-                    {groupBy === g && <Check className="h-3 w-3 stroke-[2.5] text-primary" />}
+                    {groupBy === g && <Check className="h-3 w-3 text-foreground" />}
                   </ContextMenuItem>
                 ))}
               </ContextMenuSubContent>
@@ -1303,7 +1357,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             {/* Color Filter */}
             <ContextMenuSub>
               <ContextMenuSubTrigger>
-                <Palette className="mr-2 h-3.5 w-3.5 text-pink-500" />
+                <Palette className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                 <span>Filter by Color</span>
               </ContextMenuSubTrigger>
               <ContextMenuSubContent className="w-40">
@@ -1312,7 +1366,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                   className="flex items-center justify-between"
                 >
                   <span>All Colors</span>
-                  {!selectedColorFilter && <Check className="h-3 w-3 stroke-[2.5] text-primary" />}
+                  {!selectedColorFilter && <Check className="h-3 w-3 text-foreground" />}
                 </ContextMenuItem>
                 <ContextMenuSeparator />
                 {NOTE_COLORS.map((c) => (
@@ -1329,7 +1383,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                       <span>{c.label}</span>
                     </div>
                     {selectedColorFilter === c.id && (
-                      <Check className="h-3 w-3 stroke-[2.5] text-primary" />
+                      <Check className="h-3 w-3 text-foreground" />
                     )}
                   </ContextMenuItem>
                 ))}
@@ -1339,13 +1393,13 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             <ContextMenuSeparator />
 
             <ContextMenuItem onClick={() => void handleRefreshLibrary()}>
-              <RefreshCw className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+              <ArrowClockwise className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
               <span>Refresh Library</span>
               <ContextMenuShortcut>F5</ContextMenuShortcut>
             </ContextMenuItem>
 
             <ContextMenuItem onClick={() => setSettingsOpen(true)}>
-              <SettingsIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+              <GearSix className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
               <span>Preferences</span>
               <ContextMenuShortcut>Ctrl+,</ContextMenuShortcut>
             </ContextMenuItem>
@@ -1359,12 +1413,26 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
               {bulkSelected.size} selected
             </span>
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  const selectedNotes = notes.filter((n) => bulkSelected.has(n.id));
+                  downloadMarkdownArchive(selectedNotes);
+                  toast.show({
+                    message: "Exported selected notes",
+                    description: `${selectedNotes.length} notes saved as Markdown archive.`,
+                  });
+                }}
+                className="flex items-center gap-1.5 rounded border border-border bg-surface px-3 py-1.5 text-xs font-medium transition-colors hover:bg-surface-hover"
+              >
+                <DownloadSimple className="h-3.5 w-3.5 text-muted-foreground" />
+                Export Markdown
+              </button>
               {activeSection !== "trash" && (
                 <button
                   onClick={() => void handleBulkArchive()}
                   className="flex items-center gap-1.5 rounded border border-border bg-surface px-3 py-1.5 text-xs font-medium transition-colors hover:bg-surface-hover"
                 >
-                  <Archive className="h-3.5 w-3.5" />
+                  <Archive className="h-3.5 w-3.5 text-muted-foreground" />
                   Archive
                 </button>
               )}
@@ -1372,7 +1440,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 onClick={() => void handleBulkTrash()}
                 className="flex items-center gap-1.5 rounded border border-border bg-surface px-3 py-1.5 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10"
               >
-                <Trash2 className="h-3.5 w-3.5" />
+                <Trash className="h-3.5 w-3.5 text-destructive" />
                 Trash
               </button>
               <button
@@ -1380,7 +1448,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
                 title="Clear selection (Esc)"
               >
-                <X className="h-3.5 w-3.5" />
+                <X className="h-3.5 w-3.5 text-muted-foreground" />
               </button>
             </div>
           </div>

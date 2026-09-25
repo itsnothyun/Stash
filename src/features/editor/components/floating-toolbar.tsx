@@ -1,56 +1,56 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Editor } from "@tiptap/react";
 import {
-  AlignCenter,
-  AlignJustify,
-  AlignLeft,
-  AlignRight,
-  Baseline,
-  Bold,
+  TextAlignCenter as AlignCenter,
+  TextAlignJustify as AlignJustify,
+  TextAlignLeft as AlignLeft,
+  TextAlignRight as AlignRight,
+  TextAa as Baseline,
+  TextB as Bold,
   Check,
-  ChevronDown,
-  ChevronUp,
+  CaretDown as ChevronDown,
+  CaretUp as ChevronUp,
   Code,
   CheckSquare,
-  FileCode,
-  Heading1,
-  Heading2,
-  Heading3,
+  CodeBlock as FileCode,
+  TextHOne as Heading1,
+  TextHTwo as Heading2,
+  TextHThree as Heading3,
   Highlighter,
-  Italic,
+  TextItalic as Italic,
   Link as LinkIcon,
-  List,
-  ListOrdered,
+  ListBullets as List,
+  ListNumbers as ListOrdered,
   Minus,
   Plus,
-  Quote,
-  Redo2,
-  RemoveFormatting,
-  Strikethrough,
-  Subscript as SubscriptIcon,
-  Superscript as SuperscriptIcon,
-  Type,
-  Underline as UnderlineIcon,
-  Unlink,
-  Undo2,
+  Quotes as Quote,
+  ArrowUUpRight as Redo2,
+  TextAa as RemoveFormatting,
+  TextStrikethrough as Strikethrough,
+  TextSubscript as SubscriptIcon,
+  TextSuperscript as SuperscriptIcon,
+  TextT as Type,
+  TextUnderline as UnderlineIcon,
+  LinkBreak as Unlink,
+  ArrowUUpLeft as Undo2,
   Calculator as CalcIcon,
   Timer as TimerIcon,
-  ArrowUpDown,
-  TrendingUp,
-  CalendarClock,
+  ArrowsDownUp as ArrowUpDown,
+  TrendUp as TrendingUp,
+  CalendarBlank as CalendarClock,
   Globe,
   Ruler,
   Target,
   Sun,
   Users,
   Kanban,
-  Sparkles,
+  Sparkle as Sparkles,
   Bug,
   Lightbulb,
-  Code2,
+  CodeBlock as Code2,
   BookOpen,
   Palette,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import "@tiptap/extension-underline";
 import "@tiptap/extension-subscript";
 import "@tiptap/extension-superscript";
@@ -267,7 +267,7 @@ export const FloatingToolbar: React.FC<FloatingToolbarProps> = ({
               )}
               aria-label="Maximize formatting dock"
             >
-              <Type className="h-3.5 w-3.5 text-brand" />
+              <Type className="h-3.5 w-3.5 text-foreground" />
               <span className="text-[11px] font-medium tracking-tight">Format</span>
               <ChevronUp className="h-3.5 w-3.5 opacity-60" />
             </button>
@@ -421,7 +421,7 @@ export const FloatingToolbar: React.FC<FloatingToolbarProps> = ({
                   )}
                 </div>
                 {fontFamily === font.value && (
-                  <Check className="ml-2 h-3.5 w-3.5 shrink-0 text-brand" />
+                  <Check className="ml-2 h-3.5 w-3.5 shrink-0 text-foreground" />
                 )}
               </DropdownMenuItem>
             ))}
@@ -469,7 +469,7 @@ export const FloatingToolbar: React.FC<FloatingToolbarProps> = ({
                   className="flex items-center justify-between py-1 text-xs"
                 >
                   <span>{size.label}</span>
-                  {sizeNum === size.numeric && <Check className="ml-2 h-3 w-3 text-brand" />}
+                  {sizeNum === size.numeric && <Check className="ml-2 h-3 w-3 text-foreground" />}
                 </DropdownMenuItem>
               ))}
               <DropdownMenuSeparator />
@@ -1071,11 +1071,11 @@ export const FloatingToolbar: React.FC<FloatingToolbarProps> = ({
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  className="flex h-7 shrink-0 items-center gap-1 rounded px-2 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 transition-all active:scale-95 cursor-pointer shadow-2xs"
+                  className="flex h-7 shrink-0 items-center gap-1 rounded px-2 text-[11px] font-semibold text-foreground bg-surface hover:bg-surface-hover border border-border/60 transition-all active:scale-95 cursor-pointer shadow-2xs"
                   aria-label="Attach Interactive Widget"
                   title="Attach Interactive Widget"
                 >
-                  <Plus className="h-3 w-3 stroke-[2.5]" />
+                  <Plus className="h-3 w-3" weight="bold" />
                   <span>Widget</span>
                   <ChevronDown className="h-2.5 w-2.5 opacity-60" />
                 </button>
@@ -1085,39 +1085,39 @@ export const FloatingToolbar: React.FC<FloatingToolbarProps> = ({
                   Interactive Tools
                 </div>
                 <DropdownMenuItem onClick={() => onAddWidget("calculator")} className="cursor-pointer">
-                  <CalcIcon className="mr-2 h-3.5 w-3.5 text-amber-500" />
+                  <CalcIcon className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>Quick Calculator</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddWidget("timer")} className="cursor-pointer">
-                  <TimerIcon className="mr-2 h-3.5 w-3.5 text-rose-500" />
+                  <TimerIcon className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>Focus & Pomodoro</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddWidget("swap")} className="cursor-pointer">
-                  <ArrowUpDown className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+                  <ArrowUpDown className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>Currency Converter</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddWidget("ticker")} className="cursor-pointer">
-                  <TrendingUp className="mr-2 h-3.5 w-3.5 text-blue-500" />
+                  <TrendingUp className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>Market Tickers</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddWidget("countdown")} className="cursor-pointer">
-                  <CalendarClock className="mr-2 h-3.5 w-3.5 text-orange-500" />
+                  <CalendarClock className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>Countdown Timer</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddWidget("worldclock")} className="cursor-pointer">
-                  <Globe className="mr-2 h-3.5 w-3.5 text-cyan-500" />
+                  <Globe className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>World Clock</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddWidget("unitconverter")} className="cursor-pointer">
-                  <Ruler className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+                  <Ruler className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>Unit Converter</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddWidget("counter")} className="cursor-pointer">
-                  <Target className="mr-2 h-3.5 w-3.5 text-purple-500" />
+                  <Target className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>Tally Counter</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddWidget("browser")} className="cursor-pointer">
-                  <Globe className="mr-2 h-3.5 w-3.5 text-cyan-500" />
+                  <Globe className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>Mini Web Browser</span>
                 </DropdownMenuItem>
 
@@ -1126,39 +1126,39 @@ export const FloatingToolbar: React.FC<FloatingToolbarProps> = ({
                   Component Blocks
                 </div>
                 <DropdownMenuItem onClick={() => onAddWidget("scratchpad")} className="cursor-pointer">
-                  <Sun className="mr-2 h-3.5 w-3.5 text-amber-500" />
+                  <Sun className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>Daily Scratchpad</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddWidget("meeting")} className="cursor-pointer">
-                  <Users className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+                  <Users className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>Meeting Minutes</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddWidget("kanban")} className="cursor-pointer">
-                  <Kanban className="mr-2 h-3.5 w-3.5 text-blue-500" />
+                  <Kanban className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>Kanban Board</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddWidget("habits")} className="cursor-pointer">
-                  <Sparkles className="mr-2 h-3.5 w-3.5 text-emerald-500" />
+                  <Sparkles className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>7-Day Habit Tracker</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddWidget("bug")} className="cursor-pointer">
-                  <Bug className="mr-2 h-3.5 w-3.5 text-rose-500" />
+                  <Bug className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>Bug Blitz & Triage</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddWidget("idea")} className="cursor-pointer">
-                  <Lightbulb className="mr-2 h-3.5 w-3.5 text-yellow-500" />
+                  <Lightbulb className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>Idea Incubator</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddWidget("api")} className="cursor-pointer">
-                  <Code2 className="mr-2 h-3.5 w-3.5 text-blue-500" />
+                  <Code2 className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>API & Tech Blueprint</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddWidget("reading")} className="cursor-pointer">
-                  <BookOpen className="mr-2 h-3.5 w-3.5 text-indigo-500" />
+                  <BookOpen className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>Book & Article Digest</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onAddWidget("palette")} className="cursor-pointer">
-                  <Palette className="mr-2 h-3.5 w-3.5 text-pink-500" />
+                  <Palette className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>Color Palette</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>

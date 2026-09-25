@@ -26,6 +26,7 @@ export const App: React.FC = () => {
     zoomIn,
     zoomOut,
     resetZoom,
+    terminalSettings,
   } = useUIStore();
 
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -281,6 +282,7 @@ export const App: React.FC = () => {
   return (
     <>
       <WindowResizeBorders />
+      {terminalSettings.crtScanlines && <div className="stash-crt-scanlines" />}
       {content}
       {zoomHudElement}
       <Toaster />

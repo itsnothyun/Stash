@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, X, ArrowRight, ArrowLeft, CheckCircle2, Circle, Clock } from "lucide-react";
+import { Plus, X, ArrowRight, ArrowLeft, CheckCircle, Circle, Clock } from "@phosphor-icons/react";
 import { WidgetInsertButton } from "./widget-insert-button";
 import { cn } from "@/lib/utils/cn";
 
@@ -105,9 +105,9 @@ ${doneText}\n`;
   };
 
   const columns = [
-    { id: "todo", label: "To Do", icon: Circle, color: "text-amber-500", badge: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
-    { id: "in_progress", label: "Doing", icon: Clock, color: "text-blue-500", badge: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
-    { id: "done", label: "Done", icon: CheckCircle2, color: "text-emerald-500", badge: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
+    { id: "todo", label: "To Do", icon: Circle, color: "text-foreground", badge: "bg-muted text-foreground" },
+    { id: "in_progress", label: "Doing", icon: Clock, color: "text-foreground", badge: "bg-muted text-foreground" },
+    { id: "done", label: "Done", icon: CheckCircle, color: "text-foreground", badge: "bg-muted text-foreground" },
   ] as const;
 
   return (

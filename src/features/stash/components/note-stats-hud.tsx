@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
 import {
-  BarChart3,
-  Copy,
-  ListTodo,
-} from "lucide-react";
+  ChartBar as BarChart3,
+  CopySimple as Copy,
+  CheckSquare as ListTodo,
+} from "@phosphor-icons/react";
 import {
   Popover,
   PopoverContent,
@@ -109,7 +109,7 @@ export const NoteStatsHud: React.FC<NoteStatsHudProps> = ({
             className
           )}
         >
-          <BarChart3 className="h-3 w-3 text-primary shrink-0 opacity-80" />
+          <BarChart3 className="h-3 w-3 text-foreground/70 shrink-0" />
           <span>{pillLabel}</span>
         </button>
       </PopoverTrigger>
@@ -121,7 +121,7 @@ export const NoteStatsHud: React.FC<NoteStatsHudProps> = ({
       >
         <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/40">
           <div className="flex items-center gap-1.5 font-semibold text-foreground">
-            <BarChart3 className="h-3.5 w-3.5 text-primary" />
+            <BarChart3 className="h-3.5 w-3.5 text-foreground" />
             <span>Note Insights</span>
           </div>
           <button
@@ -140,16 +140,16 @@ export const NoteStatsHud: React.FC<NoteStatsHudProps> = ({
           <div className="mb-3 rounded-md bg-muted/40 p-2 border border-border/30">
             <div className="flex items-center justify-between text-[11px] mb-1.5">
               <span className="flex items-center gap-1 text-foreground font-medium">
-                <ListTodo className="h-3 w-3 text-emerald-500" />
+                <ListTodo className="h-3 w-3 text-foreground/80" />
                 Checklist
               </span>
-              <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+              <span className="font-semibold text-foreground">
                 {stats.completedTasks}/{stats.totalTasks} ({stats.taskProgress}%)
               </span>
             </div>
             <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
               <div
-                className="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                className="h-full bg-foreground rounded-full transition-all duration-300"
                 style={{ width: `${stats.taskProgress}%` }}
               />
             </div>

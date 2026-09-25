@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { Tag } from "@/features/stash/types/note";
-import { Plus, X, Tag as TagIcon, Copy, Trash2, Filter } from "lucide-react";
+import {
+  Plus,
+  X,
+  Tag as TagIcon,
+  CopySimple as Copy,
+  Trash as Trash2,
+  Funnel as Filter,
+} from "@phosphor-icons/react";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -111,7 +118,7 @@ export const TagManager: React.FC<TagManagerProps> = ({
                 </ContextMenuTrigger>
                 <ContextMenuContent className="w-48">
                   <div className="flex items-center gap-1.5 px-2.5 py-1.5 border-b border-border/50 text-[11px] font-semibold text-foreground truncate select-none">
-                    <TagIcon className="h-3 w-3 text-primary shrink-0" />
+                    <TagIcon className="h-3 w-3 text-foreground shrink-0" />
                     <span className="truncate">#{tag.name}</span>
                   </div>
 

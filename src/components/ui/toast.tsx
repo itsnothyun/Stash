@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { create } from "zustand";
-import { X } from "lucide-react";
+import { X } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils/cn";
 
 /**

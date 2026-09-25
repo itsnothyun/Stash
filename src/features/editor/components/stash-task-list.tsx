@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import TaskList from "@tiptap/extension-task-list";
 import { NodeViewContent, NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
 import type { ReactNodeViewProps } from "@tiptap/react";
-import { Plus, ListTodo } from "lucide-react";
+import { Plus, CheckSquare as ListTodo } from "@phosphor-icons/react";
 
 /**
  * The checklist inside a stash. Tasks stay normal Tiptap `taskItem` nodes, so

@@ -174,3 +174,200 @@ export const SHORTCUTS = {
   zoomOut: "mod+-",
   resetZoom: "mod+0",
 } as const;
+
+export type ShortcutCategory = "global" | "editor" | "library" | "windows";
+
+export interface ShortcutItem {
+  id: string;
+  name: string;
+  description: string;
+  category: ShortcutCategory;
+  keys: string;
+  context: string;
+}
+
+export const SHORTCUTS_LIST: ShortcutItem[] = [
+  {
+    id: "quick-capture",
+    name: "Global Quick Capture",
+    description: "Instantly create a floating stash from any app in the OS",
+    category: "global",
+    keys: "mod+shift+n",
+    context: "Global Desktop",
+  },
+  {
+    id: "command-palette",
+    name: "Command Palette",
+    description: "Search actions, filter notes, switch views, or jump to settings",
+    category: "global",
+    keys: "mod+k",
+    context: "Library Hub",
+  },
+  {
+    id: "quick-search",
+    name: "Focus Full-Text Search",
+    description: "Instantly jump into the search bar and filter your stashes",
+    category: "library",
+    keys: "mod+f",
+    context: "Library Hub",
+  },
+  {
+    id: "settings",
+    name: "Open Settings Modal",
+    description: "Configure appearance, editor, defaults, and vault privacy",
+    category: "global",
+    keys: "mod+,",
+    context: "Everywhere",
+  },
+  {
+    id: "close-window",
+    name: "Close Active Window / Stash",
+    description: "Dismiss the current dialog, drawer, or floating stash note",
+    category: "windows",
+    keys: "escape",
+    context: "Floating Stash",
+  },
+  {
+    id: "always-on-top",
+    name: "Toggle Always On Top",
+    description: "Pin floating stash above IDEs, browsers, and game windows",
+    category: "windows",
+    keys: "mod+shift+p",
+    context: "Floating Stash",
+  },
+  {
+    id: "duplicate-note",
+    name: "Duplicate Stash",
+    description: "Create an exact clone of the current note with fresh timestamp",
+    category: "library",
+    keys: "mod+d",
+    context: "Library / Stash",
+  },
+  {
+    id: "archive-note",
+    name: "Archive / Restore Stash",
+    description: "Send note to archive or restore it back to active stash",
+    category: "library",
+    keys: "mod+shift+a",
+    context: "Library / Stash",
+  },
+  {
+    id: "zoom-in",
+    name: "Zoom Interface In",
+    description: "Scale up library and floating stash views (+10%)",
+    category: "windows",
+    keys: "mod+=",
+    context: "Everywhere",
+  },
+  {
+    id: "zoom-out",
+    name: "Zoom Interface Out",
+    description: "Scale down library and floating stash views (-10%)",
+    category: "windows",
+    keys: "mod+-",
+    context: "Everywhere",
+  },
+  {
+    id: "reset-zoom",
+    name: "Reset Zoom to 100%",
+    description: "Restore standard 100% DPI viewport scale",
+    category: "windows",
+    keys: "mod+0",
+    context: "Everywhere",
+  },
+  {
+    id: "slash-menu",
+    name: "Slash Commands Menu",
+    description: "Type '/' at start of line or space to insert headings, tables, or widgets",
+    category: "editor",
+    keys: "/",
+    context: "Editor",
+  },
+  {
+    id: "inline-math",
+    name: "Evaluate Inline Math",
+    description: "Type an equation ending with '=' to compute instantly (e.g. 15 * 8 =)",
+    category: "editor",
+    keys: "=",
+    context: "Editor",
+  },
+  {
+    id: "checklist-toggle",
+    name: "Insert Checklist Item",
+    description: "Insert an interactive checkbox to track todos and tasks",
+    category: "editor",
+    keys: "mod+shift+9",
+    context: "Editor",
+  },
+  {
+    id: "bold-text",
+    name: "Bold Formatting",
+    description: "Toggle bold style on highlighted text",
+    category: "editor",
+    keys: "mod+b",
+    context: "Editor",
+  },
+  {
+    id: "italic-text",
+    name: "Italic Formatting",
+    description: "Toggle italic style on highlighted text",
+    category: "editor",
+    keys: "mod+i",
+    context: "Editor",
+  },
+  {
+    id: "underline-text",
+    name: "Underline Formatting",
+    description: "Toggle underline on highlighted text",
+    category: "editor",
+    keys: "mod+u",
+    context: "Editor",
+  },
+  {
+    id: "highlight-text",
+    name: "Color Highlight",
+    description: "Apply soft fluorescent highlight to selected phrase",
+    category: "editor",
+    keys: "mod+shift+h",
+    context: "Editor",
+  },
+  {
+    id: "strike-text",
+    name: "Strikethrough Formatting",
+    description: "Cross out text to indicate deprecation or completion",
+    category: "editor",
+    keys: "mod+shift+x",
+    context: "Editor",
+  },
+  {
+    id: "bulk-select",
+    name: "Range / Multi-Select Notes",
+    description: "Shift-click notes in the library to bulk-select and batch archive or trash",
+    category: "library",
+    keys: "shift+click",
+    context: "Library Hub",
+  },
+  {
+    id: "roll-up-shade",
+    name: "Window Roll-Up / Shade",
+    description: "Double click titlebar to roll stash up into a sleek ambient bar",
+    category: "windows",
+    keys: "double-click",
+    context: "Floating Stash Titlebar",
+  },
+];
+
+export function exportShortcutsMarkdown(): string {
+  const lines = [
+    "# Stash — Keyboard Shortcuts & Hotkeys Matrix",
+    "",
+    "| Functionality | Shortcut | Context | Description |",
+    "| :--- | :--- | :--- | :--- |",
+  ];
+  for (const item of SHORTCUTS_LIST) {
+    const formatted = formatShortcut(item.keys);
+    lines.push(`| **${item.name}** | \`${formatted}\` | ${item.context} | ${item.description} |`);
+  }
+  return lines.join("\n");
+}
+

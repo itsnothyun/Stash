@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpDown, Check, Search, X, RotateCw, Plus, Copy } from "lucide-react";
+import {
+  ArrowsDownUp as ArrowUpDown,
+  Check,
+  MagnifyingGlass as Search,
+  X,
+  ArrowClockwise as RotateCw,
+  Plus,
+  CopySimple as Copy,
+} from "@phosphor-icons/react";
 import {
   CURRENCIES,
   CURRENCY_LIST,
@@ -223,7 +231,7 @@ export const Swap: React.FC<SwapProps> = ({
             </button>
           </span>
           <span className="swp-slip flex items-center gap-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" />
+            <span className="h-1.5 w-1.5 rounded-full bg-foreground inline-block animate-pulse" />
             <span>Live rates</span>
           </span>
         </header>
@@ -266,7 +274,7 @@ export const Swap: React.FC<SwapProps> = ({
             zIndex: 10,
           }}
         >
-          <ArrowUpDown className="h-4 w-4 stroke-[2.2]" />
+          <ArrowUpDown className="h-4 w-4" />
         </motion.button>
 
         {/* "You receive" Well (Bottom) */}
@@ -362,12 +370,12 @@ export const Swap: React.FC<SwapProps> = ({
         >
           {isInserted ? (
             <>
-              <Check className="h-3.5 w-3.5 text-emerald-400 stroke-[2.5]" />
+              <Check className="h-3.5 w-3.5" weight="bold" />
               <span>Inserted to Note!</span>
             </>
           ) : (
             <>
-              <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
+              <Plus className="h-3.5 w-3.5" weight="bold" />
               <span>Insert to Note</span>
             </>
           )}
@@ -381,8 +389,8 @@ export const Swap: React.FC<SwapProps> = ({
         >
           {isCopied ? (
             <>
-              <Check className="h-3.5 w-3.5 text-emerald-500 stroke-[2.5]" />
-              <span className="text-emerald-500 font-medium">Copied!</span>
+              <Check className="h-3.5 w-3.5 text-foreground" weight="bold" />
+              <span className="text-foreground font-medium">Copied!</span>
             </>
           ) : (
             <>
@@ -490,7 +498,7 @@ export const Swap: React.FC<SwapProps> = ({
                         <div className="text-xs font-medium leading-tight flex items-center gap-1.5">
                           <span>{c.symbol}</span>
                           {isSelected && (
-                            <Check className="h-3 w-3 text-emerald-500 stroke-[3]" />
+                            <Check className="h-3 w-3 text-foreground" weight="bold" />
                           )}
                         </div>
                         <div className="text-[10px] text-muted-foreground leading-tight">

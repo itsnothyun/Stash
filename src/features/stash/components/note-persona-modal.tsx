@@ -18,15 +18,15 @@ import {
   getFrameStyleClass,
 } from "@/features/stash/note-meta";
 import {
-  Smile,
+  Smiley as Smile,
   FileText,
-  Type,
+  TextT as Type,
   Square,
   Palette,
-  Sparkles,
+  Sparkle as Sparkles,
   Check,
-  RotateCcw,
-} from "lucide-react";
+  ArrowCounterClockwise as RotateCcw,
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils/cn";
 import { motion } from "framer-motion";
 
@@ -267,7 +267,7 @@ export const NotePersonaModal: React.FC<NotePersonaModalProps> = ({
                         </span>
                         {isSelected && (
                           <div className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                            <Check className="h-2.5 w-2.5 stroke-[3]" />
+                            <Check className="h-2.5 w-2.5" weight="bold" />
                           </div>
                         )}
                       </div>
@@ -328,7 +328,7 @@ export const NotePersonaModal: React.FC<NotePersonaModalProps> = ({
                         </span>
                         {isSelected && (
                           <div className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                            <Check className="h-2.5 w-2.5 stroke-[3]" />
+                            <Check className="h-2.5 w-2.5" weight="bold" />
                           </div>
                         )}
                       </div>
@@ -377,7 +377,7 @@ export const NotePersonaModal: React.FC<NotePersonaModalProps> = ({
                         </span>
                         {isSelected && (
                           <div className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                            <Check className="h-2.5 w-2.5 stroke-[3]" />
+                            <Check className="h-2.5 w-2.5" weight="bold" />
                           </div>
                         )}
                       </div>

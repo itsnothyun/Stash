@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Globe, Sun, Moon, Plus, Check, Copy } from "lucide-react";
+import { Globe, Sun, Moon, Plus, Check, CopySimple as Copy } from "@phosphor-icons/react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -154,7 +154,7 @@ ${cityLines}\n`;
       <div className="flex items-center justify-between pb-1.5 border-b border-border/40 text-xs">
         {!isEmbedded ? (
           <div className="flex items-center gap-1.5 font-semibold">
-            <Globe className="h-3.5 w-3.5 text-blue-500" />
+            <Globe className="h-3.5 w-3.5 text-foreground" />
             <span>World Clocks</span>
           </div>
         ) : (
@@ -207,7 +207,7 @@ ${cityLines}\n`;
                       </span>
                       <span>{c.name}</span>
                     </div>
-                    {isSelected && <Check className="h-3.5 w-3.5 text-primary stroke-[2.5]" />}
+                    {isSelected && <Check className="h-3.5 w-3.5 text-foreground" weight="bold" />}
                   </DropdownMenuItem>
                 );
               })}
@@ -234,9 +234,9 @@ ${cityLines}\n`;
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground group-hover:text-foreground transition-colors">
                   {isDaytime ? (
-                    <Sun className="h-3.5 w-3.5 text-amber-500/80" />
+                    <Sun className="h-3.5 w-3.5 text-foreground/80" />
                   ) : (
-                    <Moon className="h-3.5 w-3.5 text-indigo-400/80" />
+                    <Moon className="h-3.5 w-3.5 text-foreground/80" />
                   )}
                 </span>
                 <div>
@@ -260,7 +260,7 @@ ${cityLines}\n`;
                 </span>
                 <span className="opacity-0 group-hover:opacity-100 text-muted-foreground transition-opacity">
                   {isCopied ? (
-                    <Check className="h-3 w-3 text-emerald-500" />
+                    <Check className="h-3 w-3 text-foreground" weight="bold" />
                   ) : (
                     <Copy className="h-3 w-3" />
                   )}

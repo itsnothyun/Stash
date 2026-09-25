@@ -2,7 +2,7 @@ import React from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { NOTE_COLORS, NoteColor } from "@/features/stash/types/color";
 import { cn } from "@/lib/utils/cn";
-import { Check } from "lucide-react";
+import { Check } from "@phosphor-icons/react";
 
 interface ColorPickerProps {
   currentColor: NoteColor;
@@ -62,7 +62,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
                 className="h-3.5 w-3.5 rounded-full border border-black/10 shrink-0 flex items-center justify-center"
                 style={{ backgroundColor: c.dotColor }}
               >
-                {isSelected && <Check className="h-2.5 w-2.5 text-black/70 stroke-[3]" />}
+                {isSelected && <Check className="h-2.5 w-2.5 text-black/70" weight="bold" />}
               </span>
               <span>{c.label}</span>
             </button>

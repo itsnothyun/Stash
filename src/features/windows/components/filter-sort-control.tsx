@@ -1,30 +1,30 @@
 import React, { useState } from "react";
 import {
   SlidersHorizontal,
-  ChevronDown,
-  LayoutGrid,
+  CaretDown,
+  SquaresFour,
   List as ListIcon,
-  SortAsc,
-  SortDesc,
+  SortAscending,
+  SortDescending,
   Check,
-  RotateCcw,
-  Layers2,
-  Calendar,
+  ArrowCounterClockwise,
+  Stack,
+  CalendarBlank,
   Clock,
-  Type,
+  TextAa,
   Palette,
   Archive,
-  Pin,
+  PushPin,
   Star,
-  ListChecks,
-  Lock,
-  Sparkles,
-  Filter,
+  CheckSquareOffset,
+  LockSimple,
+  Sparkle,
+  Funnel,
   Eye,
   FileText,
   Tag as TagIcon,
-  Coins,
-} from "lucide-react";
+  PuzzlePiece,
+} from "@phosphor-icons/react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { NOTE_COLORS, NoteColor } from "@/features/stash/types/color";
 import { Tag } from "@/features/stash/types/note";
@@ -168,11 +168,11 @@ export const FilterSortControl: React.FC<FilterSortControlProps> = ({
   const sortOptions: {
     field: SortField;
     label: string;
-    icon: React.FC<{ className?: string }>;
+    icon: React.ComponentType<{ className?: string; weight?: any }>;
   }[] = [
     { field: "updatedAt", label: "Last Modified", icon: Clock },
-    { field: "createdAt", label: "Date Created", icon: Calendar },
-    { field: "title", label: "Title (A–Z)", icon: Type },
+    { field: "createdAt", label: "Date Created", icon: CalendarBlank },
+    { field: "title", label: "Title (A–Z)", icon: TextAa },
     { field: "color", label: "Color Palette", icon: Palette },
     { field: "words", label: "Word Count / Length", icon: FileText },
   ];
@@ -180,14 +180,14 @@ export const FilterSortControl: React.FC<FilterSortControlProps> = ({
   const quickFilterChips: {
     id: QuickFilter;
     label: string;
-    icon: React.FC<{ className?: string }>;
+    icon: React.ComponentType<{ className?: string; weight?: any }>;
   }[] = [
-    { id: "all", label: "All Stashes", icon: Sparkles },
-    { id: "pinned", label: "Pinned", icon: Pin },
+    { id: "all", label: "All Stashes", icon: Sparkle },
+    { id: "pinned", label: "Pinned", icon: PushPin },
     { id: "favorites", label: "Favorites", icon: Star },
-    { id: "todos", label: "Has Tasks", icon: ListChecks },
-    { id: "vault", label: "Vault Locked", icon: Lock },
-    { id: "has_widgets", label: "With Widgets", icon: Coins },
+    { id: "todos", label: "Has Tasks", icon: CheckSquareOffset },
+    { id: "vault", label: "Vault Locked", icon: LockSimple },
+    { id: "has_widgets", label: "With Widgets", icon: PuzzlePiece },
   ];
 
   const getSortSummaryLabel = () => {
@@ -238,7 +238,7 @@ export const FilterSortControl: React.FC<FilterSortControlProps> = ({
             </span>
           )}
 
-          <ChevronDown className="h-3 w-3 opacity-60 transition-transform duration-200 group-data-[state=open]:rotate-180 shrink-0" />
+          <CaretDown className="h-3 w-3 opacity-60 transition-transform duration-200 group-data-[state=open]:rotate-180 shrink-0" />
         </button>
       </PopoverTrigger>
 
@@ -250,13 +250,13 @@ export const FilterSortControl: React.FC<FilterSortControlProps> = ({
         {/* Card Header */}
         <div className="flex items-center justify-between p-3.5 pb-2.5 border-b border-border/50 bg-muted/20">
           <div className="flex items-center gap-2 font-semibold text-foreground">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 text-primary border border-primary/20">
+            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-muted/60 text-foreground border border-border/50">
               <SlidersHorizontal className="h-3.5 w-3.5" />
             </div>
             <div>
               <span className="text-xs font-semibold">Display & Filters</span>
               {activeFiltersCount > 0 && (
-                <span className="ml-2 rounded-full bg-primary/15 text-primary px-1.5 py-0.2 text-[10px] font-mono font-bold">
+                <span className="ml-2 rounded-full bg-muted text-foreground/80 border border-border/50 px-1.5 py-0.2 text-[10px] font-mono font-bold">
                   {activeFiltersCount} active
                 </span>
               )}
@@ -269,7 +269,7 @@ export const FilterSortControl: React.FC<FilterSortControlProps> = ({
               onClick={handleReset}
               className="flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors cursor-pointer"
             >
-              <RotateCcw className="h-3 w-3" />
+              <ArrowCounterClockwise className="h-3 w-3" />
               <span>Reset All</span>
             </button>
           )}
@@ -335,7 +335,7 @@ export const FilterSortControl: React.FC<FilterSortControlProps> = ({
                 : "border-transparent text-muted-foreground hover:text-foreground"
             )}
           >
-            <Filter className="h-3 w-3" />
+            <Funnel className="h-3 w-3" />
             <span>Filters</span>
           </button>
 
@@ -352,7 +352,7 @@ export const FilterSortControl: React.FC<FilterSortControlProps> = ({
                 : "border-transparent text-muted-foreground hover:text-foreground"
             )}
           >
-            <SortAsc className="h-3 w-3" />
+            <SortAscending className="h-3 w-3" />
             <span>Sort & Group</span>
           </button>
 
@@ -596,7 +596,7 @@ export const FilterSortControl: React.FC<FilterSortControlProps> = ({
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <LayoutGrid className="h-3.5 w-3.5" />
+                  <SquaresFour className="h-3.5 w-3.5" />
                   <span>Gallery Grid</span>
                 </button>
 
@@ -660,9 +660,9 @@ export const FilterSortControl: React.FC<FilterSortControlProps> = ({
                         <div className="flex items-center gap-1 text-[10px] font-mono text-primary">
                           <span>{sortDir === "asc" ? "Ascending" : "Descending"}</span>
                           {sortDir === "asc" ? (
-                            <SortAsc className="h-3.5 w-3.5" />
+                            <SortAscending className="h-3.5 w-3.5" />
                           ) : (
-                            <SortDesc className="h-3.5 w-3.5" />
+                            <SortDescending className="h-3.5 w-3.5" />
                           )}
                         </div>
                       )}
@@ -685,12 +685,12 @@ export const FilterSortControl: React.FC<FilterSortControlProps> = ({
               >
                 {sortDir === "asc" ? (
                   <>
-                    <SortAsc className="h-3.5 w-3.5 text-primary" />
+                    <SortAscending className="h-3.5 w-3.5 text-primary" />
                     <span>Ascending (A → Z, Oldest)</span>
                   </>
                 ) : (
                   <>
-                    <SortDesc className="h-3.5 w-3.5 text-primary" />
+                    <SortDescending className="h-3.5 w-3.5 text-primary" />
                     <span>Descending (Z → A, Newest)</span>
                   </>
                 )}
@@ -700,7 +700,7 @@ export const FilterSortControl: React.FC<FilterSortControlProps> = ({
             {/* Grouping Options */}
             <div className="space-y-1.5 pt-2 border-t border-border/40">
               <label className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground flex items-center gap-1">
-                <Layers2 className="h-3 w-3" />
+                <Stack className="h-3 w-3" />
                 <span>Group Stashes</span>
               </label>
               <div className="grid grid-cols-4 gap-1">
@@ -826,7 +826,7 @@ export const FilterSortControl: React.FC<FilterSortControlProps> = ({
 
               <label className="flex items-center justify-between cursor-pointer select-none py-1">
                 <div className="flex items-center gap-2 text-xs text-foreground">
-                  <Coins className="h-3.5 w-3.5 text-muted-foreground" />
+                  <PuzzlePiece className="h-3.5 w-3.5 text-muted-foreground" />
                   <span>Show attached widget indicators</span>
                 </div>
                 <input

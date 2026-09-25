@@ -16,26 +16,26 @@ import { formatShortcut, SHORTCUTS } from "@/lib/keyboard/shortcuts";
 import { toast } from "@/components/ui/toast";
 import {
   Archive,
-  ArrowUpDown,
-  Clipboard,
-  Copy,
-  ExternalLink,
-  Layers,
+  ArrowsDownUp as ArrowUpDown,
+  ClipboardText as Clipboard,
+  CopySimple as Copy,
+  ArrowUpRight as ExternalLink,
+  Stack as Layers,
   Plus,
-  LayoutGrid,
-  ListChecks,
+  SquaresFour as LayoutGrid,
+  CheckSquareOffset as ListChecks,
   Moon,
-  Monitor,
-  Pin,
-  RotateCcw,
-  Settings as SettingsIcon,
+  Desktop as Monitor,
+  PushPin as Pin,
+  ArrowCounterClockwise as RotateCcw,
+  Gear as SettingsIcon,
   Star,
   Sun,
-  Trash2,
-  ZoomIn,
-  ZoomOut,
+  Trash as Trash2,
+  MagnifyingGlassPlus as ZoomIn,
+  MagnifyingGlassMinus as ZoomOut,
   Globe,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import { NOTE_TEMPLATES } from "@/features/stash/templates";
 import { cn } from "@/lib/utils/cn";
 import { stashIpc } from "@/lib/ipc/stash-ipc";
@@ -92,7 +92,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
         <CommandGroup heading="Capture">
           <CommandItem onSelect={() => run(() => void onCapture())}>
-            <Plus className="mr-2 h-4 w-4" strokeWidth={1.75} />
+            <Plus className="mr-2 h-4 w-4" />
             <span>New stash</span>
             <CommandShortcut>{formatShortcut(SHORTCUTS.quickCapture)}</CommandShortcut>
           </CommandItem>
@@ -115,7 +115,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               })();
             }}
           >
-            <Clipboard className="mr-2 h-4 w-4" strokeWidth={1.75} />
+            <Clipboard className="mr-2 h-4 w-4" />
             <span>Capture clipboard</span>
           </CommandItem>
 
@@ -131,12 +131,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               })
             }
           >
-            <ArrowUpDown className="mr-2 h-4 w-4" strokeWidth={1.75} />
+            <ArrowUpDown className="mr-2 h-4 w-4" />
             <span>New swap note</span>
           </CommandItem>
 
           <CommandItem onSelect={() => run(() => requestSearchFocus())}>
-            <Layers className="mr-2 h-4 w-4" strokeWidth={1.75} />
+            <Layers className="mr-2 h-4 w-4" />
             <span>Search your stash</span>
             <CommandShortcut>{formatShortcut(SHORTCUTS.search)}</CommandShortcut>
           </CommandItem>
@@ -148,7 +148,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               })
             }
           >
-            <Globe className="mr-2 h-4 w-4 text-cyan-500" strokeWidth={1.75} />
+            <Globe className="mr-2 h-4 w-4 text-foreground" />
             <span>Open Picture-in-Picture Browser</span>
           </CommandItem>
         </CommandGroup>
@@ -181,7 +181,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                     tmpl.iconBg
                   )}
                 >
-                  <Icon className={cn("h-3.5 w-3.5", tmpl.iconColor)} strokeWidth={2} />
+                  <Icon className={cn("h-3.5 w-3.5", tmpl.iconColor)} />
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{tmpl.name}</span>
@@ -211,7 +211,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 key={item.id}
                 onSelect={() => run(() => setActiveSection(item.id))}
               >
-                <Icon className="mr-2 h-4 w-4" strokeWidth={1.75} />
+                <Icon className="mr-2 h-4 w-4" />
                 <span>{item.label}</span>
               </CommandItem>
             );
@@ -228,7 +228,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 <CommandItem
                   onSelect={() => run(() => onOpenNote(currentNote.id))}
                 >
-                  <ExternalLink className="mr-2 h-4 w-4" strokeWidth={1.75} />
+                  <ExternalLink className="mr-2 h-4 w-4" />
                   <span>Open as floating stash</span>
                   <CommandShortcut>⏎</CommandShortcut>
                 </CommandItem>
@@ -237,7 +237,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 <CommandItem
                   onSelect={() => run(() => onDuplicateNote(currentNote))}
                 >
-                  <Copy className="mr-2 h-4 w-4" strokeWidth={1.75} />
+                  <Copy className="mr-2 h-4 w-4" />
                   <span>Duplicate</span>
                   <CommandShortcut>
                     {formatShortcut(SHORTCUTS.duplicate)}
@@ -248,7 +248,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 <CommandItem
                   onSelect={() => run(() => onArchiveNote(currentNote))}
                 >
-                  <Archive className="mr-2 h-4 w-4" strokeWidth={1.75} />
+                  <Archive className="mr-2 h-4 w-4" />
                   <span>{currentNote.isArchived ? "Unarchive" : "Archive"}</span>
                   <CommandShortcut>
                     {formatShortcut(SHORTCUTS.archive)}
@@ -257,7 +257,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               )}
               {onTrashNote && (
                 <CommandItem onSelect={() => run(() => onTrashNote(currentNote))}>
-                  <Trash2 className="mr-2 h-4 w-4 text-destructive" strokeWidth={1.75} />
+                  <Trash2 className="mr-2 h-4 w-4 text-destructive" />
                   <span className="text-destructive">Move to Trash</span>
                 </CommandItem>
               )}
@@ -270,7 +270,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         <CommandGroup heading="Preferences">
           {onToggleViewMode && (
             <CommandItem onSelect={() => run(onToggleViewMode)}>
-              <LayoutGrid className="mr-2 h-4 w-4" strokeWidth={1.75} />
+              <LayoutGrid className="mr-2 h-4 w-4" />
               <span>Toggle grid / list view</span>
             </CommandItem>
           )}
@@ -293,14 +293,14 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   })
                 }
               >
-                <Icon className="mr-2 h-4 w-4" strokeWidth={1.75} />
+                <Icon className="mr-2 h-4 w-4" />
                 <span>{item.label}</span>
               </CommandItem>
             );
           })}
 
           <CommandItem onSelect={() => run(() => setSettingsOpen(true))}>
-            <SettingsIcon className="mr-2 h-4 w-4" strokeWidth={1.75} />
+            <SettingsIcon className="mr-2 h-4 w-4" />
             <span>Settings</span>
             <CommandShortcut>{formatShortcut(SHORTCUTS.settings)}</CommandShortcut>
           </CommandItem>
@@ -310,17 +310,17 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
         <CommandGroup heading="Zoom">
           <CommandItem onSelect={() => run(() => zoomIn())}>
-            <ZoomIn className="mr-2 h-4 w-4" strokeWidth={1.75} />
+            <ZoomIn className="mr-2 h-4 w-4" />
             <span>Zoom in</span>
             <CommandShortcut>{formatShortcut(SHORTCUTS.zoomIn)}</CommandShortcut>
           </CommandItem>
           <CommandItem onSelect={() => run(() => zoomOut())}>
-            <ZoomOut className="mr-2 h-4 w-4" strokeWidth={1.75} />
+            <ZoomOut className="mr-2 h-4 w-4" />
             <span>Zoom out</span>
             <CommandShortcut>{formatShortcut(SHORTCUTS.zoomOut)}</CommandShortcut>
           </CommandItem>
           <CommandItem onSelect={() => run(() => resetZoom())}>
-            <RotateCcw className="mr-2 h-4 w-4" strokeWidth={1.75} />
+            <RotateCcw className="mr-2 h-4 w-4" />
             <span>Reset zoom</span>
             <CommandShortcut>{formatShortcut(SHORTCUTS.resetZoom)}</CommandShortcut>
           </CommandItem>

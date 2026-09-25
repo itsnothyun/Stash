@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Check, Lightbulb, RefreshCw, ThumbsUp, ThumbsDown, Sparkles } from "lucide-react";
+import { Check, Lightbulb, ArrowClockwise as RefreshCw, ThumbsUp, ThumbsDown, Sparkle as Sparkles } from "@phosphor-icons/react";
 import { WidgetInsertButton } from "./widget-insert-button";
 import { cn } from "@/lib/utils/cn";
 
@@ -59,10 +59,10 @@ export const IdeaWidget: React.FC<IdeaWidgetProps> = ({
   return (
     <div className={cn("flex flex-col gap-3 p-3 text-xs", className)}>
       {/* Top Banner: Concept & Confidence */}
-      <div className="flex flex-col gap-2 rounded-xl bg-amber-500/10 border border-amber-500/20 p-2.5">
+      <div className="flex flex-col gap-2 rounded-xl bg-card border border-border/70 p-2.5 shadow-xs">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-500/20 text-amber-500">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground">
               <Lightbulb className="h-4 w-4" />
             </div>
             <input
@@ -125,7 +125,7 @@ export const IdeaWidget: React.FC<IdeaWidgetProps> = ({
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-[11px]">
           <span className="font-medium text-foreground flex items-center gap-1">
-            <Sparkles className="h-3 w-3 text-pink-500" />
+            <Sparkles className="h-3 w-3 text-foreground" />
             <span>Theme Swatches (Click to copy)</span>
           </span>
           <button
@@ -150,7 +150,7 @@ export const IdeaWidget: React.FC<IdeaWidgetProps> = ({
                 className="h-6 w-full rounded-md shadow-inner flex items-center justify-center"
                 style={{ backgroundColor: hex }}
               >
-                {copiedHex === hex && <Check className="h-3 w-3 text-white drop-shadow stroke-[3]" />}
+                {copiedHex === hex && <Check className="h-3 w-3 text-white drop-shadow" weight="bold" />}
               </div>
               <span className="font-mono text-[9px] text-muted-foreground group-hover:text-foreground">
                 {hex}
@@ -163,20 +163,20 @@ export const IdeaWidget: React.FC<IdeaWidgetProps> = ({
       {/* Pros & Cons */}
       <div className="grid grid-cols-2 gap-2">
         <div className="space-y-1">
-          <label className="text-[10px] font-semibold uppercase tracking-wider text-emerald-500 flex items-center gap-1">
-            <ThumbsUp className="h-2.5 w-2.5" />
+          <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+            <ThumbsUp className="h-2.5 w-2.5 text-foreground" />
             <span>Key Advantages</span>
           </label>
           <textarea
             rows={2}
             value={pros}
             onChange={(e) => setPros(e.target.value)}
-            className="w-full rounded-md border border-border bg-background/60 p-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-emerald-500 resize-none shadow-2xs"
+            className="w-full rounded-md border border-border bg-background/60 p-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 resize-none shadow-2xs"
           />
         </div>
         <div className="space-y-1">
-          <label className="text-[10px] font-semibold uppercase tracking-wider text-rose-500 flex items-center gap-1">
-            <ThumbsDown className="h-2.5 w-2.5" />
+          <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+            <ThumbsDown className="h-2.5 w-2.5 text-foreground" />
             <span>Risks & Trade-offs</span>
           </label>
           <textarea

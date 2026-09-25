@@ -2,20 +2,20 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Plus,
-  Calendar,
-  Sparkles,
-  Settings as SettingsIcon,
+  CalendarBlank as Calendar,
+  Sparkle as Sparkles,
+  Gear as SettingsIcon,
   Sun,
   Moon,
-  Layers,
-  ListChecks,
-  Pin,
+  Stack as Layers,
+  CheckSquareOffset as ListChecks,
+  PushPin as Pin,
   Kanban,
   Globe,
   Flame,
-  ArrowDownUp,
+  ArrowsDownUp as ArrowDownUp,
   Check,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import { StashLogo } from "@/components/shared/stash-logo";
 import { useUIStore } from "@/stores/ui-store";
 import { createAndOpenStash } from "@/features/capture/create-stash";
@@ -190,7 +190,7 @@ export const LiquidGlassFooter: React.FC<LiquidGlassFooterProps> = ({
                   className={cn(
                     "relative overflow-hidden shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold select-none cursor-pointer transition-all duration-200",
                     isCaptured
-                      ? "bg-emerald-600 text-white shadow-emerald-600/30"
+                      ? "bg-foreground text-background shadow-xs"
                       : "bg-gradient-to-b from-[#2a2a2e] to-[#0c0c0e] text-white dark:from-[#ffffff] dark:to-[#e2e2e8] dark:text-zinc-950",
                     "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.35),inset_0_-1px_1px_0_rgba(0,0,0,0.5),0_7px_16px_-6px_rgba(0,0,0,0.35)]",
                     "dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9),inset_0_-1px_1px_0_rgba(0,0,0,0.2),0_7px_16px_-6px_rgba(0,0,0,0.4)]"
@@ -204,12 +204,12 @@ export const LiquidGlassFooter: React.FC<LiquidGlassFooterProps> = ({
 
                   {isCaptured ? (
                     <>
-                      <Check className="h-3.5 w-3.5 stroke-[2.5]" />
+                      <Check className="h-3.5 w-3.5" weight="bold" />
                       <span>Captured!</span>
                     </>
                   ) : (
                     <>
-                      <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
+                      <Plus className="h-3.5 w-3.5" weight="bold" />
                       <span>Capture</span>
                     </>
                   )}
@@ -231,7 +231,7 @@ export const LiquidGlassFooter: React.FC<LiquidGlassFooterProps> = ({
                   onClick={() => setActiveSection("all")}
                   className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-foreground/80 hover:text-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-all text-left"
                 >
-                  <Layers className="h-3.5 w-3.5 text-primary opacity-80" />
+                  <Layers className="h-3.5 w-3.5 text-foreground/70" />
                   <span>All Notes</span>
                 </button>
                 <button
@@ -239,7 +239,7 @@ export const LiquidGlassFooter: React.FC<LiquidGlassFooterProps> = ({
                   onClick={() => setActiveSection("todos")}
                   className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-foreground/80 hover:text-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-all text-left"
                 >
-                  <ListChecks className="h-3.5 w-3.5 text-emerald-500 opacity-80" />
+                  <ListChecks className="h-3.5 w-3.5 text-foreground/70" />
                   <span>To-dos & Tasks</span>
                 </button>
                 <button
@@ -247,7 +247,7 @@ export const LiquidGlassFooter: React.FC<LiquidGlassFooterProps> = ({
                   onClick={() => setActiveSection("pinned")}
                   className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-foreground/80 hover:text-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-all text-left"
                 >
-                  <Pin className="h-3.5 w-3.5 text-amber-500 opacity-80" />
+                  <Pin className="h-3.5 w-3.5 text-foreground/70" />
                   <span>Pinned Stashes</span>
                 </button>
                 <button
@@ -255,7 +255,7 @@ export const LiquidGlassFooter: React.FC<LiquidGlassFooterProps> = ({
                   onClick={handleOpenToday}
                   className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-foreground/80 hover:text-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-all text-left"
                 >
-                  <Calendar className="h-3.5 w-3.5 text-indigo-500 opacity-80" />
+                  <Calendar className="h-3.5 w-3.5 text-foreground/70" />
                   <span>Today's Stash</span>
                 </button>
               </div>
@@ -272,7 +272,7 @@ export const LiquidGlassFooter: React.FC<LiquidGlassFooterProps> = ({
                   onClick={handleCreateKanbanStash}
                   className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-foreground/80 hover:text-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-all text-left"
                 >
-                  <Kanban className="h-3.5 w-3.5 text-blue-500 opacity-80" />
+                  <Kanban className="h-3.5 w-3.5 text-foreground/70" />
                   <span>Kanban Board</span>
                 </button>
                 <button
@@ -280,7 +280,7 @@ export const LiquidGlassFooter: React.FC<LiquidGlassFooterProps> = ({
                   onClick={handleOpenBrowserPip}
                   className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-foreground/80 hover:text-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-all text-left"
                 >
-                  <Globe className="h-3.5 w-3.5 text-teal-500 opacity-80" />
+                  <Globe className="h-3.5 w-3.5 text-foreground/70" />
                   <span>PiP Web Browser</span>
                 </button>
                 <button
@@ -293,7 +293,7 @@ export const LiquidGlassFooter: React.FC<LiquidGlassFooterProps> = ({
                   }}
                   className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-foreground/80 hover:text-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-all text-left"
                 >
-                  <Flame className="h-3.5 w-3.5 text-orange-500 opacity-80" />
+                  <Flame className="h-3.5 w-3.5 text-foreground/70" />
                   <span>Habit Tracker</span>
                 </button>
                 <button
@@ -306,7 +306,7 @@ export const LiquidGlassFooter: React.FC<LiquidGlassFooterProps> = ({
                   }}
                   className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-foreground/80 hover:text-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-all text-left"
                 >
-                  <ArrowDownUp className="h-3.5 w-3.5 text-violet-500 opacity-80" />
+                  <ArrowDownUp className="h-3.5 w-3.5 text-foreground/70" />
                   <span>Unit Converter</span>
                 </button>
               </div>
@@ -324,7 +324,7 @@ export const LiquidGlassFooter: React.FC<LiquidGlassFooterProps> = ({
                   className="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs text-foreground/80 hover:text-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-all text-left"
                 >
                   <span className="flex items-center gap-2">
-                    <Plus className="h-3.5 w-3.5 text-primary opacity-80" />
+                    <Plus className="h-3.5 w-3.5 text-foreground/70" />
                     <span>Quick Stash</span>
                   </span>
                   <kbd className="font-mono text-[10px] text-muted-foreground bg-black/5 dark:bg-white/10 px-1 py-0.5 rounded">
@@ -337,7 +337,7 @@ export const LiquidGlassFooter: React.FC<LiquidGlassFooterProps> = ({
                   className="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs text-foreground/80 hover:text-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-all text-left"
                 >
                   <span className="flex items-center gap-2">
-                    <Sparkles className="h-3.5 w-3.5 text-amber-500 opacity-80" />
+                    <Sparkles className="h-3.5 w-3.5 text-foreground/70" />
                     <span>Command Bar</span>
                   </span>
                   <kbd className="font-mono text-[10px] text-muted-foreground bg-black/5 dark:bg-white/10 px-1 py-0.5 rounded">
@@ -350,7 +350,7 @@ export const LiquidGlassFooter: React.FC<LiquidGlassFooterProps> = ({
                   className="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs text-foreground/80 hover:text-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-all text-left"
                 >
                   <span className="flex items-center gap-2">
-                    <SettingsIcon className="h-3.5 w-3.5 text-zinc-500 opacity-80" />
+                    <SettingsIcon className="h-3.5 w-3.5 text-foreground/70" />
                     <span>Preferences</span>
                   </span>
                   <kbd className="font-mono text-[10px] text-muted-foreground bg-black/5 dark:bg-white/10 px-1 py-0.5 rounded">
@@ -364,9 +364,9 @@ export const LiquidGlassFooter: React.FC<LiquidGlassFooterProps> = ({
                 >
                   <span className="flex items-center gap-2">
                     {theme === "dark" ? (
-                      <Sun className="h-3.5 w-3.5 text-amber-400 opacity-80" />
+                      <Sun className="h-3.5 w-3.5 text-foreground/70" />
                     ) : (
-                      <Moon className="h-3.5 w-3.5 text-indigo-400 opacity-80" />
+                      <Moon className="h-3.5 w-3.5 text-foreground/70" />
                     )}
                     <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
                   </span>
@@ -401,7 +401,7 @@ export const LiquidGlassFooter: React.FC<LiquidGlassFooterProps> = ({
               )}
               title="New Stash Note (Ctrl+N)"
             >
-              <Plus className="h-4 w-4 stroke-[2.2]" />
+              <Plus className="h-4 w-4" weight="bold" />
             </motion.button>
 
             <motion.button

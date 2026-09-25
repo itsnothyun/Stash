@@ -1,0 +1,1511 @@
+/* ==========================================================================
+   Stash Rich Theme Palettes & Terminal Transformations
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Terminal Matrix (Hacker Green Phosphor)
+   -------------------------------------------------------------------------- */
+html[data-theme="terminal"] {
+  --background: 120 15% 3.5%;
+  --foreground: 142 80% 60%;
+
+  --surface: 120 14% 5.5%;
+  --surface-elevated: 120 14% 7.5%;
+  --surface-hover: 120 16% 11%;
+  --surface-sunken: 120 16% 2.8%;
+
+  --card: 120 14% 5.5%;
+  --card-foreground: 142 80% 65%;
+
+  --popover: 120 14% 6.5%;
+  --popover-foreground: 142 80% 65%;
+
+  --primary: 142 85% 55%;
+  --primary-foreground: 120 20% 4%;
+
+  --secondary: 120 14% 11%;
+  --secondary-foreground: 142 75% 70%;
+
+  --muted: 120 14% 10%;
+  --muted-foreground: 142 40% 45%;
+  --subtle-foreground: 142 30% 35%;
+
+  --accent: 120 14% 12%;
+  --accent-foreground: 142 85% 65%;
+
+  --destructive: 0 75% 55%;
+  --destructive-foreground: 0 0% 100%;
+
+  --brand: 142 85% 50%;
+  --brand-foreground: 120 25% 4%;
+  --brand-muted: 120 20% 12%;
+
+  --border: 142 50% 16%;
+  --border-strong: 142 60% 26%;
+  --input: 120 14% 10%;
+  --ring: 142 85% 50%;
+  --selection: 142 85% 50%;
+
+  --sidebar: 120 15% 4.5%;
+  --sidebar-foreground: 142 50% 55%;
+  --sidebar-active: 120 16% 10%;
+  --sidebar-active-foreground: 142 85% 70%;
+  --sidebar-hover: 120 16% 8%;
+  --sidebar-border: 142 50% 14%;
+
+  --editor: 120 15% 4.5%;
+  --editor-foreground: 142 80% 62%;
+  --editor-placeholder: 142 30% 35%;
+
+  /* Stash Note Colors in Terminal Matrix */
+  --stash-paper-surface: #0a110a;
+  --stash-paper-hover: #101c10;
+  --stash-paper-border: #164e22;
+  --stash-paper-fg: #4ade80;
+  --stash-paper-muted: #1e7e34;
+  --stash-paper-dot: #22c55e;
+
+  --stash-sand-surface: #101109;
+  --stash-sand-hover: #1a1c10;
+  --stash-sand-border: #4d4416;
+  --stash-sand-fg: #d9ca65;
+  --stash-sand-muted: #8c8230;
+  --stash-sand-dot: #eab308;
+
+  --stash-lemon-surface: #121208;
+  --stash-lemon-hover: #1e1e0e;
+  --stash-lemon-border: #525213;
+  --stash-lemon-fg: #facc15;
+  --stash-lemon-muted: #85741b;
+  --stash-lemon-dot: #facc15;
+
+  --stash-sage-surface: #08120b;
+  --stash-sage-hover: #0e1e12;
+  --stash-sage-border: #184724;
+  --stash-sage-fg: #86efac;
+  --stash-sage-muted: #2d8a46;
+  --stash-sage-dot: #4ade80;
+
+  --stash-mint-surface: #07120e;
+  --stash-mint-hover: #0c1e17;
+  --stash-mint-border: #134e38;
+  --stash-mint-fg: #6ee7b7;
+  --stash-mint-muted: #228f64;
+  --stash-mint-dot: #34d399;
+
+  --stash-sky-surface: #071014;
+  --stash-sky-hover: #0d1b22;
+  --stash-sky-border: #15455c;
+  --stash-sky-fg: #7dd3fc;
+  --stash-sky-muted: #25789e;
+  --stash-sky-dot: #38bdf8;
+
+  --stash-lavender-surface: #0e0a14;
+  --stash-lavender-hover: #171021;
+  --stash-lavender-border: #3b2359;
+  --stash-lavender-fg: #d8b4fe;
+  --stash-lavender-muted: #7e4db8;
+  --stash-lavender-dot: #c084fc;
+
+  --stash-rose-surface: #14090b;
+  --stash-rose-hover: #210e13;
+  --stash-rose-border: #571e28;
+  --stash-rose-fg: #fda4af;
+  --stash-rose-muted: #a1394a;
+  --stash-rose-dot: #fb7185;
+
+  --stash-graphite-surface: #0a0e0b;
+  --stash-graphite-hover: #121814;
+  --stash-graphite-border: #233428;
+  --stash-graphite-fg: #a7f3d0;
+  --stash-graphite-muted: #4b7a5e;
+  --stash-graphite-dot: #6ee7b7;
+}
+
+/* --------------------------------------------------------------------------
+   2. Terminal Amber (VT100 Mainframe CRT)
+   -------------------------------------------------------------------------- */
+html[data-theme="amber-crt"] {
+  --background: 35 30% 3%;
+  --foreground: 38 95% 58%;
+
+  --surface: 35 25% 5%;
+  --surface-elevated: 35 25% 7%;
+  --surface-hover: 35 25% 10%;
+  --surface-sunken: 35 30% 2.5%;
+
+  --card: 35 25% 5%;
+  --card-foreground: 38 95% 62%;
+
+  --popover: 35 25% 6%;
+  --popover-foreground: 38 95% 62%;
+
+  --primary: 38 95% 55%;
+  --primary-foreground: 35 35% 4%;
+
+  --secondary: 35 25% 10%;
+  --secondary-foreground: 38 90% 70%;
+
+  --muted: 35 25% 9%;
+  --muted-foreground: 38 50% 42%;
+  --subtle-foreground: 38 40% 32%;
+
+  --accent: 35 25% 11%;
+  --accent-foreground: 38 95% 65%;
+
+  --destructive: 0 75% 55%;
+  --destructive-foreground: 0 0% 100%;
+
+  --brand: 38 95% 52%;
+  --brand-foreground: 35 35% 4%;
+  --brand-muted: 35 30% 12%;
+
+  --border: 38 60% 16%;
+  --border-strong: 38 70% 25%;
+  --input: 35 25% 9%;
+  --ring: 38 95% 52%;
+  --selection: 38 95% 52%;
+
+  --sidebar: 35 30% 4%;
+  --sidebar-foreground: 38 60% 50%;
+  --sidebar-active: 35 25% 9%;
+  --sidebar-active-foreground: 38 95% 70%;
+  --sidebar-hover: 35 25% 7.5%;
+  --sidebar-border: 38 60% 14%;
+
+  --editor: 35 30% 4%;
+  --editor-foreground: 38 95% 60%;
+  --editor-placeholder: 38 40% 32%;
+
+  --stash-paper-surface: #120c04;
+  --stash-paper-hover: #1c1408;
+  --stash-paper-border: #4d330e;
+  --stash-paper-fg: #fbbf24;
+  --stash-paper-muted: #855512;
+  --stash-paper-dot: #f59e0b;
+
+  --stash-sand-surface: #140d05;
+  --stash-sand-hover: #1f1409;
+  --stash-sand-border: #573911;
+  --stash-sand-fg: #fde68a;
+  --stash-sand-muted: #966518;
+  --stash-sand-dot: #fbbf24;
+
+  --stash-lemon-surface: #160e05;
+  --stash-lemon-hover: #221609;
+  --stash-lemon-border: #634011;
+  --stash-lemon-fg: #fef08a;
+  --stash-lemon-muted: #a67219;
+  --stash-lemon-dot: #facc15;
+
+  --stash-sage-surface: #100d06;
+  --stash-sage-hover: #19140b;
+  --stash-sage-border: #453518;
+  --stash-sage-fg: #fed7aa;
+  --stash-sage-muted: #8f6527;
+  --stash-sage-dot: #fb923c;
+
+  --stash-mint-surface: #0e0d07;
+  --stash-mint-hover: #17150c;
+  --stash-mint-border: #40361a;
+  --stash-mint-fg: #fef3c7;
+  --stash-mint-muted: #8a702c;
+  --stash-mint-dot: #fde047;
+
+  --stash-sky-surface: #110e08;
+  --stash-sky-hover: #1a160d;
+  --stash-sky-border: #4d3b1f;
+  --stash-sky-fg: #ffedd5;
+  --stash-sky-muted: #9e7039;
+  --stash-sky-dot: #f97316;
+
+  --stash-lavender-surface: #130c0a;
+  --stash-lavender-hover: #1e1310;
+  --stash-lavender-border: #523126;
+  --stash-lavender-fg: #fed7aa;
+  --stash-lavender-muted: #9c553d;
+  --stash-lavender-dot: #ea580c;
+
+  --stash-rose-surface: #140b08;
+  --stash-rose-hover: #20120d;
+  --stash-rose-border: #59291b;
+  --stash-rose-fg: #ffedd5;
+  --stash-rose-muted: #a3462f;
+  --stash-rose-dot: #f43f5e;
+
+  --stash-graphite-surface: #110c05;
+  --stash-graphite-hover: #19130a;
+  --stash-graphite-border: #423017;
+  --stash-graphite-fg: #fed7aa;
+  --stash-graphite-muted: #825a28;
+  --stash-graphite-dot: #d97706;
+}
+
+/* --------------------------------------------------------------------------
+   3. Cyberpunk 2077 (Neon Syndicate)
+   -------------------------------------------------------------------------- */
+html[data-theme="cyberpunk"] {
+  --background: 260 40% 4.5%;
+  --foreground: 180 100% 70%;
+
+  --surface: 260 35% 7%;
+  --surface-elevated: 260 35% 9.5%;
+  --surface-hover: 260 30% 14%;
+  --surface-sunken: 260 45% 3.5%;
+
+  --card: 260 35% 7%;
+  --card-foreground: 180 100% 75%;
+
+  --popover: 260 35% 8.5%;
+  --popover-foreground: 180 100% 75%;
+
+  --primary: 54 98% 52%; /* Cyber yellow */
+  --primary-foreground: 260 45% 5%;
+
+  --secondary: 260 30% 13%;
+  --secondary-foreground: 180 80% 80%;
+
+  --muted: 260 30% 12%;
+  --muted-foreground: 260 20% 55%;
+  --subtle-foreground: 260 20% 42%;
+
+  --accent: 330 100% 55%; /* Cyber pink */
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 90% 60%;
+  --destructive-foreground: 0 0% 100%;
+
+  --brand: 54 98% 52%;
+  --brand-foreground: 260 45% 5%;
+  --brand-muted: 54 80% 15%;
+
+  --border: 330 70% 30%;
+  --border-strong: 330 90% 48%;
+  --input: 260 30% 12%;
+  --ring: 180 100% 50%;
+  --selection: 330 100% 55%;
+
+  --sidebar: 260 42% 5.5%;
+  --sidebar-foreground: 180 60% 65%;
+  --sidebar-active: 260 30% 13%;
+  --sidebar-active-foreground: 54 98% 60%;
+  --sidebar-hover: 260 30% 10%;
+  --sidebar-border: 330 70% 25%;
+
+  --editor: 260 40% 5.5%;
+  --editor-foreground: 180 100% 75%;
+  --editor-placeholder: 260 20% 45%;
+
+  --stash-paper-surface: #100d20;
+  --stash-paper-hover: #191433;
+  --stash-paper-border: #4d1d61;
+  --stash-paper-fg: #fcee0a;
+  --stash-paper-muted: #9648a8;
+  --stash-paper-dot: #fcee0a;
+
+  --stash-sand-surface: #14101d;
+  --stash-sand-hover: #20192e;
+  --stash-sand-border: #63325c;
+  --stash-sand-fg: #ff007f;
+  --stash-sand-muted: #b0337d;
+  --stash-sand-dot: #ff007f;
+
+  --stash-lemon-surface: #141208;
+  --stash-lemon-hover: #221f0e;
+  --stash-lemon-border: #6b6319;
+  --stash-lemon-fg: #fcee0a;
+  --stash-lemon-muted: #a69a23;
+  --stash-lemon-dot: #fcee0a;
+
+  --stash-sage-surface: #0a141a;
+  --stash-sage-hover: #10212a;
+  --stash-sage-border: #1d5569;
+  --stash-sage-fg: #00f0ff;
+  --stash-sage-muted: #248aa8;
+  --stash-sage-dot: #00f0ff;
+
+  --stash-mint-surface: #091717;
+  --stash-mint-hover: #0f2424;
+  --stash-mint-border: #1a5e5e;
+  --stash-mint-fg: #05ffa1;
+  --stash-mint-muted: #1e9970;
+  --stash-mint-dot: #05ffa1;
+
+  --stash-sky-surface: #0a1222;
+  --stash-sky-hover: #101d36;
+  --stash-sky-border: #1e457f;
+  --stash-sky-fg: #00f0ff;
+  --stash-sky-muted: #2976c7;
+  --stash-sky-dot: #00f0ff;
+
+  --stash-lavender-surface: #170d24;
+  --stash-lavender-hover: #241438;
+  --stash-lavender-border: #61278f;
+  --stash-lavender-fg: #e066ff;
+  --stash-lavender-muted: #983dbf;
+  --stash-lavender-dot: #e066ff;
+
+  --stash-rose-surface: #1f0b18;
+  --stash-rose-hover: #311126;
+  --stash-rose-border: #80195c;
+  --stash-rose-fg: #ff007f;
+  --stash-rose-muted: #c22585;
+  --stash-rose-dot: #ff007f;
+
+  --stash-graphite-surface: #110e1a;
+  --stash-graphite-hover: #1b172a;
+  --stash-graphite-border: #3f335e;
+  --stash-graphite-fg: #00f0ff;
+  --stash-graphite-muted: #5e6694;
+  --stash-graphite-dot: #00f0ff;
+}
+
+/* --------------------------------------------------------------------------
+   4. Dracula Gothic
+   -------------------------------------------------------------------------- */
+html[data-theme="dracula"] {
+  --background: 231 15% 18%; /* #282a36 */
+  --foreground: 60 30% 96%;  /* #f8f8f2 */
+
+  --surface: 232 14% 23%;     /* #343746 */
+  --surface-elevated: 232 14% 27%;
+  --surface-hover: 232 14% 31%;
+  --surface-sunken: 231 15% 15%;
+
+  --card: 232 14% 23%;
+  --card-foreground: 60 30% 96%;
+
+  --popover: 232 14% 25%;
+  --popover-foreground: 60 30% 96%;
+
+  --primary: 265 89% 78%; /* #bd93f9 */
+  --primary-foreground: 231 15% 18%;
+
+  --secondary: 232 14% 30%;
+  --secondary-foreground: 60 30% 96%;
+
+  --muted: 232 14% 28%;
+  --muted-foreground: 232 14% 65%;
+  --subtle-foreground: 232 14% 50%;
+
+  --accent: 326 100% 74%; /* #ff79c6 */
+  --accent-foreground: 231 15% 18%;
+
+  --destructive: 0 100% 67%; /* #ff5555 */
+  --destructive-foreground: 60 30% 96%;
+
+  --brand: 265 89% 78%;
+  --brand-foreground: 231 15% 18%;
+  --brand-muted: 265 40% 25%;
+
+  --border: 232 14% 32%;
+  --border-strong: 232 14% 42%;
+  --input: 232 14% 26%;
+  --ring: 265 89% 78%;
+  --selection: 265 89% 78%;
+
+  --sidebar: 231 15% 16%;
+  --sidebar-foreground: 232 14% 75%;
+  --sidebar-active: 232 14% 27%;
+  --sidebar-active-foreground: 265 89% 78%;
+  --sidebar-hover: 232 14% 22%;
+  --sidebar-border: 232 14% 28%;
+
+  --editor: 231 15% 18%;
+  --editor-foreground: 60 30% 96%;
+  --editor-placeholder: 232 14% 52%;
+
+  --stash-paper-surface: #282a36;
+  --stash-paper-hover: #343746;
+  --stash-paper-border: #44475a;
+  --stash-paper-fg: #f8f8f2;
+  --stash-paper-muted: #8b8f9e;
+  --stash-paper-dot: #bd93f9;
+
+  --stash-sand-surface: #2d2a33;
+  --stash-sand-hover: #3b3744;
+  --stash-sand-border: #544b60;
+  --stash-sand-fg: #f1fa8c;
+  --stash-sand-muted: #a49e6c;
+  --stash-sand-dot: #f1fa8c;
+
+  --stash-lemon-surface: #2e2b2a;
+  --stash-lemon-hover: #3d3936;
+  --stash-lemon-border: #5c5240;
+  --stash-lemon-fg: #f1fa8c;
+  --stash-lemon-muted: #b3a968;
+  --stash-lemon-dot: #f1fa8c;
+
+  --stash-sage-surface: #242f32;
+  --stash-sage-hover: #303d42;
+  --stash-sage-border: #3e5a5f;
+  --stash-sage-fg: #50fa7b;
+  --stash-sage-muted: #4fb36b;
+  --stash-sage-dot: #50fa7b;
+
+  --stash-mint-surface: #222e2b;
+  --stash-mint-hover: #2d3d39;
+  --stash-mint-border: #3a5950;
+  --stash-mint-fg: #50fa7b;
+  --stash-mint-muted: #3fa863;
+  --stash-mint-dot: #50fa7b;
+
+  --stash-sky-surface: #222b3d;
+  --stash-sky-hover: #2d3952;
+  --stash-sky-border: #3e547a;
+  --stash-sky-fg: #8be9fd;
+  --stash-sky-muted: #4e95ad;
+  --stash-sky-dot: #8be9fd;
+
+  --stash-lavender-surface: #2c253d;
+  --stash-lavender-hover: #3b3152;
+  --stash-lavender-border: #56437a;
+  --stash-lavender-fg: #bd93f9;
+  --stash-lavender-muted: #8a64c4;
+  --stash-lavender-dot: #bd93f9;
+
+  --stash-rose-surface: #362232;
+  --stash-rose-hover: #472d42;
+  --stash-rose-border: #6e3d64;
+  --stash-rose-fg: #ff79c6;
+  --stash-rose-muted: #c25793;
+  --stash-rose-dot: #ff79c6;
+
+  --stash-graphite-surface: #2a2c38;
+  --stash-graphite-hover: #373a4a;
+  --stash-graphite-border: #4d5169;
+  --stash-graphite-fg: #f8f8f2;
+  --stash-graphite-muted: #9499ad;
+  --stash-graphite-dot: #bd93f9;
+}
+
+/* --------------------------------------------------------------------------
+   5. Nord Arctic Aurora
+   -------------------------------------------------------------------------- */
+html[data-theme="nord"] {
+  --background: 220 16% 22%; /* #2e3440 */
+  --foreground: 218 27% 94%; /* #eceff4 */
+
+  --surface: 222 16% 28%;     /* #3b4252 */
+  --surface-elevated: 220 17% 32%;
+  --surface-hover: 220 17% 38%;
+  --surface-sunken: 220 16% 18%;
+
+  --card: 222 16% 28%;
+  --card-foreground: 218 27% 94%;
+
+  --popover: 220 17% 30%;
+  --popover-foreground: 218 27% 94%;
+
+  --primary: 193 43% 67%; /* #88c0d0 */
+  --primary-foreground: 220 16% 20%;
+
+  --secondary: 220 17% 35%;
+  --secondary-foreground: 218 27% 94%;
+
+  --muted: 220 17% 32%;
+  --muted-foreground: 219 14% 71%;
+  --subtle-foreground: 219 14% 56%;
+
+  --accent: 210 34% 63%; /* #81a1c1 */
+  --accent-foreground: 220 16% 18%;
+
+  --destructive: 354 42% 56%; /* #bf616a */
+  --destructive-foreground: 218 27% 94%;
+
+  --brand: 193 43% 67%;
+  --brand-foreground: 220 16% 18%;
+  --brand-muted: 193 30% 28%;
+
+  --border: 220 17% 36%;
+  --border-strong: 220 17% 48%;
+  --input: 222 16% 30%;
+  --ring: 193 43% 67%;
+  --selection: 193 43% 67%;
+
+  --sidebar: 220 16% 19%;
+  --sidebar-foreground: 219 14% 75%;
+  --sidebar-active: 222 16% 32%;
+  --sidebar-active-foreground: 193 43% 72%;
+  --sidebar-hover: 222 16% 25%;
+  --sidebar-border: 220 17% 29%;
+
+  --editor: 220 16% 21%;
+  --editor-foreground: 218 27% 94%;
+  --editor-placeholder: 219 14% 56%;
+
+  --stash-paper-surface: #2e3440;
+  --stash-paper-hover: #3b4252;
+  --stash-paper-border: #4c566a;
+  --stash-paper-fg: #eceff4;
+  --stash-paper-muted: #9aa5b8;
+  --stash-paper-dot: #88c0d0;
+
+  --stash-sand-surface: #36343e;
+  --stash-sand-hover: #454250;
+  --stash-sand-border: #5d596e;
+  --stash-sand-fg: #ebcb8b;
+  --stash-sand-muted: #b89f6c;
+  --stash-sand-dot: #ebcb8b;
+
+  --stash-lemon-surface: #383637;
+  --stash-lemon-hover: #484547;
+  --stash-lemon-border: #645f62;
+  --stash-lemon-fg: #ebcb8b;
+  --stash-lemon-muted: #c2a66b;
+  --stash-lemon-dot: #ebcb8b;
+
+  --stash-sage-surface: #2d3839;
+  --stash-sage-hover: #3a484a;
+  --stash-sage-border: #4a6366;
+  --stash-sage-fg: #a3be8c;
+  --stash-sage-muted: #799465;
+  --stash-sage-dot: #a3be8c;
+
+  --stash-mint-surface: #2b3837;
+  --stash-mint-hover: #374847;
+  --stash-mint-border: #466361;
+  --stash-mint-fg: #8fbcbb;
+  --stash-mint-muted: #629190;
+  --stash-mint-dot: #8fbcbb;
+
+  --stash-sky-surface: #293544;
+  --stash-sky-hover: #354457;
+  --stash-sky-border: #435b75;
+  --stash-sky-fg: #88c0d0;
+  --stash-sky-muted: #5e8d9c;
+  --stash-sky-dot: #88c0d0;
+
+  --stash-lavender-surface: #343044;
+  --stash-lavender-hover: #433e57;
+  --stash-lavender-border: #595275;
+  --stash-lavender-fg: #b48ead;
+  --stash-lavender-muted: #8a6583;
+  --stash-lavender-dot: #b48ead;
+
+  --stash-rose-surface: #392b34;
+  --stash-rose-hover: #4a3743;
+  --stash-rose-border: #694b5e;
+  --stash-rose-fg: #bf616a;
+  --stash-rose-muted: #994850;
+  --stash-rose-dot: #bf616a;
+
+  --stash-graphite-surface: #323842;
+  --stash-graphite-hover: #404854;
+  --stash-graphite-border: #525c6b;
+  --stash-graphite-fg: #eceff4;
+  --stash-graphite-muted: #959fad;
+  --stash-graphite-dot: #88c0d0;
+}
+
+/* --------------------------------------------------------------------------
+   6. Monokai Pro
+   -------------------------------------------------------------------------- */
+html[data-theme="monokai"] {
+  --background: 60 7% 15%; /* #272822 */
+  --foreground: 60 30% 96%;
+
+  --surface: 60 7% 20%;     /* #32332c */
+  --surface-elevated: 60 7% 24%;
+  --surface-hover: 60 7% 30%;
+  --surface-sunken: 60 7% 12%;
+
+  --card: 60 7% 20%;
+  --card-foreground: 60 30% 96%;
+
+  --popover: 60 7% 22%;
+  --popover-foreground: 60 30% 96%;
+
+  --primary: 48 100% 70%; /* #ffd866 */
+  --primary-foreground: 60 7% 12%;
+
+  --secondary: 60 7% 28%;
+  --secondary-foreground: 60 30% 96%;
+
+  --muted: 60 7% 25%;
+  --muted-foreground: 60 8% 65%;
+  --subtle-foreground: 60 8% 50%;
+
+  --accent: 85 55% 66%; /* #a9dc76 */
+  --accent-foreground: 60 7% 12%;
+
+  --destructive: 345 100% 69%; /* #ff6188 */
+  --destructive-foreground: 60 30% 96%;
+
+  --brand: 48 100% 70%;
+  --brand-foreground: 60 7% 12%;
+  --brand-muted: 48 50% 25%;
+
+  --border: 60 7% 30%;
+  --border-strong: 60 7% 42%;
+  --input: 60 7% 24%;
+  --ring: 48 100% 70%;
+  --selection: 48 100% 70%;
+
+  --sidebar: 60 7% 13%;
+  --sidebar-foreground: 60 8% 70%;
+  --sidebar-active: 60 7% 25%;
+  --sidebar-active-foreground: 48 100% 70%;
+  --sidebar-hover: 60 7% 19%;
+  --sidebar-border: 60 7% 24%;
+
+  --editor: 60 7% 15%;
+  --editor-foreground: 60 30% 96%;
+  --editor-placeholder: 60 8% 50%;
+
+  --stash-paper-surface: #272822;
+  --stash-paper-hover: #32332c;
+  --stash-paper-border: #49483e;
+  --stash-paper-fg: #f8f8f2;
+  --stash-paper-muted: #959489;
+  --stash-paper-dot: #ffd866;
+
+  --stash-sand-surface: #2b2923;
+  --stash-sand-hover: #38352d;
+  --stash-sand-border: #524d40;
+  --stash-sand-fg: #fc9867;
+  --stash-sand-muted: #b87049;
+  --stash-sand-dot: #fc9867;
+
+  --stash-lemon-surface: #2e2b20;
+  --stash-lemon-hover: #3b3729;
+  --stash-lemon-border: #5c553d;
+  --stash-lemon-fg: #ffd866;
+  --stash-lemon-muted: #baa04c;
+  --stash-lemon-dot: #ffd866;
+
+  --stash-sage-surface: #222923;
+  --stash-sage-hover: #2b362c;
+  --stash-sage-border: #3d523f;
+  --stash-sage-fg: #a9dc76;
+  --stash-sage-muted: #73994d;
+  --stash-sage-dot: #a9dc76;
+
+  --stash-mint-surface: #202b28;
+  --stash-mint-hover: #293834;
+  --stash-mint-border: #3b544e;
+  --stash-mint-fg: #78e8c6;
+  --stash-mint-muted: #4aa88e;
+  --stash-mint-dot: #78e8c6;
+
+  --stash-sky-surface: #20272e;
+  --stash-sky-hover: #29333d;
+  --stash-sky-border: #3b4d5e;
+  --stash-sky-fg: #78dce8;
+  --stash-sky-muted: #4e9ca8;
+  --stash-sky-dot: #78dce8;
+
+  --stash-lavender-surface: #29242d;
+  --stash-lavender-hover: #362f3b;
+  --stash-lavender-border: #52445c;
+  --stash-lavender-fg: #ab9df2;
+  --stash-lavender-muted: #796cad;
+  --stash-lavender-dot: #ab9df2;
+
+  --stash-rose-surface: #2e2126;
+  --stash-rose-hover: #3c2a32;
+  --stash-rose-border: #5c3c4b;
+  --stash-rose-fg: #ff6188;
+  --stash-rose-muted: #ba405f;
+  --stash-rose-dot: #ff6188;
+
+  --stash-graphite-surface: #292a25;
+  --stash-graphite-hover: #353630;
+  --stash-graphite-border: #4c4d44;
+  --stash-graphite-fg: #f8f8f2;
+  --stash-graphite-muted: #95968b;
+  --stash-graphite-dot: #ffd866;
+}
+
+/* --------------------------------------------------------------------------
+   7. Solarized Dark
+   -------------------------------------------------------------------------- */
+html[data-theme="solarized-dark"] {
+  --background: 192 100% 11%; /* #002b36 */
+  --foreground: 186 21% 68%;  /* #839496 */
+
+  --surface: 192 81% 14%;     /* #073642 */
+  --surface-elevated: 192 81% 18%;
+  --surface-hover: 192 81% 23%;
+  --surface-sunken: 192 100% 8%;
+
+  --card: 192 81% 14%;
+  --card-foreground: 186 21% 75%;
+
+  --popover: 192 81% 16%;
+  --popover-foreground: 186 21% 75%;
+
+  --primary: 175 59% 40%; /* #2aa198 (Cyan) */
+  --primary-foreground: 192 100% 8%;
+
+  --secondary: 192 81% 20%;
+  --secondary-foreground: 186 21% 80%;
+
+  --muted: 192 81% 18%;
+  --muted-foreground: 186 16% 50%;
+  --subtle-foreground: 186 16% 40%;
+
+  --accent: 44 87% 35%; /* #b58900 (Yellow) */
+  --accent-foreground: 192 100% 8%;
+
+  --destructive: 1 71% 52%; /* #dc322f */
+  --destructive-foreground: 0 0% 100%;
+
+  --brand: 175 59% 40%;
+  --brand-foreground: 192 100% 8%;
+  --brand-muted: 175 40% 18%;
+
+  --border: 192 81% 22%;
+  --border-strong: 192 81% 32%;
+  --input: 192 81% 16%;
+  --ring: 175 59% 40%;
+  --selection: 175 59% 40%;
+
+  --sidebar: 192 100% 9%;
+  --sidebar-foreground: 186 21% 65%;
+  --sidebar-active: 192 81% 18%;
+  --sidebar-active-foreground: 175 59% 50%;
+  --sidebar-hover: 192 81% 14%;
+  --sidebar-border: 192 81% 18%;
+
+  --editor: 192 100% 10%;
+  --editor-foreground: 186 21% 72%;
+  --editor-placeholder: 186 16% 40%;
+
+  --stash-paper-surface: #002b36;
+  --stash-paper-hover: #073642;
+  --stash-paper-border: #0e4e5e;
+  --stash-paper-fg: #93a1a1;
+  --stash-paper-muted: #586e75;
+  --stash-paper-dot: #2aa198;
+
+  --stash-sand-surface: #0c2a30;
+  --stash-sand-hover: #14373e;
+  --stash-sand-border: #23515b;
+  --stash-sand-fg: #cb4b16;
+  --stash-sand-muted: #8d3e1d;
+  --stash-sand-dot: #cb4b16;
+
+  --stash-lemon-surface: #0e2a2c;
+  --stash-lemon-hover: #16363a;
+  --stash-lemon-border: #275155;
+  --stash-lemon-fg: #b58900;
+  --stash-lemon-muted: #80640d;
+  --stash-lemon-dot: #b58900;
+
+  --stash-sage-surface: #092a2d;
+  --stash-sage-hover: #10363b;
+  --stash-sage-border: #1c5258;
+  --stash-sage-fg: #859900;
+  --stash-sage-muted: #5e6d08;
+  --stash-sage-dot: #859900;
+
+  --stash-mint-surface: #062b32;
+  --stash-mint-hover: #0c3841;
+  --stash-mint-border: #16535f;
+  --stash-mint-fg: #2aa198;
+  --stash-mint-muted: #1e716b;
+  --stash-mint-dot: #2aa198;
+
+  --stash-sky-surface: #052a39;
+  --stash-sky-hover: #0b3749;
+  --stash-sky-border: #13526c;
+  --stash-sky-fg: #268bd2;
+  --stash-sky-muted: #1b6394;
+  --stash-sky-dot: #268bd2;
+
+  --stash-lavender-surface: #102636;
+  --stash-lavender-hover: #183345;
+  --stash-lavender-border: #274d66;
+  --stash-lavender-fg: #6c71c4;
+  --stash-lavender-muted: #4e5394;
+  --stash-lavender-dot: #6c71c4;
+
+  --stash-rose-surface: #172332;
+  --stash-rose-hover: #222f42;
+  --stash-rose-border: #394861;
+  --stash-rose-fg: #d33682;
+  --stash-rose-muted: #992960;
+  --stash-rose-dot: #d33682;
+
+  --stash-graphite-surface: #062c37;
+  --stash-graphite-hover: #0d3844;
+  --stash-graphite-border: #185261;
+  --stash-graphite-fg: #93a1a1;
+  --stash-graphite-muted: #586e75;
+  --stash-graphite-dot: #2aa198;
+}
+
+/* --------------------------------------------------------------------------
+   8. Solarized Light
+   -------------------------------------------------------------------------- */
+html[data-theme="solarized-light"] {
+  --background: 44 87% 94%;   /* #fdf6e3 */
+  --foreground: 192 100% 11%; /* #002b36 */
+
+  --surface: 44 38% 89%;      /* #eee8d5 */
+  --surface-elevated: 44 87% 96%;
+  --surface-hover: 44 40% 84%;
+  --surface-sunken: 44 38% 85%;
+
+  --card: 44 87% 97%;
+  --card-foreground: 192 100% 11%;
+
+  --popover: 44 87% 97%;
+  --popover-foreground: 192 100% 11%;
+
+  --primary: 205 69% 49%; /* #268bd2 */
+  --primary-foreground: 44 87% 94%;
+
+  --secondary: 44 38% 85%;
+  --secondary-foreground: 192 100% 11%;
+
+  --muted: 44 38% 87%;
+  --muted-foreground: 192 15% 40%;
+  --subtle-foreground: 192 15% 55%;
+
+  --accent: 175 59% 40%; /* #2aa198 */
+  --accent-foreground: 44 87% 94%;
+
+  --destructive: 1 71% 52%;
+  --destructive-foreground: 0 0% 100%;
+
+  --brand: 205 69% 49%;
+  --brand-foreground: 44 87% 94%;
+  --brand-muted: 205 60% 90%;
+
+  --border: 44 25% 78%;
+  --border-strong: 44 30% 65%;
+  --input: 44 25% 82%;
+  --ring: 205 69% 49%;
+  --selection: 205 69% 49%;
+
+  --sidebar: 44 50% 91%;
+  --sidebar-foreground: 192 20% 30%;
+  --sidebar-active: 44 40% 84%;
+  --sidebar-active-foreground: 205 69% 40%;
+  --sidebar-hover: 44 45% 87%;
+  --sidebar-border: 44 25% 78%;
+
+  --editor: 44 87% 95%;
+  --editor-foreground: 192 100% 11%;
+  --editor-placeholder: 192 15% 55%;
+
+  --stash-paper-surface: #fdf6e3;
+  --stash-paper-hover: #f7ebd0;
+  --stash-paper-border: #dfd4b7;
+  --stash-paper-fg: #002b36;
+  --stash-paper-muted: #586e75;
+  --stash-paper-dot: #268bd2;
+
+  --stash-sand-surface: #fbf0d8;
+  --stash-sand-hover: #f3dfb9;
+  --stash-sand-border: #dcc28f;
+  --stash-sand-fg: #cb4b16;
+  --stash-sand-muted: #8d3e1d;
+  --stash-sand-dot: #cb4b16;
+
+  --stash-lemon-surface: #faf3cf;
+  --stash-lemon-hover: #f3e6a7;
+  --stash-lemon-border: #ded083;
+  --stash-lemon-fg: #b58900;
+  --stash-lemon-muted: #80640d;
+  --stash-lemon-dot: #b58900;
+
+  --stash-sage-surface: #f4f6dc;
+  --stash-sage-hover: #e7ebb9;
+  --stash-sage-border: #cdd497;
+  --stash-sage-fg: #859900;
+  --stash-sage-muted: #5e6d08;
+  --stash-sage-dot: #859900;
+
+  --stash-mint-surface: #ebf7f1;
+  --stash-mint-hover: #d3eee1;
+  --stash-mint-border: #afdcc8;
+  --stash-mint-fg: #2aa198;
+  --stash-mint-muted: #1e716b;
+  --stash-mint-dot: #2aa198;
+
+  --stash-sky-surface: #e9f4f9;
+  --stash-sky-hover: #cfe7f3;
+  --stash-sky-border: #a9d4ec;
+  --stash-sky-fg: #268bd2;
+  --stash-sky-muted: #1b6394;
+  --stash-sky-dot: #268bd2;
+
+  --stash-lavender-surface: #f2f1f9;
+  --stash-lavender-hover: #e0dff3;
+  --stash-lavender-border: #c3c1ea;
+  --stash-lavender-fg: #6c71c4;
+  --stash-lavender-muted: #4e5394;
+  --stash-lavender-dot: #6c71c4;
+
+  --stash-rose-surface: #fbf0f4;
+  --stash-rose-hover: #f5dde7;
+  --stash-rose-border: #e6bfd2;
+  --stash-rose-fg: #d33682;
+  --stash-rose-muted: #992960;
+  --stash-rose-dot: #d33682;
+
+  --stash-graphite-surface: #f0f0e8;
+  --stash-graphite-hover: #e2e2d6;
+  --stash-graphite-border: #c7c7b8;
+  --stash-graphite-fg: #002b36;
+  --stash-graphite-muted: #586e75;
+  --stash-graphite-dot: #268bd2;
+}
+
+/* --------------------------------------------------------------------------
+   9. Matcha Zen (Japanese Forest Ceremony)
+   -------------------------------------------------------------------------- */
+html[data-theme="matcha"] {
+  --background: 130 20% 10%; /* #152218 */
+  --foreground: 140 25% 88%; /* #d8e2dc */
+
+  --surface: 130 18% 14%;
+  --surface-elevated: 130 18% 18%;
+  --surface-hover: 130 18% 23%;
+  --surface-sunken: 130 22% 7.5%;
+
+  --card: 130 18% 14%;
+  --card-foreground: 140 25% 88%;
+
+  --popover: 130 18% 16%;
+  --popover-foreground: 140 25% 88%;
+
+  --primary: 114 20% 55%; /* #7da379 (Matcha Jade) */
+  --primary-foreground: 130 25% 8%;
+
+  --secondary: 130 18% 22%;
+  --secondary-foreground: 140 25% 88%;
+
+  --muted: 130 18% 20%;
+  --muted-foreground: 130 12% 58%;
+  --subtle-foreground: 130 12% 44%;
+
+  --accent: 40 40% 65%; /* Bamboo cream */
+  --accent-foreground: 130 25% 8%;
+
+  --destructive: 0 50% 55%;
+  --destructive-foreground: 0 0% 100%;
+
+  --brand: 114 20% 55%;
+  --brand-foreground: 130 25% 8%;
+  --brand-muted: 114 20% 20%;
+
+  --border: 130 16% 22%;
+  --border-strong: 130 16% 32%;
+  --input: 130 18% 18%;
+  --ring: 114 20% 55%;
+  --selection: 114 20% 55%;
+
+  --sidebar: 130 20% 8.5%;
+  --sidebar-foreground: 130 15% 68%;
+  --sidebar-active: 130 18% 20%;
+  --sidebar-active-foreground: 114 25% 75%;
+  --sidebar-hover: 130 18% 15%;
+  --sidebar-border: 130 16% 18%;
+
+  --editor: 130 20% 9.5%;
+  --editor-foreground: 140 25% 86%;
+  --editor-placeholder: 130 12% 45%;
+
+  --stash-paper-surface: #152218;
+  --stash-paper-hover: #1e3022;
+  --stash-paper-border: #2e4734;
+  --stash-paper-fg: #d8e2dc;
+  --stash-paper-muted: #7da379;
+  --stash-paper-dot: #7da379;
+
+  --stash-sand-surface: #1e2417;
+  --stash-sand-hover: #2b3321;
+  --stash-sand-border: #424e33;
+  --stash-sand-fg: #d4c8a5;
+  --stash-sand-muted: #8f8564;
+  --stash-sand-dot: #d4c8a5;
+
+  --stash-lemon-surface: #222517;
+  --stash-lemon-hover: #2f3320;
+  --stash-lemon-border: #494e32;
+  --stash-lemon-fg: #ebe5b7;
+  --stash-lemon-muted: #9e996f;
+  --stash-lemon-dot: #ebe5b7;
+
+  --stash-sage-surface: #18261b;
+  --stash-sage-hover: #223626;
+  --stash-sage-border: #35523b;
+  --stash-sage-fg: #b2d6b7;
+  --stash-sage-muted: #6e9474;
+  --stash-sage-dot: #b2d6b7;
+
+  --stash-mint-surface: #14261f;
+  --stash-mint-hover: #1c362c;
+  --stash-mint-border: #2c5243;
+  --stash-mint-fg: #a8dec9;
+  --stash-mint-muted: #619e88;
+  --stash-mint-dot: #a8dec9;
+
+  --stash-sky-surface: #152427;
+  --stash-sky-hover: #1e3337;
+  --stash-sky-border: #2f4d54;
+  --stash-sky-fg: #aedae3;
+  --stash-sky-muted: #65939e;
+  --stash-sky-dot: #aedae3;
+
+  --stash-lavender-surface: #201e27;
+  --stash-lavender-hover: #2c2937;
+  --stash-lavender-border: #443f54;
+  --stash-lavender-fg: #cfc7e8;
+  --stash-lavender-muted: #887f9e;
+  --stash-lavender-dot: #cfc7e8;
+
+  --stash-rose-surface: #261c1e;
+  --stash-rose-hover: #36272a;
+  --stash-rose-border: #523c40;
+  --stash-rose-fg: #e6b8be;
+  --stash-rose-muted: #a37279;
+  --stash-rose-dot: #e6b8be;
+
+  --stash-graphite-surface: #1c231e;
+  --stash-graphite-hover: #27312a;
+  --stash-graphite-border: #3c4a40;
+  --stash-graphite-fg: #d8e2dc;
+  --stash-graphite-muted: #839487;
+  --stash-graphite-dot: #7da379;
+}
+
+/* --------------------------------------------------------------------------
+   10. Synthwave '84 (Outrun Retro Grid)
+   -------------------------------------------------------------------------- */
+html[data-theme="synthwave"] {
+  --background: 265 32% 15%; /* #241b35 */
+  --foreground: 320 90% 75%; /* #ff7edb */
+
+  --surface: 265 30% 20%;     /* #2f2345 */
+  --surface-elevated: 265 30% 24%;
+  --surface-hover: 265 30% 30%;
+  --surface-sunken: 265 35% 11%;
+
+  --card: 265 30% 20%;
+  --card-foreground: 320 90% 80%;
+
+  --popover: 265 30% 22%;
+  --popover-foreground: 320 90% 80%;
+
+  --primary: 320 100% 70%; /* #ff7edb (Neon Pink) */
+  --primary-foreground: 265 40% 10%;
+
+  --secondary: 265 30% 28%;
+  --secondary-foreground: 180 95% 75%;
+
+  --muted: 265 30% 26%;
+  --muted-foreground: 265 18% 65%;
+  --subtle-foreground: 265 18% 50%;
+
+  --accent: 180 95% 58%; /* #36f9f6 (Laser Cyan) */
+  --accent-foreground: 265 40% 10%;
+
+  --destructive: 0 95% 65%;
+  --destructive-foreground: 0 0% 100%;
+
+  --brand: 320 100% 70%;
+  --brand-foreground: 265 40% 10%;
+  --brand-muted: 320 60% 25%;
+
+  --border: 265 35% 32%;
+  --border-strong: 320 60% 48%;
+  --input: 265 30% 25%;
+  --ring: 180 95% 58%;
+  --selection: 320 100% 70%;
+
+  --sidebar: 265 35% 12%;
+  --sidebar-foreground: 265 25% 75%;
+  --sidebar-active: 265 30% 24%;
+  --sidebar-active-foreground: 320 100% 75%;
+  --sidebar-hover: 265 30% 18%;
+  --sidebar-border: 265 35% 24%;
+
+  --editor: 265 32% 14%;
+  --editor-foreground: 320 90% 80%;
+  --editor-placeholder: 265 18% 50%;
+
+  --stash-paper-surface: #241b35;
+  --stash-paper-hover: #32254a;
+  --stash-paper-border: #573a82;
+  --stash-paper-fg: #ff7edb;
+  --stash-paper-muted: #b84ea0;
+  --stash-paper-dot: #ff7edb;
+
+  --stash-sand-surface: #2b1c2b;
+  --stash-sand-hover: #3c273c;
+  --stash-sand-border: #6b3e6b;
+  --stash-sand-fg: #fede5d;
+  --stash-sand-muted: #b89c37;
+  --stash-sand-dot: #fede5d;
+
+  --stash-lemon-surface: #2d1c25;
+  --stash-lemon-hover: #402734;
+  --stash-lemon-border: #703f5b;
+  --stash-lemon-fg: #ff9955;
+  --stash-lemon-muted: #bd6a33;
+  --stash-lemon-dot: #ff9955;
+
+  --stash-sage-surface: #1c2432;
+  --stash-sage-hover: #273347;
+  --stash-sage-border: #3f5575;
+  --stash-sage-fg: #72f1b8;
+  --stash-sage-muted: #41ad7e;
+  --stash-sage-dot: #72f1b8;
+
+  --stash-mint-surface: #182733;
+  --stash-mint-hover: #223747;
+  --stash-mint-border: #365a75;
+  --stash-mint-fg: #36f9f6;
+  --stash-mint-muted: #21b3b0;
+  --stash-mint-dot: #36f9f6;
+
+  --stash-sky-surface: #1e203b;
+  --stash-sky-hover: #2b2e54;
+  --stash-sky-border: #444985;
+  --stash-sky-fg: #36f9f6;
+  --stash-sky-muted: #2da1a6;
+  --stash-sky-dot: #36f9f6;
+
+  --stash-lavender-surface: #291a3b;
+  --stash-lavender-hover: #3a2554;
+  --stash-lavender-border: #633b8f;
+  --stash-lavender-fg: #fe4450;
+  --stash-lavender-muted: #b52a33;
+  --stash-lavender-dot: #fe4450;
+
+  --stash-rose-surface: #33172e;
+  --stash-rose-hover: #472040;
+  --stash-rose-border: #7a326e;
+  --stash-rose-fg: #ff7edb;
+  --stash-rose-muted: #b84ea0;
+  --stash-rose-dot: #ff7edb;
+
+  --stash-graphite-surface: #261f36;
+  --stash-graphite-hover: #342a4a;
+  --stash-graphite-border: #544473;
+  --stash-graphite-fg: #ff7edb;
+  --stash-graphite-muted: #9c7bb0;
+  --stash-graphite-dot: #36f9f6;
+}
+
+/* --------------------------------------------------------------------------
+   11. Rosé Pine Moon (Cozy Scandinavian Twilight)
+   -------------------------------------------------------------------------- */
+html[data-theme="rose-pine"] {
+  --background: 247 20% 12%; /* #191724 */
+  --foreground: 245 40% 91%; /* #e0def4 */
+
+  --surface: 247 22% 16%;     /* #26233a */
+  --surface-elevated: 247 22% 20%;
+  --surface-hover: 247 22% 25%;
+  --surface-sunken: 247 22% 9%;
+
+  --card: 247 22% 16%;
+  --card-foreground: 245 40% 91%;
+
+  --popover: 247 22% 18%;
+  --popover-foreground: 245 40% 91%;
+
+  --primary: 2 55% 83%; /* #ebbcba (Blush Rose) */
+  --primary-foreground: 247 25% 10%;
+
+  --secondary: 247 22% 24%;
+  --secondary-foreground: 245 40% 91%;
+
+  --muted: 247 22% 22%;
+  --muted-foreground: 245 15% 65%;
+  --subtle-foreground: 245 15% 50%;
+
+  --accent: 38 86% 72%; /* #f6c177 (Gold) */
+  --accent-foreground: 247 25% 10%;
+
+  --destructive: 343 76% 68%; /* #eb6f92 */
+  --destructive-foreground: 0 0% 100%;
+
+  --brand: 2 55% 83%;
+  --brand-foreground: 247 25% 10%;
+  --brand-muted: 2 40% 25%;
+
+  --border: 247 18% 26%;
+  --border-strong: 247 20% 36%;
+  --input: 247 22% 20%;
+  --ring: 2 55% 83%;
+  --selection: 2 55% 83%;
+
+  --sidebar: 247 22% 10%;
+  --sidebar-foreground: 245 20% 72%;
+  --sidebar-active: 247 22% 22%;
+  --sidebar-active-foreground: 2 55% 85%;
+  --sidebar-hover: 247 22% 15%;
+  --sidebar-border: 247 20% 20%;
+
+  --editor: 247 20% 12%;
+  --editor-foreground: 245 40% 91%;
+  --editor-placeholder: 245 15% 50%;
+
+  --stash-paper-surface: #191724;
+  --stash-paper-hover: #232033;
+  --stash-paper-border: #393552;
+  --stash-paper-fg: #e0def4;
+  --stash-paper-muted: #908caa;
+  --stash-paper-dot: #ebbcba;
+
+  --stash-sand-surface: #221d26;
+  --stash-sand-hover: #2f2736;
+  --stash-sand-border: #4d3d57;
+  --stash-sand-fg: #f6c177;
+  --stash-sand-muted: #ab8248;
+  --stash-sand-dot: #f6c177;
+
+  --stash-lemon-surface: #251e22;
+  --stash-lemon-hover: #33292e;
+  --stash-lemon-border: #524049;
+  --stash-lemon-fg: #f6c177;
+  --stash-lemon-muted: #a67f49;
+  --stash-lemon-dot: #f6c177;
+
+  --stash-sage-surface: #1a2228;
+  --stash-sage-hover: #232f38;
+  --stash-sage-border: #364857;
+  --stash-sage-fg: #9ccfd8;
+  --stash-sage-muted: #5e8991;
+  --stash-sage-dot: #9ccfd8;
+
+  --stash-mint-surface: #182329;
+  --stash-mint-hover: #213038;
+  --stash-mint-border: #334b57;
+  --stash-mint-fg: #31748f;
+  --stash-mint-muted: #56949f;
+  --stash-mint-dot: #31748f;
+
+  --stash-sky-surface: #1c202d;
+  --stash-sky-hover: #262c3d;
+  --stash-sky-border: #3b445e;
+  --stash-sky-fg: #9ccfd8;
+  --stash-sky-muted: #648999;
+  --stash-sky-dot: #9ccfd8;
+
+  --stash-lavender-surface: #211c2e;
+  --stash-lavender-hover: #2e2640;
+  --stash-lavender-border: #483b63;
+  --stash-lavender-fg: #c4a7e7;
+  --stash-lavender-muted: #856ba6;
+  --stash-lavender-dot: #c4a7e7;
+
+  --stash-rose-surface: #261924;
+  --stash-rose-hover: #362232;
+  --stash-rose-border: #57344f;
+  --stash-rose-fg: #eb6f92;
+  --stash-rose-muted: #9e435d;
+  --stash-rose-dot: #eb6f92;
+
+  --stash-graphite-surface: #211f2d;
+  --stash-graphite-hover: #2c293b;
+  --stash-graphite-border: #444059;
+  --stash-graphite-fg: #e0def4;
+  --stash-graphite-muted: #908caa;
+  --stash-graphite-dot: #ebbcba;
+}
+
+/* --------------------------------------------------------------------------
+   12. E-Ink Minimalist (True Monochrome E-Paper)
+   -------------------------------------------------------------------------- */
+html[data-theme="e-ink"] {
+  --background: 0 0% 98%;    /* #fafafa */
+  --foreground: 0 0% 8%;     /* #141414 */
+
+  --surface: 0 0% 93%;       /* #eeeeee */
+  --surface-elevated: 0 0% 100%;
+  --surface-hover: 0 0% 89%;
+  --surface-sunken: 0 0% 91%;
+
+  --card: 0 0% 99%;
+  --card-foreground: 0 0% 8%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 8%;
+
+  --primary: 0 0% 10%;
+  --primary-foreground: 0 0% 98%;
+
+  --secondary: 0 0% 90%;
+  --secondary-foreground: 0 0% 10%;
+
+  --muted: 0 0% 92%;
+  --muted-foreground: 0 0% 38%;
+  --subtle-foreground: 0 0% 50%;
+
+  --accent: 0 0% 88%;
+  --accent-foreground: 0 0% 8%;
+
+  --destructive: 0 0% 25%;
+  --destructive-foreground: 0 0% 100%;
+
+  --brand: 0 0% 10%;
+  --brand-foreground: 0 0% 98%;
+  --brand-muted: 0 0% 88%;
+
+  --border: 0 0% 75%;
+  --border-strong: 0 0% 45%;
+  --input: 0 0% 85%;
+  --ring: 0 0% 10%;
+  --selection: 0 0% 20%;
+
+  --sidebar: 0 0% 95%;
+  --sidebar-foreground: 0 0% 25%;
+  --sidebar-active: 0 0% 88%;
+  --sidebar-active-foreground: 0 0% 5%;
+  --sidebar-hover: 0 0% 91%;
+  --sidebar-border: 0 0% 78%;
+
+  --editor: 0 0% 98%;
+  --editor-foreground: 0 0% 8%;
+  --editor-placeholder: 0 0% 50%;
+
+  /* High contrast monochrome e-ink stash colors */
+  --stash-paper-surface: #ffffff;
+  --stash-paper-hover: #f0f0f0;
+  --stash-paper-border: #525252;
+  --stash-paper-fg: #111111;
+  --stash-paper-muted: #555555;
+  --stash-paper-dot: #111111;
+
+  --stash-sand-surface: #f7f7f7;
+  --stash-sand-hover: #eaeaea;
+  --stash-sand-border: #666666;
+  --stash-sand-fg: #111111;
+  --stash-sand-muted: #555555;
+  --stash-sand-dot: #333333;
+
+  --stash-lemon-surface: #f9f9f9;
+  --stash-lemon-hover: #ededed;
+  --stash-lemon-border: #737373;
+  --stash-lemon-fg: #111111;
+  --stash-lemon-muted: #555555;
+  --stash-lemon-dot: #222222;
+
+  --stash-sage-surface: #f5f5f5;
+  --stash-sage-hover: #e8e8e8;
+  --stash-sage-border: #666666;
+  --stash-sage-fg: #111111;
+  --stash-sage-muted: #555555;
+  --stash-sage-dot: #222222;
+
+  --stash-mint-surface: #f5f5f5;
+  --stash-mint-hover: #e8e8e8;
+  --stash-mint-border: #666666;
+  --stash-mint-fg: #111111;
+  --stash-mint-muted: #555555;
+  --stash-mint-dot: #222222;
+
+  --stash-sky-surface: #f5f5f5;
+  --stash-sky-hover: #e8e8e8;
+  --stash-sky-border: #666666;
+  --stash-sky-fg: #111111;
+  --stash-sky-muted: #555555;
+  --stash-sky-dot: #222222;
+
+  --stash-lavender-surface: #f6f6f6;
+  --stash-lavender-hover: #e9e9e9;
+  --stash-lavender-border: #666666;
+  --stash-lavender-fg: #111111;
+  --stash-lavender-muted: #555555;
+  --stash-lavender-dot: #222222;
+
+  --stash-rose-surface: #f6f6f6;
+  --stash-rose-hover: #e9e9e9;
+  --stash-rose-border: #666666;
+  --stash-rose-fg: #111111;
+  --stash-rose-muted: #555555;
+  --stash-rose-dot: #222222;
+
+  --stash-graphite-surface: #f0f0f0;
+  --stash-graphite-hover: #e2e2e2;
+  --stash-graphite-border: #444444;
+  --stash-graphite-fg: #111111;
+  --stash-graphite-muted: #555555;
+  --stash-graphite-dot: #111111;
+}
+
+/* ==========================================================================
+   TERMINAL UI & UX ENHANCEMENTS
+   ========================================================================== */
+
+/* 1. Sharp Geometry for Terminal & Cyberpunk Themes */
+html[data-theme="terminal"],
+html[data-theme="amber-crt"],
+html[data-theme="cyberpunk"],
+html[data-theme="e-ink"],
+html[data-terminal-sharp="true"] {
+  --radius-xs: 0px !important;
+  --radius-sm: 0px !important;
+  --radius: 0px !important;
+  --radius-md: 0px !important;
+  --radius-lg: 0px !important;
+  --radius-xl: 0px !important;
+  --radius-2xl: 0px !important;
+}
+
+/* 2. Terminal Glow & Phosphor Bloom */
+html[data-theme="terminal"] .terminal-glow,
+html[data-theme="terminal"][data-terminal-glow="true"] {
+  text-shadow: 0 0 4px rgba(34, 197, 94, 0.45);
+}
+
+html[data-theme="amber-crt"] .terminal-glow,
+html[data-theme="amber-crt"][data-terminal-glow="true"] {
+  text-shadow: 0 0 4px rgba(245, 158, 11, 0.45);
+}
+
+/* 3. Terminal CRT Scanline Overlay */
+.stash-crt-scanlines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99999;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.25) 50%
+  );
+  background-size: 100% 3px;
+  opacity: 0.35;
+}
+
+/* 4. Blinking Terminal Cursor */
+@keyframes terminal-blink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+.terminal-cursor-block {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.1em;
+  vertical-align: -0.15em;
+  background-color: currentColor;
+  animation: terminal-blink 1s infinite steps(1);
+}
+
+.terminal-cursor-underscore {
+  display: inline-block;
+  width: 0.6em;
+  height: 2px;
+  vertical-align: -0.1em;
+  background-color: currentColor;
+  animation: terminal-blink 1s infinite steps(1);
+}
+
+/* 5. Terminal CLI Prompt in Search Bar */
+html[data-theme="terminal"] input::placeholder,
+html[data-theme="amber-crt"] input::placeholder {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}

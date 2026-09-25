@@ -1,4 +1,5 @@
 import { NoteColor } from "./color";
+import { AppTheme } from "@/lib/themes/theme-definitions";
 
 export interface Tag {
   id: string;
@@ -47,7 +48,7 @@ export interface Revision {
 }
 
 export interface Settings {
-  theme: "system" | "light" | "dark";
+  theme: AppTheme;
   defaultColor: NoteColor;
   defaultAlwaysOnTop: boolean;
   launchAtStartup: boolean;
