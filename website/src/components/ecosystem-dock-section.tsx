@@ -109,7 +109,7 @@ export const EcosystemDockSection: React.FC = () => {
                   <div className="mt-3.5 pt-2 border-t border-white/[0.06] flex items-center justify-between text-[10px] text-zinc-500 font-mono">
                     <span className="capitalize">{app.id}</span>
                     <span className="text-zinc-400 group-hover:text-white transition-colors">
-                      {app.isCurrent ? "Active App • Home" : "Open GitHub Repo →"}
+                      {app.isCurrent ? "Active App • Home" : "Launch App →"}
                     </span>
                   </div>
                 </a>

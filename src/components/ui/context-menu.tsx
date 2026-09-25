@@ -70,31 +70,23 @@ const ContextMenuItem = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Item> & {
     inset?: boolean;
   }
->(({ className, inset, onSelect, onClick, ...props }, ref) => {
-  const lastSelectTimeRef = React.useRef(0);
-  return (
-    <ContextMenuPrimitive.Item
-      ref={ref}
-      onSelect={(event) => {
-        lastSelectTimeRef.current = Date.now();
-        onSelect?.(event);
-        if (!event.defaultPrevented && onClick) {
-          (onClick as any)(event);
-        }
-      }}
-      onClick={(e) => {
-        if (Date.now() - lastSelectTimeRef.current < 150) return;
-        onClick?.(e);
-      }}
-      className={cn(
-        "relative flex cursor-default select-none items-center rounded-lg px-2.5 py-1.5 text-xs outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-        inset && "pl-8",
-        className
-      )}
-      {...props}
-    />
-  );
-});
+>(({ className, inset, onSelect, onClick, ...props }, ref) => (
+  <ContextMenuPrimitive.Item
+    ref={ref}
+    onSelect={(event) => {
+      onSelect?.(event);
+      if (!event.defaultPrevented && onClick) {
+        (onClick as any)(event);
+      }
+    }}
+    className={cn(
+      "relative flex cursor-default select-none items-center rounded-lg px-2.5 py-1.5 text-xs outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      inset && "pl-8",
+      className
+    )}
+    {...props}
+  />
+));
 ContextMenuItem.displayName = ContextMenuPrimitive.Item.displayName;
 
 const ContextMenuCheckboxItem = React.forwardRef<

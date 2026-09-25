@@ -44,7 +44,7 @@ export const DOCK_ITEMS: DockAppItem[] = [
     description: "Multi-model reasoning workspace & proactive agent workflow orchestrator.",
     icon: novaLogo,
     glowColor: "rgba(56, 189, 248, 0.75)", // Electric Cyan
-    url: "https://github.com/itsnothyun/Nova",
+    url: "https://novaruntime.vercel.app/",
     badge: "AI Command Center",
   },
   {
@@ -54,7 +54,7 @@ export const DOCK_ITEMS: DockAppItem[] = [
     description: "End-to-end encrypted vault for subscriptions, documents, keys & reminders.",
     icon: coveLogo,
     glowColor: "rgba(45, 212, 191, 0.75)", // Emerald / Teal
-    url: "https://github.com/itsnothyun/Cove",
+    url: "https://covecloud.vercel.app/",
     badge: "Private Vault",
   },
   {
@@ -64,7 +64,7 @@ export const DOCK_ITEMS: DockAppItem[] = [
     description: "High-velocity revenue operations, client tracking & analytics engine.",
     icon: crestLogo,
     glowColor: "rgba(168, 85, 247, 0.75)", // Royal Violet
-    url: "https://github.com/itsnothyun/Crest",
+    url: "https://crestcloud.vercel.app/",
     badge: "Revenue CRM",
   },
 ];
@@ -199,7 +199,7 @@ const DockIconItem: React.FC<DockIconProps> = ({
                   <span>itsnothyun suite</span>
                 </span>
                 <span className="inline-flex items-center gap-0.5 text-white/80 group-hover:text-white font-medium">
-                  {item.isCurrent ? "Active App" : "Explore"}
+                  {item.isCurrent ? "Active App" : "Launch App"}
                   <ExternalLink className="h-2.5 w-2.5 ml-0.5" />
                 </span>
               </div>
