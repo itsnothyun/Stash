@@ -679,4 +679,49 @@ pub async fn kill_process(
     crate::performance::kill_process_by_pid(&perf, pid)
 }
 
+/// Opens a drive mount point or directory in the system file manager.
+#[tauri::command]
+pub fn open_path_in_explorer(path: String) -> AppResult<()> {
+    #[cfg(target_os = "windows")]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        let _ = std::process::Command::new("explorer")
+            .arg(&path)
+            .creation_flags(CREATE_NO_WINDOW)
+            .spawn();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let _ = std::process::Command::new("open").arg(&path).spawn();
+    }
+    #[cfg(target_os = "linux")]
+    {
+        let _ = std::process::Command::new("xdg-open").arg(&path).spawn();
+    }
+    Ok(())
+}
+
+/// Opens the operating system's storage settings (Windows ms-settings:storagesense).
+#[tauri::command]
+pub fn open_storage_settings() -> AppResult<()> {
+    #[cfg(target_os = "windows")]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        let res = std::process::Command::new("explorer")
+            .arg("ms-settings:storagesense")
+            .creation_flags(CREATE_NO_WINDOW)
+            .spawn();
+        if res.is_err() {
+            let _ = std::process::Command::new("cmd")
+                .args(["/c", "start", "", "ms-settings:storagesense"])
+                .creation_flags(CREATE_NO_WINDOW)
+                .spawn();
+        }
+    }
+    Ok(())
+}
+
+
 

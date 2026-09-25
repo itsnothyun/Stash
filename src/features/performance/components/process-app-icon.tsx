@@ -33,6 +33,7 @@ export const ProcessAppIcon: React.FC<ProcessAppIconProps> = ({
           className
         )}
         style={{ width: size + 8, height: size + 8 }}
+        title="Stash"
       >
         <svg viewBox="0 0 32 32" width={size} height={size} fill="none">
           <rect width="32" height="32" rx="7" fill="currentColor" fillOpacity={isColorful ? 0.2 : 0.1} />
@@ -47,7 +48,102 @@ export const ProcessAppIcon: React.FC<ProcessAppIconProps> = ({
     );
   }
 
-  // 2. Google Chrome
+  // 2. Orca Slicer / Orca 3D
+  if (lower.startsWith("orca") || lower.includes("orcaslicer") || lower.includes("orca_slicer")) {
+    return (
+      <div
+        className={cn(
+          "rounded-lg flex items-center justify-center shrink-0 border border-border/60 shadow-2xs overflow-hidden",
+          isColorful ? "bg-[#0b1d28] text-[#00b4d8]" : "bg-card text-foreground",
+          className
+        )}
+        style={{ width: size + 8, height: size + 8 }}
+        title="Orca Slicer"
+      >
+        <svg viewBox="0 0 32 32" width={size} height={size} fill="none">
+          {/* Orca breaching curved silhouette with white eye patch & teal wave */}
+          <path
+            d="M26 9c-2.5 0-5.8 2.2-8.5 5.5-2.4-3.5-5.5-5-8.5-5C4.5 9.5 2 13 2 17.5c0 6.5 6.5 10 14 10s14-3.5 14-10c0-4.5-2-8.5-4-8.5z"
+            fill={isColorful ? "#0f2b3c" : "currentColor"}
+          />
+          {/* Dorsal fin & sleek body */}
+          <path
+            d="M16 4c-1.5 3-3 7-2 10.5 1.5-1 3.5-1.5 5.5-1.5 1 0 1.5-.2 2-.5C20.5 8 18 5 16 4z"
+            fill={isColorful ? "#00b4d8" : "currentColor"}
+          />
+          {/* White belly / eye patch */}
+          <ellipse
+            cx="21.5"
+            cy="15"
+            rx="3"
+            ry="1.5"
+            transform="rotate(-20 21.5 15)"
+            fill={isColorful ? "#ffffff" : "currentColor"}
+            fillOpacity={isColorful ? 0.95 : 0.4}
+          />
+          {/* Breaching ocean curl */}
+          <path
+            d="M5 24c3.5 1.5 7.5 2 11 1.5 4-.6 8-2.6 11-5.5"
+            stroke={isColorful ? "#90e0ef" : "currentColor"}
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
+        </svg>
+      </div>
+    );
+  }
+
+  // 3. AGY / Google Antigravity CLI
+  if (lower.startsWith("agy") || lower.includes("antigravity")) {
+    return (
+      <div
+        className={cn(
+          "rounded-lg flex items-center justify-center shrink-0 border border-border/60 shadow-2xs overflow-hidden",
+          isColorful ? "bg-[#18112c] text-[#a855f7]" : "bg-card text-foreground",
+          className
+        )}
+        style={{ width: size + 8, height: size + 8 }}
+        title="Antigravity (AGY)"
+      >
+        <svg viewBox="0 0 32 32" width={size} height={size} fill="none">
+          {/* Outer gravitational orbital ring */}
+          <ellipse
+            cx="16"
+            cy="16"
+            rx="12"
+            ry="5.5"
+            transform="rotate(-25 16 16)"
+            stroke={isColorful ? "#c084fc" : "currentColor"}
+            strokeWidth="1.6"
+            strokeDasharray="4 2"
+          />
+          {/* Quantum core sphere */}
+          <circle
+            cx="16"
+            cy="16"
+            r="6"
+            fill={isColorful ? "url(#agy-grad)" : "currentColor"}
+            fillOpacity={isColorful ? 1 : 0.8}
+          />
+          {/* Inverted gravity upward beacon arrow */}
+          <path
+            d="M16 9.5l3.5 4h-2.2v4.5h-2.6v-4.5h-2.2l3.5-4z"
+            fill={isColorful ? "#ffffff" : "currentColor"}
+          />
+          {isColorful && (
+            <defs>
+              <linearGradient id="agy-grad" x1="10" y1="10" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#9333ea" />
+                <stop offset="1" stopColor="#4f46e5" />
+              </linearGradient>
+            </defs>
+          )}
+        </svg>
+      </div>
+    );
+  }
+
+  // 4. Google Chrome
   if (lower.includes("chrome")) {
     return (
       <div
@@ -85,7 +181,7 @@ export const ProcessAppIcon: React.FC<ProcessAppIconProps> = ({
     );
   }
 
-  // 3. Visual Studio Code
+  // 5. Visual Studio Code
   if (lower.includes("code") || lower === "code.exe") {
     return (
       <div
@@ -104,7 +200,7 @@ export const ProcessAppIcon: React.FC<ProcessAppIconProps> = ({
     );
   }
 
-  // 4. Discord
+  // 6. Discord
   if (lower.includes("discord")) {
     return (
       <div
@@ -123,7 +219,7 @@ export const ProcessAppIcon: React.FC<ProcessAppIconProps> = ({
     );
   }
 
-  // 5. Spotify
+  // 7. Spotify
   if (lower.includes("spotify")) {
     return (
       <div
@@ -142,7 +238,7 @@ export const ProcessAppIcon: React.FC<ProcessAppIconProps> = ({
     );
   }
 
-  // 6. Steam
+  // 8. Steam
   if (lower.includes("steam")) {
     return (
       <div
@@ -161,7 +257,71 @@ export const ProcessAppIcon: React.FC<ProcessAppIconProps> = ({
     );
   }
 
-  // 7. Microsoft Edge
+  // 9. Blender 3D
+  if (lower.startsWith("blender")) {
+    return (
+      <div
+        className={cn(
+          "rounded-lg flex items-center justify-center shrink-0 border border-border/60 shadow-2xs overflow-hidden",
+          isColorful ? "bg-[#e87d0d]/15 text-[#e87d0d]" : "bg-card text-foreground",
+          className
+        )}
+        style={{ width: size + 8, height: size + 8 }}
+        title="Blender"
+      >
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor">
+          <path d="M12.016 11.016a5 5 0 1 0 5 5 5.006 5.006 0 0 0-5-5zm0 8.016a3.016 3.016 0 1 1 3.016-3.016 3.02 3.02 0 0 1-3.016 3.016zM9.54 8.788L4.62 1.636a1 1 0 0 0-1.64 1.144L6.96 8.52A7.95 7.95 0 0 0 4 15.016a8.016 8.016 0 1 0 14.156-5.148l2.67-4.11a1 1 0 1 0-1.68-1.092l-3.328 5.12a7.973 7.973 0 0 0-6.278-.998z" />
+        </svg>
+      </div>
+    );
+  }
+
+  // 10. Figma
+  if (lower.startsWith("figma")) {
+    return (
+      <div
+        className={cn(
+          "rounded-lg flex items-center justify-center shrink-0 border border-border/60 shadow-2xs bg-card",
+          className
+        )}
+        style={{ width: size + 8, height: size + 8 }}
+        title="Figma"
+      >
+        {isColorful ? (
+          <svg viewBox="0 0 38 57" width={size - 2} height={size + 2} fill="none">
+            <path d="M19 28.5a9.5 9.5 0 1 1 19 0 9.5 9.5 0 0 1-19 0z" fill="#1ABCFE" />
+            <path d="M0 47.5A9.5 9.5 0 0 1 9.5 38H19v9.5a9.5 9.5 0 1 1-19 0z" fill="#0ACF83" />
+            <path d="M19 0v19h9.5a9.5 9.5 0 1 0 0-19H19z" fill="#FF7262" />
+            <path d="M0 9.5A9.5 9.5 0 0 0 9.5 19H19V0H9.5A9.5 9.5 0 0 0 0 9.5z" fill="#F24E1E" />
+            <path d="M0 28.5A9.5 9.5 0 0 0 9.5 38H19V19H9.5A9.5 9.5 0 0 0 0 28.5z" fill="#A259FF" />
+          </svg>
+        ) : (
+          <span className="font-bold text-xs text-foreground font-mono">F</span>
+        )}
+      </div>
+    );
+  }
+
+  // 11. OBS Studio
+  if (lower.startsWith("obs") || lower.includes("obs64")) {
+    return (
+      <div
+        className={cn(
+          "rounded-lg flex items-center justify-center shrink-0 border border-border/60 shadow-2xs bg-[#1f2326] text-white",
+          className
+        )}
+        style={{ width: size + 8, height: size + 8 }}
+        title="OBS Studio"
+      >
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor">
+          <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
+          <path d="M12 6a6 6 0 0 1 5.2 3 6 6 0 0 1-2.2 7.8 6 6 0 0 1-8-1.8A6 6 0 0 1 12 6z" />
+        </svg>
+      </div>
+    );
+  }
+
+  // 12. Microsoft Edge
   if (lower.includes("msedge") || lower.includes("edge")) {
     return (
       <div
@@ -180,7 +340,7 @@ export const ProcessAppIcon: React.FC<ProcessAppIconProps> = ({
     );
   }
 
-  // 8. Mozilla Firefox
+  // 13. Mozilla Firefox
   if (lower.includes("firefox")) {
     return (
       <div
@@ -199,7 +359,7 @@ export const ProcessAppIcon: React.FC<ProcessAppIconProps> = ({
     );
   }
 
-  // 9. Slack
+  // 14. Slack
   if (lower.includes("slack")) {
     return (
       <div
@@ -218,7 +378,7 @@ export const ProcessAppIcon: React.FC<ProcessAppIconProps> = ({
     );
   }
 
-  // 10. Notion
+  // 15. Notion
   if (lower.includes("notion")) {
     return (
       <div
@@ -234,7 +394,26 @@ export const ProcessAppIcon: React.FC<ProcessAppIconProps> = ({
     );
   }
 
-  // 11. Windows Explorer
+  // 16. Docker Desktop
+  if (lower.startsWith("docker")) {
+    return (
+      <div
+        className={cn(
+          "rounded-lg flex items-center justify-center shrink-0 border border-border/60 shadow-2xs",
+          isColorful ? "bg-[#2496ed]/15 text-[#2496ed]" : "bg-card text-foreground",
+          className
+        )}
+        style={{ width: size + 8, height: size + 8 }}
+        title="Docker"
+      >
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor">
+          <path d="M13.983 11.078h2.119a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.119a.185.185 0 00-.185.185v1.888c0 .102.083.185.185.185m-2.954-5.43h2.118a.186.186 0 00.186-.186V3.574a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.185.185.185m0 2.716h2.118a.187.187 0 00.186-.186V6.29a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.887c0 .102.082.186.185.186m-2.93 0h2.12a.186.186 0 00.184-.186V6.29a.185.185 0 00-.185-.185H8.1a.185.185 0 00-.185.185v1.887c0 .102.083.186.185.186m-2.964 0h2.119a.186.186 0 00.185-.186V6.29a.185.185 0 00-.185-.185H5.136a.186.186 0 00-.186.185v1.887c0 .102.084.186.186.186m5.893 2.715h2.118a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.185.185.185m-2.93 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186H8.1a.185.185 0 00-.185.185v1.888c0 .102.083.185.185.185m-2.964 0h2.119a.185.185 0 00.185-.185V9.006a.185.185 0 00-.185-.186H5.136a.186.186 0 00-.186.185v1.888c0 .102.084.185.186.185m-2.928 0h2.119a.185.185 0 00.185-.185V9.006a.185.185 0 00-.185-.186H2.208a.186.186 0 00-.186.185v1.888c0 .102.083.185.186.185M23.76 9.89a3.868 3.868 0 00-2.316-1.503l-.403-.082-.249.33a5.55 5.55 0 01-3.664 2.115H.982a.987.987 0 00-.982.99 8.016 8.016 0 002.348 5.688 12.39 12.39 0 008.826 3.566c7.098 0 11.956-4.52 12.632-10.744a3.82 3.82 0 00-.046-.36" />
+        </svg>
+      </div>
+    );
+  }
+
+  // 17. Windows Explorer
   if (lower.includes("explorer")) {
     return (
       <div
@@ -251,7 +430,7 @@ export const ProcessAppIcon: React.FC<ProcessAppIconProps> = ({
     );
   }
 
-  // 12. Terminal / PowerShell / CMD
+  // 18. Terminal / PowerShell / CMD
   if (lower.includes("cmd") || lower.includes("powershell") || lower.includes("terminal") || lower.includes("pwsh")) {
     return (
       <div
@@ -268,7 +447,7 @@ export const ProcessAppIcon: React.FC<ProcessAppIconProps> = ({
     );
   }
 
-  // 13. Desktop Window Manager / System Process
+  // 19. Desktop Window Manager / System Process
   if (lower === "dwm.exe" || lower.includes("svchost") || lower.includes("system") || lower.includes("services")) {
     return (
       <div
@@ -285,7 +464,7 @@ export const ProcessAppIcon: React.FC<ProcessAppIconProps> = ({
     );
   }
 
-  // 14. Fallback App Tile with Clean Initial
+  // 20. Fallback App Tile with Clean Initial
   const initial = (processName.replace(/\.exe$/i, "").charAt(0) || "A").toUpperCase();
 
   return (

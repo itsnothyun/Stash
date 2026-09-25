@@ -26,6 +26,8 @@ import {
   X,
   Clock,
   SquaresFour,
+  FolderOpen,
+  ArrowSquareOut,
 } from "@phosphor-icons/react";
 import {
   stashIpc,
@@ -48,7 +50,7 @@ import { ProcessAppIcon } from "./process-app-icon";
 import { useUIStore } from "@/stores/ui-store";
 import { cn } from "@/lib/utils/cn";
 
-type PerformanceTab = "apps" | "cockpit" | "bottlenecks" | "turbo";
+type PerformanceTab = "apps" | "storage" | "cockpit" | "bottlenecks" | "turbo";
 type ProcessSortField = "cpu" | "memory" | "name" | "pid";
 
 interface PerformanceHubProps {
@@ -210,6 +212,24 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
     }
   };
 
+  // Open Drive in Windows Explorer
+  const handleOpenDrive = async (mountPoint: string) => {
+    try {
+      await stashIpc.openPathInExplorer(mountPoint);
+    } catch (err) {
+      toast.error("Failed to open explorer", String(err));
+    }
+  };
+
+  // Open Windows Storage Sense / Settings
+  const handleOpenStorageSettings = async () => {
+    try {
+      await stashIpc.openStorageSettings();
+    } catch (err) {
+      toast.error("Failed to open settings", String(err));
+    }
+  };
+
   const ramUsagePct =
     snapshot && snapshot.total_memory > 0
       ? (snapshot.used_memory / snapshot.total_memory) * 100
@@ -265,6 +285,18 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
   const topCpu = snapshot?.top_cpu_consumer;
   const topRam = snapshot?.top_ram_consumer;
 
+  // Total disk calculations across all drives
+  const storageSummary = useMemo(() => {
+    if (!snapshot || !snapshot.disks || snapshot.disks.length === 0) {
+      return { totalBytes: 0, usedBytes: 0, freeBytes: 0, usedPct: 0 };
+    }
+    const totalBytes = snapshot.disks.reduce((acc, d) => acc + d.total_space, 0);
+    const freeBytes = snapshot.disks.reduce((acc, d) => acc + d.available_space, 0);
+    const usedBytes = totalBytes - freeBytes;
+    const usedPct = totalBytes > 0 ? (usedBytes / totalBytes) * 100 : 0;
+    return { totalBytes, usedBytes, freeBytes, usedPct };
+  }, [snapshot]);
+
   if (isLoading && !snapshot) {
     return (
       <div className={cn("flex flex-col items-center justify-center p-20 gap-3 text-muted-foreground", className)}>
@@ -296,7 +328,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
             <div className="flex flex-col">
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-lg font-bold tracking-tight text-foreground">
-                  Performance & Process Monitor
+                  Performance & System Hub
                 </h1>
                 {analysis && (
                   <span
@@ -311,7 +343,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                 )}
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Live system telemetry, process inspector, and resource monitor.
+                Live system telemetry, process inspector, and drive storage management.
               </p>
             </div>
           </div>
@@ -632,10 +664,10 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. TAB NAVIGATION BAR                                                     */}
+      {/* 3. TAB NAVIGATION BAR (Applications, Storage, Hardware, Bottlenecks, Turbo)*/}
       {/* ========================================================================= */}
       <div className="flex items-center justify-between border-b border-border/80 pb-2">
-        <div className="flex items-center gap-1 p-1 rounded-xl bg-muted/50 border border-border/60">
+        <div className="flex items-center gap-1 p-1 rounded-xl bg-muted/50 border border-border/60 flex-wrap">
           <button
             type="button"
             onClick={() => setActiveTab("apps")}
@@ -648,6 +680,21 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
           >
             <AppWindow className="h-4 w-4 text-indigo-500" weight="bold" />
             <span>Applications ({snapshot?.total_processes_count || 0})</span>
+          </button>
+
+          {/* Brand New Dedicated Storage & Disk Management Tab */}
+          <button
+            type="button"
+            onClick={() => setActiveTab("storage")}
+            className={cn(
+              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer",
+              activeTab === "storage"
+                ? "bg-card text-foreground shadow-2xs border border-border/60"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <HardDrive className="h-4 w-4 text-amber-500" weight="bold" />
+            <span>Disk Management ({snapshot?.disks.length || 0})</span>
           </button>
 
           <button
@@ -970,7 +1017,195 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
       )}
 
       {/* ========================================================================= */}
-      {/* 5. TAB CONTENT: HARDWARE COCKPIT                                          */}
+      {/* 5. TAB CONTENT: DISK & STORAGE MANAGEMENT (BRAND NEW POLISHED BUILD)      */}
+      {/* ========================================================================= */}
+      {activeTab === "storage" && (
+        <div className="flex flex-col gap-4">
+          {/* Master Storage Banner */}
+          <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-xs flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div
+                  className={cn(
+                    "h-10 w-10 rounded-xl flex items-center justify-center shrink-0 border shadow-2xs",
+                    isColorful ? "bg-amber-500/15 text-amber-500 border-amber-500/30" : "bg-muted text-foreground border-border"
+                  )}
+                >
+                  <HardDrive className="h-5 w-5" weight="bold" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-foreground">
+                    System Storage & Volume Drives
+                  </h2>
+                  <p className="text-xs text-muted-foreground mt-0.5 font-mono">
+                    {snapshot?.disks.length || 0} Volumes Installed · {formatBytes(storageSummary.totalBytes)} Total Storage
+                  </p>
+                </div>
+              </div>
+
+              {/* Windows Storage Settings Action */}
+              <button
+                type="button"
+                onClick={handleOpenStorageSettings}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-border/80 bg-background/80 hover:bg-muted text-foreground transition-all cursor-pointer shadow-2xs"
+                title="Open Windows Storage Settings / Cleanup"
+              >
+                <ArrowSquareOut className="h-3.5 w-3.5" />
+                <span>Windows Storage Settings</span>
+              </button>
+            </div>
+
+            {/* Overall Storage Utilization Progress Bar */}
+            <div className="space-y-1.5 pt-1">
+              <div className="flex justify-between items-center text-xs font-mono">
+                <span className="text-muted-foreground">
+                  Used: <strong className="text-foreground">{formatBytes(storageSummary.usedBytes)}</strong> ({storageSummary.usedPct.toFixed(1)}%)
+                </span>
+                <span className="text-emerald-500 font-semibold">
+                  Free: {formatBytes(storageSummary.freeBytes)} Available
+                </span>
+              </div>
+
+              <div className="h-2.5 w-full rounded-full bg-muted/60 overflow-hidden">
+                <motion.div
+                  className={cn(
+                    "h-full rounded-full transition-all duration-400",
+                    storageSummary.usedPct >= 90
+                      ? "bg-rose-500"
+                      : storageSummary.usedPct >= 75
+                      ? "bg-amber-500"
+                      : "bg-primary"
+                  )}
+                  animate={{ width: `${Math.min(100, storageSummary.usedPct)}%` }}
+                  transition={{ duration: 0.4 }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Drive Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {snapshot?.disks.map((disk, idx) => {
+              const usedSpace = disk.total_space - disk.available_space;
+              const usedPct = disk.total_space > 0 ? (usedSpace / disk.total_space) * 100 : 0;
+              const isBootDrive = disk.mount_point.startsWith("C") || disk.mount_point === "/";
+              const isCritical = usedPct >= 92;
+              const isWarning = usedPct >= 80;
+
+              return (
+                <div
+                  key={disk.mount_point || idx}
+                  className="p-4 rounded-xl bg-card border border-border/80 shadow-xs flex flex-col justify-between gap-3 relative overflow-hidden"
+                >
+                  {/* Card Header: Mount Point, Volume Name & Disk Type */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div
+                        className={cn(
+                          "h-9 w-9 rounded-lg flex items-center justify-center shrink-0 border shadow-2xs font-mono font-bold text-xs",
+                          isBootDrive
+                            ? "bg-primary/15 text-primary border-primary/30"
+                            : "bg-muted text-foreground border-border/60"
+                        )}
+                      >
+                        {disk.mount_point.replace(/\\|\//g, "") || "D:"}
+                      </div>
+
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <h3 className="text-sm font-bold text-foreground truncate" title={disk.name}>
+                            {disk.name || `Local Disk (${disk.mount_point})`}
+                          </h3>
+                          {isBootDrive && (
+                            <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-primary/20 text-primary border border-primary/30">
+                              OS Boot
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-muted-foreground font-mono mt-0.5">
+                          {disk.mount_point} · {disk.file_system || "NTFS"}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Disk Type Badge */}
+                    <span
+                      className={cn(
+                        "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase shrink-0 border",
+                        disk.disk_type === "SSD"
+                          ? "bg-purple-500/10 text-purple-500 border-purple-500/25"
+                          : disk.is_removable
+                          ? "bg-amber-500/10 text-amber-500 border-amber-500/25"
+                          : "bg-muted text-muted-foreground border-border"
+                      )}
+                    >
+                      {disk.disk_type || (disk.is_removable ? "Removable" : "SSD/NVMe")}
+                    </span>
+                  </div>
+
+                  {/* Meter Bar */}
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between items-center text-[11px] font-mono">
+                      <span className="text-muted-foreground">
+                        {formatBytes(usedSpace)} ({usedPct.toFixed(0)}%)
+                      </span>
+                      <span className="font-bold text-foreground">
+                        {formatBytes(disk.total_space)} Total
+                      </span>
+                    </div>
+
+                    <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                      <motion.div
+                        className={cn(
+                          "h-full rounded-full transition-all duration-300",
+                          isCritical
+                            ? "bg-rose-500"
+                            : isWarning
+                            ? "bg-amber-500"
+                            : isBootDrive
+                            ? "bg-primary"
+                            : "bg-blue-500"
+                        )}
+                        animate={{ width: `${Math.min(100, Math.max(3, usedPct))}%` }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] pt-0.5">
+                      <span
+                        className={cn(
+                          "font-mono font-medium",
+                          isCritical
+                            ? "text-rose-500 font-bold"
+                            : isWarning
+                            ? "text-amber-500 font-bold"
+                            : "text-emerald-500"
+                        )}
+                      >
+                        {formatBytes(disk.available_space)} free space
+                      </span>
+
+                      {/* Browse in Explorer Action */}
+                      <button
+                        type="button"
+                        onClick={() => handleOpenDrive(disk.mount_point)}
+                        className="text-[11px] font-semibold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+                        title={`Open ${disk.mount_point} in Windows Explorer`}
+                      >
+                        <FolderOpen className="h-3.5 w-3.5" />
+                        <span>Open Folder</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 6. TAB CONTENT: HARDWARE COCKPIT                                          */}
       {/* ========================================================================= */}
       {activeTab === "cockpit" && (
         <div className="flex flex-col gap-5">
@@ -1270,7 +1505,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
       )}
 
       {/* ========================================================================= */}
-      {/* 6. TAB CONTENT: BOTTLENECK RADAR                                          */}
+      {/* 7. TAB CONTENT: BOTTLENECK RADAR                                          */}
       {/* ========================================================================= */}
       {activeTab === "bottlenecks" && (
         <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-xs flex flex-col gap-3.5">
@@ -1365,7 +1600,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
       )}
 
       {/* ========================================================================= */}
-      {/* 7. TAB CONTENT: STASH TURBO ENGINE                                        */}
+      {/* 8. TAB CONTENT: STASH TURBO ENGINE                                        */}
       {/* ========================================================================= */}
       {activeTab === "turbo" && (
         <div className="flex flex-col gap-5">
@@ -1472,7 +1707,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
       )}
 
       {/* ========================================================================= */}
-      {/* 8. PROCESS TERMINATION CONFIRMATION MODAL                                  */}
+      {/* 9. PROCESS TERMINATION CONFIRMATION MODAL                                  */}
       {/* ========================================================================= */}
       <AnimatePresence>
         {processToKill && (

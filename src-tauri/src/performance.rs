@@ -22,7 +22,9 @@ pub struct DiskInfo {
     pub total_space: u64,     // bytes
     pub available_space: u64, // bytes
     pub is_removable: bool,
+    pub is_read_only: bool,
     pub file_system: String,
+    pub disk_type: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -190,13 +192,28 @@ pub fn collect_snapshot(
     let disk_list: Vec<DiskInfo> = disks
         .list()
         .iter()
-        .map(|d| DiskInfo {
-            name: d.name().to_string_lossy().to_string(),
-            mount_point: d.mount_point().to_string_lossy().to_string(),
-            total_space: d.total_space(),
-            available_space: d.available_space(),
-            is_removable: d.is_removable(),
-            file_system: d.file_system().to_string_lossy().to_string(),
+        .map(|d| {
+            let disk_type = match d.kind() {
+                sysinfo::DiskKind::SSD => "SSD".to_string(),
+                sysinfo::DiskKind::HDD => "HDD".to_string(),
+                _ => {
+                    if d.is_removable() {
+                        "Removable".to_string()
+                    } else {
+                        "Disk".to_string()
+                    }
+                }
+            };
+            DiskInfo {
+                name: d.name().to_string_lossy().to_string(),
+                mount_point: d.mount_point().to_string_lossy().to_string(),
+                total_space: d.total_space(),
+                available_space: d.available_space(),
+                is_removable: d.is_removable(),
+                is_read_only: d.is_read_only(),
+                file_system: d.file_system().to_string_lossy().to_string(),
+                disk_type,
+            }
         })
         .collect();
 

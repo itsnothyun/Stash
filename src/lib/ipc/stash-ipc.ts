@@ -54,7 +54,9 @@ export interface DiskInfo {
   total_space: number;
   available_space: number;
   is_removable: boolean;
+  is_read_only: boolean;
   file_system: string;
+  disk_type: string;
 }
 
 export interface ProcessStats {
@@ -726,12 +728,34 @@ export const stashIpc = {
       free_swap: Math.round(totalBytes * 0.42),
       disks: [
         {
-          name: "Local Disk (C:)",
+          name: "System Boot (C:)",
           mount_point: "C:\\",
           total_space: 1024 * 1024 * 1024 * 1024,
-          available_space: 420 * 1024 * 1024 * 1024,
+          available_space: 340 * 1024 * 1024 * 1024,
           is_removable: false,
+          is_read_only: false,
           file_system: "NTFS",
+          disk_type: "SSD",
+        },
+        {
+          name: "High-Speed Storage (D:)",
+          mount_point: "D:\\",
+          total_space: 2048 * 1024 * 1024 * 1024,
+          available_space: 1250 * 1024 * 1024 * 1024,
+          is_removable: false,
+          is_read_only: false,
+          file_system: "NTFS",
+          disk_type: "SSD",
+        },
+        {
+          name: "Workspace & Media (E:)",
+          mount_point: "E:\\",
+          total_space: 2048 * 1024 * 1024 * 1024,
+          available_space: 890 * 1024 * 1024 * 1024,
+          is_removable: false,
+          is_read_only: false,
+          file_system: "NTFS",
+          disk_type: "SSD",
         },
       ],
       stash_process: {
@@ -744,6 +768,24 @@ export const stashIpc = {
       db_size_bytes: 420 * 1024,
       active_windows_count: 1,
       processes: [
+        {
+          pid: 31840,
+          name: "orca.exe",
+          cpu_usage: 8.4,
+          memory_bytes: 680 * 1024 * 1024,
+          virtual_memory_bytes: 1800 * 1024 * 1024,
+          run_time_secs: 7200,
+          is_stash: false,
+        },
+        {
+          pid: 29140,
+          name: "agy.exe",
+          cpu_usage: 1.2,
+          memory_bytes: 110 * 1024 * 1024,
+          virtual_memory_bytes: 340 * 1024 * 1024,
+          run_time_secs: 12400,
+          is_stash: false,
+        },
         {
           pid: 22408,
           name: "chrome.exe",
@@ -869,6 +911,18 @@ export const stashIpc = {
       db_size_after: 420 * 1024,
       memory_freed_estimate_bytes: 60 * 1024,
     };
+  },
+
+  async openPathInExplorer(path: string): Promise<void> {
+    if (isTauri()) {
+      await invoke("open_path_in_explorer", { path });
+    }
+  },
+
+  async openStorageSettings(): Promise<void> {
+    if (isTauri()) {
+      await invoke("open_storage_settings");
+    }
   },
 
   async listenToEvent<T>(

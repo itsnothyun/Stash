@@ -211,6 +211,8 @@ pub fn run() {
             commands::get_system_performance,
             commands::optimize_stash_system,
             commands::kill_process,
+            commands::open_path_in_explorer,
+            commands::open_storage_settings,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Stash application");
