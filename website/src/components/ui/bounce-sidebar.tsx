@@ -96,7 +96,6 @@ export function BounceSidebar({
     animate(
       dot.current,
       { x: 0, y: toY },
-      // @ts-expect-error - path is a dynamic motion animation option
       { duration: 0.25, ease: "easeOut", path },
     );
   }, [activeIndex, animate, dot, dotSize]);
