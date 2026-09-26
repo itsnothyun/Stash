@@ -312,7 +312,6 @@ pub async fn open_floating_stash(
         .min_inner_size(280.0, 36.0)
         .always_on_top(always_on_top)
         .decorations(false)
-        .transparent(false)
         .shadow(true)
         .zoom_hotkeys_enabled(true)
         .focused(true);
