@@ -7,14 +7,21 @@ import { getWidgetColorClass, colorClass } from "@/lib/icons/icon-theme";
 import { TiptapEditor, TiptapEditorRef } from "@/features/editor/components/tiptap-editor";
 import {
   appendPlainTextToContent,
+  docForEditor,
   docToPlainText,
   emptyDoc,
   extractDoc,
   extractWidgets,
+  findWidgetNodes,
   plainTextToDoc,
   serializeStashContent,
   stashContentFromPlainText,
+  widgetToNodeJSON,
+  StashWidgetAttrs,
+  TiptapDoc,
 } from "@/features/editor/stash-content";
+import { updateWidgetNodeInEditor } from "@/features/editor/widget-ops";
+import { DEFAULT_WIDGET_TITLES } from "@/features/widgets/widget-meta";
 import { ColorPicker } from "@/components/shared/color-picker";
 import {
   ContextMenu,
@@ -106,8 +113,7 @@ import {
 } from "@/features/stash/note-meta";
 import { NotePersonaModal } from "@/features/stash/components/note-persona-modal";
 import { NoteExportImageModal } from "@/features/stash/components/note-export-image-modal";
-import { NoteWidgetsCanvas } from "@/features/widgets/components/note-widgets-canvas";
-import { NoteWidgetData, WidgetType } from "@/features/widgets/types";
+import { WidgetType } from "@/features/widgets/types";
 import { RevisionDiffViewer } from "@/features/stash/components/revision-diff-viewer";
 import { BacklinksPanel } from "@/features/stash/components/backlinks-panel";
 import {
@@ -198,7 +204,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
   const [revisionsOpen, setRevisionsOpen] = useState(false);
   const [revisions, setRevisions] = useState<Revision[]>([]);
   const [chromeVisible, setChromeVisible] = useState(false);
-  const [widgets, setWidgets] = useState<NoteWidgetData[]>([]);
+  const [widgets, setWidgets] = useState<StashWidgetAttrs[]>([]);
   const [isDockMinimized, setIsDockMinimized] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     return localStorage.getItem("stash:editor-dock-minimized") === "true";
@@ -223,8 +229,6 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
   const flushRef = useRef<(() => void) | null>(null);
   const editorRef = useRef<TiptapEditorRef | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const widgetsRef = useRef<NoteWidgetData[]>(widgets);
-  widgetsRef.current = widgets;
   const noteRef = useRef<Note | null>(note);
   noteRef.current = note;
   const titleRef = useRef<string>(title);
@@ -367,7 +371,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
     });
   }, []);
 
-  const activeSwapWidget = widgets.find((w) => w.type === "swap");
+  const activeSwapWidget = widgets.find((w) => w.widgetType === "swap");
 
   const isPairActive = (from: string, to: string) => {
     if (!activeSwapWidget) return false;
@@ -377,21 +381,12 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
   };
 
   const handleSelectSwapPair = (fromCurrency: string, toCurrency: string, label: string) => {
-    if (activeSwapWidget) {
-      const nextWidgets = widgets.map((w) =>
-        w.id === activeSwapWidget.id
-          ? {
-              ...w,
-              isCollapsed: false,
-              config: {
-                ...w.config,
-                fromCurrency,
-                toCurrency,
-              },
-            }
-          : w
-      );
-      handleUpdateWidgets(nextWidgets);
+    const editor = editorRef.current?.getEditor();
+    if (activeSwapWidget && editor) {
+      updateWidgetNodeInEditor(editor, activeSwapWidget.widgetId, {
+        isCollapsed: false,
+        config: { ...activeSwapWidget.config, fromCurrency, toCurrency },
+      });
       toast.show({ message: `Currency Swap set to ${label}` });
     } else {
       handleAddWidget("swap", {
@@ -465,29 +460,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       setNote(n);
       setTitle(n.title);
 
-      const stored = extractWidgets<NoteWidgetData>(n.contentJson);
-      if (stored.length > 0) {
-        widgetsRef.current = stored;
-        setWidgets(stored);
-      } else if (
-        n.plainText.includes("[swap-widget]") ||
-        n.tags?.some((t) => t.name.toLowerCase() === "swap")
-      ) {
-        const swapWidget: NoteWidgetData[] = [
-          {
-            id: `swap-${n.id}`,
-            type: "swap",
-            title: "Currency & Token Swap",
-            x: 0,
-            y: 0,
-          },
-        ];
-        widgetsRef.current = swapWidget;
-        setWidgets(swapWidget);
-      } else {
-        widgetsRef.current = [];
-        setWidgets([]);
-      }
+      setWidgets(findWidgetNodes(docForEditor(n.contentJson, n.plainText)));
     });
 
     stashIpc.getWindowState(noteId).then((ws) => {
@@ -510,9 +483,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
               versionRef.current = fresh.version;
               setNote(fresh);
               setTitle(fresh.title);
-              const freshWidgets = extractWidgets<NoteWidgetData>(fresh.contentJson);
-              widgetsRef.current = freshWidgets;
-              setWidgets(freshWidgets);
+              setWidgets(findWidgetNodes(docForEditor(fresh.contentJson, fresh.plainText)));
             }
           } catch {}
         }
@@ -548,9 +519,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       versionRef.current = n.version;
       setNote(n);
       setTitle(n.title);
-      const stored = extractWidgets<NoteWidgetData>(n.contentJson);
-      widgetsRef.current = stored;
-      setWidgets(stored);
+      setWidgets(findWidgetNodes(docForEditor(n.contentJson, n.plainText)));
       setContentToken((t) => t + 1);
       toast.show({ message: "Note refreshed" });
     } catch {
@@ -699,31 +668,19 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
           titleRef.current = autoTitle;
           void persist({
             title: autoTitle,
-            contentJson: serializeStashContent(extractDoc(contentJson), widgetsRef.current),
+            contentJson: serializeStashContent(extractDoc(contentJson)),
             plainText,
           });
           return;
         }
       }
       void persist({
-        contentJson: serializeStashContent(extractDoc(contentJson), widgetsRef.current),
+        contentJson: serializeStashContent(extractDoc(contentJson)),
         plainText,
       });
     },
     [persist, autoTitleFromFirstLine]
   );
-
-  const handleUpdateWidgets = (nextWidgets: NoteWidgetData[]) => {
-    widgetsRef.current = nextWidgets;
-    setWidgets(nextWidgets);
-    const currentDoc =
-      editorRef.current?.getJSON() ||
-      extractDoc(noteRef.current?.contentJson) ||
-      emptyDoc();
-    void persist({
-      contentJson: serializeStashContent(currentDoc, nextWidgets),
-    });
-  };
 
   const handleAddWidget = (
     type: WidgetType,
@@ -746,50 +703,32 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
         } catch {}
       })();
     }
-    const defaultTitles: Record<WidgetType, string> = {
-      swap: "Currency Converter",
-      ticker: "Market Tickers",
-      calculator: "Quick Calculator",
-      timer: "Timer & Stopwatch",
-      worldclock: "World Clock",
-      unitconverter: "Unit Converter",
-      counter: "Tally Counter",
-      countdown: "Countdown Timer",
-      kanban: "Kanban Board",
-      habits: "Habit Tracker",
-      palette: "Color Palette",
-      browser: "Mini Browser",
-      scratchpad: "Daily Scratchpad",
-      meeting: "Meeting Minutes",
-      bug: "Bug Blitz & Triage",
-      idea: "Idea Incubator",
-      api: "API & Tech Blueprint",
-      reading: "Book & Article Digest",
-    };
-    const newWidget: NoteWidgetData = {
-      id: `${type}-${Date.now()}`,
-      type,
-      title: defaultTitles[type] || "Interactive Widget",
-      x: 0,
-      y: 0,
-      config: initialConfig,
-    };
-    const nextWidgets = [...widgetsRef.current, newWidget];
-    widgetsRef.current = nextWidgets;
-    setWidgets(nextWidgets);
+    const title = DEFAULT_WIDGET_TITLES[type] || "Interactive Widget";
+    const widgetId = `${type}-${Date.now()}`;
+
+    if (editorRef.current) {
+      editorRef.current.insertWidget({
+        widgetId,
+        widgetType: type,
+        title,
+        config: initialConfig ?? null,
+      });
+      editorRef.current.flush();
+    } else if (noteRef.current) {
+      // Editor not mounted yet — append the widget node straight into the doc.
+      const currentDoc = extractDoc(noteRef.current.contentJson) ?? emptyDoc();
+      const nextDoc: TiptapDoc = {
+        type: "doc",
+        content: [widgetToNodeJSON({ id: widgetId, type, title, config: initialConfig }), ...currentDoc.content],
+      };
+      void persist({ contentJson: serializeStashContent(nextDoc) });
+    }
+
     playChimeSound();
-    toast.show({ message: `Attached ${defaultTitles[type] || "widget"}` });
+    toast.show({ message: `Attached ${title}` });
 
     requestAnimationFrame(() => {
       scrollContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-    });
-
-    const currentDoc =
-      editorRef.current?.getJSON() ||
-      extractDoc(noteRef.current?.contentJson) ||
-      emptyDoc();
-    void persist({
-      contentJson: serializeStashContent(currentDoc, nextWidgets),
     });
   };
 
@@ -804,7 +743,13 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
         editorRef.current.insertContent(text);
         editorRef.current.flush();
       } else if (noteRef.current) {
-        void persist(appendPlainTextToContent(noteRef.current.contentJson, widgetsRef.current, text));
+        void persist(
+          appendPlainTextToContent(
+            noteRef.current.contentJson,
+            extractWidgets(noteRef.current.contentJson),
+            text
+          )
+        );
       }
     },
     [persist]
@@ -895,7 +840,10 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
         editorRef.current.setContent(docResult.updatedDoc);
         editorRef.current.flush();
       } else {
-        const nextContentJson = serializeStashContent(docResult.updatedDoc, widgetsRef.current);
+        const nextContentJson = serializeStashContent(
+          docResult.updatedDoc,
+          extractWidgets(noteRef.current?.contentJson)
+        );
         const nextPlainText = docToPlainText(docResult.updatedDoc);
         void persist({
           contentJson: nextContentJson,
@@ -924,7 +872,10 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       editorRef.current.setContent(plainTextToDoc(textResult.updatedText));
       editorRef.current.flush();
     } else {
-      const nextContentJson = stashContentFromPlainText(textResult.updatedText, widgetsRef.current);
+      const nextContentJson = stashContentFromPlainText(
+        textResult.updatedText,
+        extractWidgets(noteRef.current?.contentJson)
+      );
       void persist({
         plainText: textResult.updatedText,
         contentJson: nextContentJson,
@@ -989,8 +940,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
     const restored = await stashIpc.restoreRevision(noteId, revId);
     setNote(restored);
     setTitle(restored.title);
-    const stored = extractWidgets<NoteWidgetData>(restored.contentJson);
-    setWidgets(stored);
+    setWidgets(findWidgetNodes(docForEditor(restored.contentJson, restored.plainText)));
     setContentToken((t) => t + 1);
     setRevisionsOpen(false);
     playChimeSound();
@@ -1523,11 +1473,9 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
               <SimpleDropdownSeparator />
               <SimpleDropdownItem
                 onSelect={() => {
-                  if (activeSwapWidget) {
-                    const nextWidgets = widgets.map((w) =>
-                      w.id === activeSwapWidget.id ? { ...w, isCollapsed: false } : w
-                    );
-                    handleUpdateWidgets(nextWidgets);
+                  const editor = editorRef.current?.getEditor();
+                  if (activeSwapWidget && editor) {
+                    updateWidgetNodeInEditor(editor, activeSwapWidget.widgetId, { isCollapsed: false });
                     toast.show({ message: "Currency Swap opened" });
                   } else {
                     handleAddWidget("swap");
@@ -1733,11 +1681,9 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
           <ContextMenuSeparator />
           <ContextMenuItem
             onClick={() => {
-              if (activeSwapWidget) {
-                const nextWidgets = widgets.map((w) =>
-                  w.id === activeSwapWidget.id ? { ...w, isCollapsed: false } : w
-                );
-                handleUpdateWidgets(nextWidgets);
+              const editor = editorRef.current?.getEditor();
+              if (activeSwapWidget && editor) {
+                updateWidgetNodeInEditor(editor, activeSwapWidget.widgetId, { isCollapsed: false });
                 toast.show({ message: "Currency Swap opened" });
               } else {
                 handleAddWidget("swap");
@@ -2019,18 +1965,6 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
               />
             )}
 
-            {/* Draggable Note Widgets Canvas */}
-            {widgets.length > 0 && (
-              <div className="relative z-10">
-                <NoteWidgetsCanvas
-                  widgets={widgets}
-                  noteId={noteId}
-                  onUpdateWidgets={handleUpdateWidgets}
-                  onInsertToNote={handleInsertTextToNote}
-                />
-              </div>
-            )}
-
             <div className={cn("relative z-10 flex-1 select-text", currentFontPersona?.fontClass)}>
               <TiptapEditor
                 key={`${note.id}-${contentToken}`}
@@ -2044,6 +1978,8 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                 onToggleDock={handleToggleDock}
                 className={currentFontPersona?.fontClass}
                 onAddWidget={handleAddWidget}
+                noteId={noteId}
+                onInsertToNote={handleInsertTextToNote}
                 onPersonalizePersona={() => setPersonaModalOpen(true)}
                 onOrganizeChecklist={handleOrganizeChecklist}
                 onDueDate={() => setDueDateDialogOpen(true)}

@@ -27,8 +27,7 @@ import {
   Ghost,
   Sparkle,
 } from "@phosphor-icons/react";
-import { extractWidgets } from "@/features/editor/stash-content";
-import { NoteWidgetData } from "@/features/widgets/types";
+import { extractWidgets, extractDoc, findWidgetNodes } from "@/features/editor/stash-content";
 import {
   hasNotePin,
   isNoteSessionUnlocked,
@@ -131,10 +130,13 @@ export const NoteCard: React.FC<NoteCardProps> = ({
     }
   }, [note.updatedAt, showRelativeTime]);
 
-  const attachedWidgets = useMemo(
-    () => extractWidgets<NoteWidgetData>(note.contentJson),
-    [note.contentJson]
-  );
+  const attachedWidgets = useMemo(() => {
+    // Legacy notes keep widgets in a separate array; newer notes carry them
+    // as nodes inside the doc. Count whichever the note actually has.
+    const legacy = extractWidgets<{ title: string }>(note.contentJson);
+    if (legacy.length > 0) return legacy;
+    return findWidgetNodes(extractDoc(note.contentJson));
+  }, [note.contentJson]);
 
   const noteActionProps = {
     note,

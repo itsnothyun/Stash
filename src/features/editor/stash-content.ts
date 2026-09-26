@@ -268,17 +268,105 @@ export function extractWidgets<T>(contentJson?: string | null): T[] {
 }
 
 /**
+ * Widgets used to live in a separate array outside the doc, rendered in a
+ * fixed shelf above the text. They're now real nodes inside the doc, so they
+ * can sit anywhere in the note and let text wrap around them.
+ */
+export const WIDGET_NODE_TYPE = "stashWidget";
+
+export type WidgetWrapSide = "left" | "right" | "none";
+
+export interface StashWidgetAttrs {
+  widgetId: string;
+  widgetType: string;
+  title: string;
+  config: Record<string, any> | null;
+  isCollapsed: boolean;
+  width: number | string | null;
+  side: WidgetWrapSide;
+}
+
+interface LegacyWidgetLike {
+  id: string;
+  type: string;
+  title: string;
+  config?: Record<string, any>;
+  isCollapsed?: boolean;
+  width?: number | string;
+}
+
+/** Builds the inline node JSON for one widget. New widgets default to a
+ * full-width block (`side: "none"`) — the same look the old shelf card had. */
+export function widgetToNodeJSON(widget: LegacyWidgetLike): TiptapNode {
+  return {
+    type: WIDGET_NODE_TYPE,
+    attrs: {
+      widgetId: widget.id,
+      widgetType: widget.type,
+      title: widget.title,
+      config: widget.config ?? null,
+      isCollapsed: widget.isCollapsed ?? false,
+      width: widget.width ?? null,
+      side: "none",
+    },
+  };
+}
+
+/**
+ * Folds a legacy note's separate widget array into its doc, once, as real
+ * nodes prepended at the top — preserving them exactly where they used to
+ * render (above the text) while moving them onto the one widget model.
+ */
+export function migrateLegacyWidgetsIntoDoc(
+  doc: TiptapDoc,
+  legacyWidgets: LegacyWidgetLike[]
+): TiptapDoc {
+  if (!legacyWidgets || legacyWidgets.length === 0) return doc;
+  return {
+    type: "doc",
+    content: [...legacyWidgets.map(widgetToNodeJSON), ...doc.content],
+  };
+}
+
+/** Recursively collects widget nodes from a doc, e.g. to find an existing swap widget. */
+export function findWidgetNodes(
+  doc: TiptapDoc | null | undefined,
+  predicate?: (attrs: StashWidgetAttrs) => boolean
+): StashWidgetAttrs[] {
+  const results: StashWidgetAttrs[] = [];
+  const walk = (nodes: TiptapNode[] | undefined) => {
+    if (!nodes) return;
+    for (const node of nodes) {
+      if (node.type === WIDGET_NODE_TYPE && node.attrs) {
+        const attrs = node.attrs as StashWidgetAttrs;
+        if (!predicate || predicate(attrs)) results.push(attrs);
+      }
+      if (Array.isArray(node.content)) walk(node.content);
+    }
+  };
+  walk(doc?.content);
+  return results;
+}
+
+/**
  * The document a note should open with.
  *
  * When `contentJson` has no usable doc but `plainText` does, the text wins —
  * that repairs notes written by a plain-text-only path, on open, without a
  * migration. Returns `null` for a genuinely empty note so the placeholder shows.
+ * Legacy shelf widgets are folded into the doc here too, so every caller that
+ * opens a note through this function sees the current widget model.
  */
 export function docForEditor(
   contentJson?: string | null,
   plainText?: string | null
 ): TiptapDoc | null {
-  const doc = extractDoc(contentJson);
+  let doc = extractDoc(contentJson);
+  const legacyWidgets = extractWidgets<LegacyWidgetLike>(contentJson);
+  if (doc && legacyWidgets.length > 0) {
+    doc = migrateLegacyWidgetsIntoDoc(doc, legacyWidgets);
+  }
+
   if (doc && !isDocEmpty(doc)) return doc;
 
   if (plainText && plainText.trim().length > 0) {
@@ -288,8 +376,12 @@ export function docForEditor(
   return doc;
 }
 
-/** Wrap a doc and its widgets into the envelope notes are stored in. */
-export function serializeStashContent(doc: unknown, widgets: unknown[]): string {
+/**
+ * Wrap a doc into the envelope notes are stored in. `widgets` is a legacy
+ * parameter — new widgets live as nodes inside `doc` itself, so callers
+ * writing fresh content can omit it (it defaults to empty).
+ */
+export function serializeStashContent(doc: unknown, widgets: unknown[] = []): string {
   const wrapper = doc && typeof doc === "object" ? (doc as { doc?: unknown }) : null;
   return JSON.stringify({
     type: STASH_DOC_TYPE,

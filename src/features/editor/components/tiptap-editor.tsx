@@ -16,7 +16,8 @@ import Superscript from "@tiptap/extension-superscript";
 import TextAlign from "@tiptap/extension-text-align";
 import { Table, TableRow, TableHeader, TableCell } from "@tiptap/extension-table";
 import { FontSize } from "../extensions/font-size";
-import { docForEditor, docToPlainText } from "../stash-content";
+import { StashWidget } from "../extensions/stash-widget-node";
+import { docForEditor, docToPlainText, WIDGET_NODE_TYPE, WidgetWrapSide } from "../stash-content";
 import { evaluateInlineMath } from "../inline-math";
 import { SlashMenu } from "./slash-menu";
 import { FloatingToolbar } from "./floating-toolbar";
@@ -31,6 +32,14 @@ export interface TiptapEditorRef {
   getPlainText: () => string;
   setContent: (content: any) => void;
   insertContent: (content: string) => void;
+  insertWidget: (attrs: {
+    widgetId: string;
+    widgetType: string;
+    title: string;
+    config?: Record<string, any> | null;
+    width?: number | string | null;
+    side?: "left" | "right" | "none";
+  }) => void;
   flush: () => void;
 }
 
@@ -67,6 +76,8 @@ interface TiptapEditorProps {
   onImportMarkdown?: () => void;
   onRevisions?: () => void;
   onRefreshNote?: () => void;
+  noteId?: string;
+  onInsertToNote?: (text: string) => void;
 }
 
 export const TiptapEditor: React.FC<TiptapEditorProps> = ({
@@ -89,6 +100,8 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
   onImportMarkdown,
   onRevisions,
   onRefreshNote,
+  noteId,
+  onInsertToNote,
 }) => {
   const {
     editorSpellcheck,
@@ -188,6 +201,10 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
           class: "border border-border px-3 py-1.5 text-xs align-top",
         },
       }),
+      StashWidget.configure({
+        noteId: noteId ?? "",
+        onInsertToNote: onInsertToNote ?? (() => {}),
+      }),
     ],
     content: parsedInitial as any,
     autofocus: autoFocus ? "end" : false,
@@ -203,6 +220,38 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
         if (target.closest(".stash-checklist")) return false;
         if (target.closest("p, h1, h2, h3, pre, blockquote, li")) return false;
         return focusOutsideChecklist(view, event.clientX, event.clientY);
+      },
+      handleDrop: (view, event) => {
+        // Dropping a widget near an edge wraps it there automatically — no
+        // manual "wrap left/right" toggle needed. Middle third stays full-width.
+        let widgetId: string | null = null;
+        view.dragging?.slice.content.forEach((node) => {
+          if (node.type.name === WIDGET_NODE_TYPE) widgetId = node.attrs.widgetId;
+        });
+        if (!widgetId) return false;
+
+        const rect = view.dom.getBoundingClientRect();
+        const fraction = (event.clientX - rect.left) / rect.width;
+        const side: WidgetWrapSide = fraction < 0.35 ? "left" : fraction > 0.65 ? "right" : "none";
+        const droppedId = widgetId;
+
+        setTimeout(() => {
+          let pos: number | null = null;
+          view.state.doc.descendants((node, nodePos) => {
+            if (pos !== null) return false;
+            if (node.type.name === WIDGET_NODE_TYPE && node.attrs.widgetId === droppedId) {
+              pos = nodePos;
+              return false;
+            }
+            return true;
+          });
+          if (pos === null) return;
+          const node = view.state.doc.nodeAt(pos);
+          if (!node) return;
+          view.dispatch(view.state.tr.setNodeMarkup(pos, undefined, { ...node.attrs, side }));
+        }, 0);
+
+        return false;
       },
       handleKeyDown: (view, event) => {
         // Detect '/' at start of block or after whitespace
@@ -254,6 +303,9 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
       },
       insertContent: (content: string) => {
         editor?.commands.insertContent(content);
+      },
+      insertWidget: (attrs) => {
+        editor?.commands.insertWidget(attrs);
       },
       flush,
     };
