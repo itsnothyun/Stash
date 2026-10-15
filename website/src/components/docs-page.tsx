@@ -562,8 +562,8 @@ export const DOCS_SECTIONS: {
 
         <div className="rounded-xl border border-white/[0.08] bg-[#161619] p-4 space-y-3 font-mono text-xs">
           <div className="text-zinc-500"># 1. Clone repository:</div>
-          <div className="text-cyan-300">git clone https://github.com/stash-app/stash.git</div>
-          <div className="text-cyan-300">cd stash</div>
+          <div className="text-cyan-300">git clone https://github.com/itsnothyun/Stash.git</div>
+          <div className="text-cyan-300">cd Stash</div>
           <div className="text-zinc-500 pt-2"># 2. Install frontend dependencies:</div>
           <div className="text-cyan-300">pnpm install</div>
           <div className="text-zinc-500 pt-2"># 3. Run in development mode with hot reload:</div>

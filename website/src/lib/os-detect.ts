@@ -25,7 +25,7 @@ export interface PlatformDownloadInfo {
 }
 
 export const GITHUB_REPO = "https://github.com/itsnothyun/Stash";
-export const LATEST_VERSION = "v0.1.0";
+export const LATEST_VERSION = "v0.1.1";
 
 export const DOWNLOAD_PACKAGES: Record<OperatingSystem, PlatformDownloadInfo> = {
   windows: {
@@ -34,19 +34,19 @@ export const DOWNLOAD_PACKAGES: Record<OperatingSystem, PlatformDownloadInfo> = 
     badge: "Windows 10 / 11",
     primaryInstaller: {
       name: "Windows Setup Installer (.exe)",
-      filename: "Stash_0.1.0_x64-setup.exe",
+      filename: "Stash_0.1.1_x64-setup.exe",
       ext: ".exe",
       arch: "x64 / x86_64",
-      url: `${GITHUB_REPO}/releases/download/${LATEST_VERSION}/Stash_0.1.0_x64-setup.exe`,
-      size: "8.4 MB",
+      url: `${GITHUB_REPO}/releases/download/${LATEST_VERSION}/Stash_0.1.1_x64-setup.exe`,
+      size: "4.7 MB",
     },
     secondaryInstaller: {
-      name: "Windows Portable Standalone (.exe)",
-      filename: "Stash_0.1.0_portable.exe",
-      ext: ".exe",
-      arch: "x64 (No installation required)",
-      url: `${GITHUB_REPO}/releases/download/${LATEST_VERSION}/Stash_0.1.0_portable.exe`,
-      size: "8.1 MB",
+      name: "Windows Installer Package (.msi)",
+      filename: "Stash_0.1.1_x64_en-US.msi",
+      ext: ".msi",
+      arch: "x64",
+      url: `${GITHUB_REPO}/releases/download/${LATEST_VERSION}/Stash_0.1.1_x64_en-US.msi`,
+      size: "5.9 MB",
     },
     cliCommand: "winget install stash-app",
     cliLabel: "winget",
@@ -57,11 +57,11 @@ export const DOWNLOAD_PACKAGES: Record<OperatingSystem, PlatformDownloadInfo> = 
     badge: "macOS 12+ Universal",
     primaryInstaller: {
       name: "Apple Silicon & Intel Disk Image (.dmg)",
-      filename: "Stash_0.1.0_universal.dmg",
+      filename: "Stash_0.1.1_universal.dmg",
       ext: ".dmg",
       arch: "Universal (M1/M2/M3/M4 & Intel)",
-      url: `${GITHUB_REPO}/releases/download/${LATEST_VERSION}/Stash_0.1.0_universal.dmg`,
-      size: "9.2 MB",
+      url: `${GITHUB_REPO}/releases/download/${LATEST_VERSION}/Stash_0.1.1_universal.dmg`,
+      size: "13.9 MB",
     },
     cliCommand: "brew install --cask stash",
     cliLabel: "Homebrew",
@@ -71,20 +71,12 @@ export const DOWNLOAD_PACKAGES: Record<OperatingSystem, PlatformDownloadInfo> = 
     osName: "Linux",
     badge: "Linux x64",
     primaryInstaller: {
-      name: "Universal AppImage (.AppImage)",
-      filename: "stash_0.1.0_amd64.AppImage",
+      name: "Build from source (no Linux build yet)",
+      filename: "stash_0.1.1_amd64.AppImage",
       ext: ".AppImage",
       arch: "x86_64",
-      url: `${GITHUB_REPO}/releases/download/${LATEST_VERSION}/stash_0.1.0_amd64.AppImage`,
-      size: "12.8 MB",
-    },
-    secondaryInstaller: {
-      name: "Debian / Ubuntu Package (.deb)",
-      filename: "stash_0.1.0_amd64.deb",
-      ext: ".deb",
-      arch: "x86_64",
-      url: `${GITHUB_REPO}/releases/download/${LATEST_VERSION}/stash_0.1.0_amd64.deb`,
-      size: "10.4 MB",
+      url: `${GITHUB_REPO}/releases`,
+      size: "N/A",
     },
     cliCommand: "curl -fsSL https://stash.run/install.sh | bash",
     cliLabel: "curl",
@@ -95,11 +87,11 @@ export const DOWNLOAD_PACKAGES: Record<OperatingSystem, PlatformDownloadInfo> = 
     badge: "Windows & macOS",
     primaryInstaller: {
       name: "Windows Setup Installer (.exe)",
-      filename: "Stash_0.1.0_x64-setup.exe",
+      filename: "Stash_0.1.1_x64-setup.exe",
       ext: ".exe",
       arch: "x64",
-      url: `${GITHUB_REPO}/releases/download/${LATEST_VERSION}/Stash_0.1.0_x64-setup.exe`,
-      size: "8.4 MB",
+      url: `${GITHUB_REPO}/releases/download/${LATEST_VERSION}/Stash_0.1.1_x64-setup.exe`,
+      size: "4.7 MB",
     },
     cliCommand: "winget install stash-app",
     cliLabel: "winget",

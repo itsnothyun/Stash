@@ -106,7 +106,7 @@ export const DownloadMatrix: React.FC = () => {
                   </div>
                 </a>
 
-                {/* Portable Standalone .EXE */}
+                {/* MSI Installer Package */}
                 {windows.secondaryInstaller && (
                   <a
                     href={windows.secondaryInstaller.url}
@@ -115,10 +115,10 @@ export const DownloadMatrix: React.FC = () => {
                   >
                     <div className="flex items-center gap-2">
                       <Package className="h-3.5 w-3.5 text-zinc-400" />
-                      <span>Portable Standalone Executable</span>
+                      <span>Windows Installer Package</span>
                     </div>
                     <span className="font-mono text-[10px] text-zinc-500 rounded bg-white/5 px-1.5 py-0.5 border border-white/5">
-                      No Install
+                      .msi
                     </span>
                   </a>
                 )}
@@ -155,7 +155,7 @@ export const DownloadMatrix: React.FC = () => {
             <div className="mt-5 pt-3 border-t border-white/[0.06] text-[10px] font-mono text-zinc-500 flex items-center justify-between">
               <span className="flex items-center gap-1.5">
                 <ShieldCheck className="h-3 w-3 text-emerald-400" />
-                <span>SHA256: 4a2bf...8c9e</span>
+                <span>SHA256: 8ea5a...0c4f</span>
               </span>
               <a
                 href={`${GITHUB_REPO}/releases`}
@@ -279,7 +279,7 @@ export const DownloadMatrix: React.FC = () => {
             <div className="mt-5 pt-3 border-t border-white/[0.06] text-[10px] font-mono text-zinc-500 flex items-center justify-between">
               <span className="flex items-center gap-1.5">
                 <ShieldCheck className="h-3 w-3 text-emerald-400" />
-                <span>SHA256: 9e1f3...4b2a</span>
+                <span>SHA256: 3201e...5b4e</span>
               </span>
               <a
                 href={`${GITHUB_REPO}/releases`}
