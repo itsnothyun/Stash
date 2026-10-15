@@ -307,7 +307,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
   }
 
   return (
-    <div className={cn("flex flex-col gap-5 p-6 max-w-7xl mx-auto w-full", className)}>
+    <div className={cn("flex flex-col gap-5 p-4 sm:p-6 max-w-7xl mx-auto w-full", className)}>
       {/* ========================================================================= */}
       {/* 1. TOP HEADER & VITAL SIGNS COCKPIT BAR                                    */}
       {/* ========================================================================= */}
@@ -855,12 +855,12 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                 <thead>
                   <tr className="border-b border-border/60 bg-muted/40 text-muted-foreground font-semibold">
                     <th className="py-2.5 px-4">Application</th>
-                    <th className="py-2.5 px-3">PID</th>
+                    <th className="hidden py-2.5 px-3 md:table-cell">PID</th>
                     <th className="py-2.5 px-3 text-right">CPU %</th>
-                    <th className="py-2.5 px-3">CPU</th>
+                    <th className="hidden py-2.5 px-3 md:table-cell">CPU</th>
                     <th className="py-2.5 px-3 text-right">Memory</th>
-                    <th className="py-2.5 px-3">RAM</th>
-                    <th className="py-2.5 px-3">Uptime</th>
+                    <th className="hidden py-2.5 px-3 md:table-cell">RAM</th>
+                    <th className="hidden py-2.5 px-3 lg:table-cell">Uptime</th>
                     <th className="py-2.5 px-4 text-right">Action</th>
                   </tr>
                 </thead>
@@ -922,7 +922,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                           </td>
 
                           {/* PID */}
-                          <td className="py-2 px-3 text-muted-foreground text-xs">
+                          <td className="hidden py-2 px-3 text-muted-foreground text-xs md:table-cell">
                             {proc.pid}
                           </td>
 
@@ -941,7 +941,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                           </td>
 
                           {/* CPU Meter */}
-                          <td className="py-2 px-3 w-28">
+                          <td className="hidden py-2 px-3 w-28 md:table-cell">
                             <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                               <div
                                 className={cn(
@@ -963,7 +963,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                           </td>
 
                           {/* Memory Meter */}
-                          <td className="py-2 px-3 w-28">
+                          <td className="hidden py-2 px-3 w-28 md:table-cell">
                             <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                               <div
                                 className={cn(
@@ -976,7 +976,7 @@ export const PerformanceHub: React.FC<PerformanceHubProps> = ({ className }) => 
                           </td>
 
                           {/* Uptime */}
-                          <td className="py-2 px-3 text-muted-foreground text-[11px] font-sans">
+                          <td className="hidden py-2 px-3 text-muted-foreground text-[11px] font-sans lg:table-cell">
                             {formatDuration(proc.run_time_secs)}
                           </td>
 

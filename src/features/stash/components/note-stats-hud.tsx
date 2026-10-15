@@ -108,7 +108,7 @@ export const NoteStatsHud: React.FC<NoteStatsHudProps> = ({
           type="button"
           title="Click to view detailed note statistics"
           className={cn(
-            "no-drag-region flex items-center gap-1.5 rounded-full border border-border/40 bg-background/85 px-2 py-0.5 text-[10px] font-medium text-muted-foreground/80 shadow-2xs backdrop-blur-xs transition-all hover:bg-background hover:text-foreground hover:shadow-xs active:scale-95 cursor-pointer select-none",
+            "no-drag-region flex items-center gap-1.5 rounded-full border border-border/40 bg-background/85 px-2 py-0.5 text-[10px] font-medium text-muted-foreground/80 shadow-xs backdrop-blur-[2px] transition-all hover:bg-background hover:text-foreground hover:shadow-xs active:scale-95 cursor-pointer select-none",
             className
           )}
         >

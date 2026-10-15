@@ -344,13 +344,22 @@ export const FloatingToolbar: React.FC<FloatingToolbarProps> = ({
         }}
         className={cn(
           "fixed bottom-3 left-1/2 -translate-x-1/2 z-40 select-none",
-          "flex flex-wrap items-center justify-center gap-0.5 rounded-xl border border-border/80",
+          // One row that scrolls sideways on narrow windows instead of
+          // wrapping into a tall block over the note.
+          "flex flex-nowrap items-center justify-start gap-0.5 overflow-x-auto no-scrollbar overscroll-x-contain rounded-xl border border-border/80 [&>*]:shrink-0",
           "bg-popover/95 px-2 py-1 shadow-2xl backdrop-blur-md",
           "animate-in fade-in-0 slide-in-from-bottom-2 duration-150",
           className
         )}
         style={{
           maxWidth: "calc(100vw - 24px)",
+        }}
+        onWheel={(e) => {
+          // Let a regular mouse wheel scroll the dock sideways when it overflows.
+          const el = e.currentTarget;
+          if (el.scrollWidth > el.clientWidth && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+            el.scrollLeft += e.deltaY;
+          }
         }}
       >
         {/* History */}
@@ -1160,6 +1169,26 @@ export const FloatingToolbar: React.FC<FloatingToolbarProps> = ({
                 <DropdownMenuItem onClick={() => onAddWidget("palette")} className="cursor-pointer">
                   <Palette className="mr-2 h-3.5 w-3.5 text-foreground" />
                   <span>Color Palette</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("coderunner")} className="cursor-pointer">
+                  <Code2 className="mr-2 h-3.5 w-3.5 text-foreground" />
+                  <span>Code Runner & Sandbox</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("devtools")} className="cursor-pointer">
+                  <Code2 className="mr-2 h-3.5 w-3.5 text-foreground" />
+                  <span>Developer Utilities</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("spreadsheet")} className="cursor-pointer">
+                  <Kanban className="mr-2 h-3.5 w-3.5 text-foreground" />
+                  <span>Reactive Mini Spreadsheet</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("expenses")} className="cursor-pointer">
+                  <CalcIcon className="mr-2 h-3.5 w-3.5 text-foreground" />
+                  <span>Expense & Budget Log</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onAddWidget("whiteboard")} className="cursor-pointer">
+                  <Palette className="mr-2 h-3.5 w-3.5 text-foreground" />
+                  <span>Freehand Sketch & Canvas</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

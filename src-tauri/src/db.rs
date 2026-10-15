@@ -284,6 +284,35 @@ impl DbState {
             )?;
         }
 
+        // Migration 5: the References library — saved links/tools with a
+        // thumbnail, kept outside notes so they can be browsed as a gallery.
+        // (`references` is an SQL keyword, hence `reference_links`.)
+        if current_version < 5 {
+            conn.execute_batch(
+                "BEGIN;
+                CREATE TABLE IF NOT EXISTS reference_links (
+                    id TEXT PRIMARY KEY,
+                    title TEXT NOT NULL,
+                    url TEXT,
+                    description TEXT NOT NULL DEFAULT '',
+                    category TEXT NOT NULL DEFAULT 'Uncategorized',
+                    status TEXT NOT NULL DEFAULT 'ready',
+                    keyword TEXT,
+                    source_label TEXT,
+                    source_url TEXT,
+                    collection TEXT,
+                    thumbnail TEXT,
+                    is_starred INTEGER NOT NULL DEFAULT 0,
+                    is_visited INTEGER NOT NULL DEFAULT 0,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS idx_reference_links_category ON reference_links(category);
+                INSERT INTO schema_migrations (version, applied_at) VALUES (5, datetime('now'));
+                COMMIT;",
+            )?;
+        }
+
         Ok(())
     }
 

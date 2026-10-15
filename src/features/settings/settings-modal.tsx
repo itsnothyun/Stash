@@ -109,8 +109,8 @@ const Row: React.FC<{
   children: React.ReactNode;
   className?: string;
 }> = ({ title, description, children, className }) => (
-  <div className={cn("flex items-start justify-between gap-6", className)}>
-    <div className="min-w-0">
+  <div className={cn("flex flex-wrap items-start justify-between gap-x-6 gap-y-2", className)}>
+    <div className="min-w-0 flex-1 basis-48">
       <div className="text-xs font-medium text-foreground">{title}</div>
       {description && (
         <div className="mt-0.5 text-2xs leading-relaxed text-muted-foreground">
@@ -118,7 +118,7 @@ const Row: React.FC<{
         </div>
       )}
     </div>
-    <div className="shrink-0 pt-0.5">{children}</div>
+    <div className="max-w-full shrink-0 pt-0.5">{children}</div>
   </div>
 );
 
@@ -529,9 +529,9 @@ export const SettingsModal: React.FC = () => {
             )}
           </DialogHeader>
 
-          <div className="flex h-[520px]">
-            {/* Sidebar navigation */}
-            <nav className="w-48 shrink-0 space-y-0.5 border-r border-border bg-surface p-2.5 overflow-y-auto">
+          <div className="flex h-[min(520px,calc(100vh-6rem))] flex-col sm:flex-row">
+            {/* Sidebar navigation: a scrolling tab row on narrow windows */}
+            <nav className="flex shrink-0 gap-1 overflow-x-auto no-scrollbar border-b border-border bg-surface p-2 sm:block sm:w-48 sm:space-y-0.5 sm:overflow-x-visible sm:overflow-y-auto sm:border-b-0 sm:border-r sm:p-2.5">
               {TABS.map((tab) => {
                 const Icon = tab.icon;
                 const isSelected = activeTab === tab.id;
@@ -543,7 +543,7 @@ export const SettingsModal: React.FC = () => {
                       if (soundEffectsEnabled) playClickSound();
                     }}
                     className={cn(
-                      "w-full rounded-md px-2.5 py-[7px] text-left text-xs transition-colors flex items-center gap-2.5 cursor-pointer",
+                      "shrink-0 whitespace-nowrap rounded-md px-2.5 py-[7px] text-left text-xs transition-colors flex items-center gap-2.5 cursor-pointer sm:w-full",
                       isSelected
                         ? "bg-surface-hover font-medium text-foreground shadow-2xs"
                         : "text-muted-foreground hover:text-foreground hover:bg-surface-hover/60"
@@ -562,7 +562,7 @@ export const SettingsModal: React.FC = () => {
             </nav>
 
             {/* Tab content area */}
-            <div className="flex-1 space-y-6 overflow-y-auto p-6">
+            <div className="min-h-0 flex-1 space-y-6 overflow-y-auto p-4 sm:p-6">
               {/* -------------------- GENERAL TAB -------------------- */}
               {activeTab === "general" && settings && (
                 <>

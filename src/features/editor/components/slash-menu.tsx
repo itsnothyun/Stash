@@ -32,6 +32,7 @@ import {
   BookOpen,
   TrendUp as TrendingUp,
   Link,
+  LinkSimple,
 } from "@phosphor-icons/react";
 import "@tiptap/extension-underline";
 import "@tiptap/extension-highlight";
@@ -462,6 +463,90 @@ const getSlashMenuItems = (isColorful: boolean): SlashMenuItem[] => [
     ),
     command: (_editor, onAddWidget) => {
       onAddWidget?.("palette");
+    },
+  },
+  {
+    title: "Code Runner & Sandbox",
+    description: "Execute JavaScript/Math code scratchpads with console output",
+    category: "Widgets",
+    keywords: ["code", "runner", "javascript", "execute", "eval", "sandbox", "widget"],
+    icon: (
+      <Code2
+        className={cn("h-4 w-4", isColorful ? "text-emerald-500" : "text-foreground")}
+      />
+    ),
+    command: (_editor, onAddWidget) => {
+      onAddWidget?.("coderunner");
+    },
+  },
+  {
+    title: "Developer Utilities",
+    description: "JSON validator & formatter, regex tester, and text diff",
+    category: "Widgets",
+    keywords: ["json", "regex", "diff", "devtools", "formatter", "developer", "widget"],
+    icon: (
+      <Code2
+        className={cn("h-4 w-4", isColorful ? "text-violet-500" : "text-foreground")}
+      />
+    ),
+    command: (_editor, onAddWidget) => {
+      onAddWidget?.("devtools");
+    },
+  },
+  {
+    title: "Reactive Mini Spreadsheet",
+    description: "Editable grid table with SUM & AVG formula recalculation",
+    category: "Widgets",
+    keywords: ["spreadsheet", "table", "excel", "formula", "sum", "calc", "widget"],
+    icon: (
+      <Kanban
+        className={cn("h-4 w-4", isColorful ? "text-teal-500" : "text-foreground")}
+      />
+    ),
+    command: (_editor, onAddWidget) => {
+      onAddWidget?.("spreadsheet");
+    },
+  },
+  {
+    title: "Expense & Budget Log",
+    description: "Daily receipt logger with currency selection and auto-total",
+    category: "Widgets",
+    keywords: ["expense", "budget", "money", "receipt", "finance", "total", "widget"],
+    icon: (
+      <CalcIcon
+        className={cn("h-4 w-4", isColorful ? "text-amber-500" : "text-foreground")}
+      />
+    ),
+    command: (_editor, onAddWidget) => {
+      onAddWidget?.("expenses");
+    },
+  },
+  {
+    title: "Freehand Sketch & Canvas",
+    description: "Quick HTML5 drawing canvas with pens, eraser and note export",
+    category: "Widgets",
+    keywords: ["sketch", "canvas", "draw", "whiteboard", "doodle", "paint", "widget"],
+    icon: (
+      <Palette
+        className={cn("h-4 w-4", isColorful ? "text-indigo-500" : "text-foreground")}
+      />
+    ),
+    command: (_editor, onAddWidget) => {
+      onAddWidget?.("whiteboard");
+    },
+  },
+  {
+    title: "Link Collection",
+    description: "Searchable, categorized list of links with favicons, stars & opened-tracking",
+    category: "Widgets",
+    keywords: ["links", "bookmarks", "urls", "resources", "repos", "collection", "widget"],
+    icon: (
+      <LinkSimple
+        className={cn("h-4 w-4", isColorful ? "text-sky-500" : "text-foreground")}
+      />
+    ),
+    command: (_editor, onAddWidget) => {
+      onAddWidget?.("links");
     },
   },
 ];

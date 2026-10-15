@@ -55,6 +55,10 @@ export const toast = {
     }),
   error: (message: string, description?: string) =>
     useToastStore.getState().push({ message, description, variant: "destructive" }),
+  success: (message: string, description?: string) =>
+    useToastStore.getState().push({ message, description, variant: "default" }),
+  info: (message: string, description?: string) =>
+    useToastStore.getState().push({ message, description, variant: "default" }),
   dismiss: (id: string) => useToastStore.getState().dismiss(id),
 };
 

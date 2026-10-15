@@ -76,7 +76,10 @@ import {
   Bug,
   Lightbulb,
   BookOpen,
+  SidebarSimple,
+  CodeBlock as Code2,
 } from "@phosphor-icons/react";
+import { NoteAIAssistantModal } from "@/features/ai/components/note-ai-assistant-modal";
 import { NoteStatsHud } from "@/features/stash/components/note-stats-hud";
 import { VoiceDictationButton } from "@/features/stash/components/voice-dictation-button";
 import { organizeChecklist, organizeDocTasks } from "@/features/stash/task-organizer";
@@ -209,6 +212,18 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
     if (typeof window === "undefined") return false;
     return localStorage.getItem("stash:editor-dock-minimized") === "true";
   });
+  const [aiModalOpen, setAiModalOpen] = useState(false);
+  const [edgeDock, setEdgeDock] = useState<"none" | "left" | "right">(() => {
+    if (typeof window === "undefined") return "none";
+    return ((localStorage.getItem(`stash:dock:${noteId}`) as any) || "none");
+  });
+
+  const handleSetEdgeDock = useCallback((mode: "none" | "left" | "right") => {
+    setEdgeDock(mode);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`stash:dock:${noteId}`, mode);
+    }
+  }, [noteId]);
 
   const handleToggleDock = useCallback((next?: boolean | unknown) => {
     setIsDockMinimized((prev) => {
@@ -230,6 +245,8 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
   const editorRef = useRef<TiptapEditorRef | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const noteRef = useRef<Note | null>(note);
+  /** Last contentJson this window sent, so its own save echo is not mistaken for an outside edit. */
+  const lastSentContentRef = useRef<string | null>(null);
   noteRef.current = note;
   const titleRef = useRef<string>(title);
   titleRef.current = title;
@@ -479,11 +496,17 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
             // Only adopt external state if it is strictly newer than our local state,
             // preventing this window's own broadcast from reverting optimistic widget additions.
             if (fresh.version > versionRef.current) {
+              // Content changed elsewhere (e.g. a task ticked on the To-dos page):
+              // reload the editor, or its next autosave would write the stale doc back.
+              const contentChanged =
+                fresh.contentJson !== noteRef.current?.contentJson &&
+                fresh.contentJson !== lastSentContentRef.current;
               noteRef.current = fresh;
               versionRef.current = fresh.version;
               setNote(fresh);
               setTitle(fresh.title);
               setWidgets(findWidgetNodes(docForEditor(fresh.contentJson, fresh.plainText)));
+              if (contentChanged) setContentToken((t) => t + 1);
             }
           } catch {}
         }
@@ -632,6 +655,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
       if (!currentNote) return Promise.resolve(null);
       setSaveStatus("saving");
 
+      if (typeof patch.contentJson === "string") lastSentContentRef.current = patch.contentJson;
       const task = persistQueueRef.current.then(async () => {
         try {
           const updated = await stashIpc.updateNote({
@@ -1094,7 +1118,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                   data-tauri-drag-region
                   aria-live="polite"
                   className={cn(
-                    "drag-region text-[10px] font-medium transition-opacity duration-200 shrink-0 pointer-events-none",
+                    "drag-region text-[10px] font-medium transition-opacity duration-200 shrink-0 pointer-events-none max-[439px]:hidden",
                     isTerminal && "font-mono",
                     saveStatus === "idle" ? "opacity-0" : "opacity-60"
                   )}
@@ -1115,7 +1139,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                   >
                     <div className="liquid-glass-track rounded-full px-2 py-0.5 flex items-center gap-1.5 text-[10px] font-semibold text-foreground">
                       <span className="glass-active-beacon h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
-                      <span>Daily Stash</span>
+                      <span className="max-[519px]:hidden">Daily Stash</span>
                     </div>
                   </div>
                 )}
@@ -1198,7 +1222,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                   aria-label="Add interactive widget"
                 >
                   <Plus className="h-3 w-3" />
-                  <span>Widget</span>
+                  <span className="max-[519px]:hidden">Widget</span>
                 </button>
               </HeaderTooltip>
             )}
@@ -1330,7 +1354,105 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
                 <span className="text-[10px] text-muted-foreground">Hex swatches & 1-click copy</span>
               </div>
             </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("coderunner")}>
+              <Code2 className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("coderunner", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Code Runner & Sandbox</span>
+                <span className="text-[10px] text-muted-foreground">JS/Math sandbox with console</span>
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("devtools")}>
+              <Code2 className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("devtools", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Developer Utilities</span>
+                <span className="text-[10px] text-muted-foreground">JSON, regex & text diff</span>
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("spreadsheet")}>
+              <Kanban className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("spreadsheet", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Mini Spreadsheet</span>
+                <span className="text-[10px] text-muted-foreground">Reactive SUM & AVG formulas</span>
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("expenses")}>
+              <CalcIcon className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("expenses", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Expense Log</span>
+                <span className="text-[10px] text-muted-foreground">Receipts & running totals</span>
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleAddWidget("whiteboard")}>
+              <Palette className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("whiteboard", isColorful))} />
+              <div className="flex flex-col">
+                <span className="font-medium">Freehand Sketch Canvas</span>
+                <span className="text-[10px] text-muted-foreground">Drawing & visual diagrams</span>
+              </div>
+            </SimpleDropdownItem>
           </SimpleDropdown>
+
+          {/* Stash AI Copilot & Intelligence */}
+<span className="contents max-[359px]:hidden">
+          <HeaderTooltip label="Stash AI Copilot (Summarize & Action Items)">
+            <button
+              onClick={() => {
+                playClickSound();
+                setAiModalOpen(true);
+              }}
+              aria-label="Stash AI Copilot"
+              className={cn(
+                iconButton,
+                "text-amber-500 hover:text-amber-400 hover:bg-amber-500/10"
+              )}
+            >
+              <Sparkles className="h-3.5 w-3.5" weight="bold" />
+            </button>
+          </HeaderTooltip>
+          </span>
+
+          {/* Edge Docking Mode */}
+<span className="contents max-[519px]:hidden">
+          <SimpleDropdown
+            align="end"
+            contentClassName="w-48 text-xs"
+            trigger={({ toggle }) => (
+              <HeaderTooltip label={edgeDock === "none" ? "Edge Docking" : `Docked ${edgeDock}`}>
+                <button
+                  onClick={toggle}
+                  aria-label="Edge docking"
+                  className={cn(
+                    iconButton,
+                    edgeDock !== "none" && "bg-current/15 text-current opacity-100 ring-1 ring-current/20"
+                  )}
+                >
+                  <SidebarSimple className="h-3.5 w-3.5" />
+                </button>
+              </HeaderTooltip>
+            )}
+          >
+            <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+              Desktop Edge Snapping
+            </div>
+            <SimpleDropdownItem onSelect={() => handleSetEdgeDock("none")}>
+              <div className="flex items-center justify-between w-full">
+                <span>Free Float (Undocked)</span>
+                {edgeDock === "none" && <Check className="h-3 w-3 text-primary" weight="bold" />}
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleSetEdgeDock("left")}>
+              <div className="flex items-center justify-between w-full">
+                <span>Snap to Left Edge</span>
+                {edgeDock === "left" && <Check className="h-3 w-3 text-primary" weight="bold" />}
+              </div>
+            </SimpleDropdownItem>
+            <SimpleDropdownItem onSelect={() => handleSetEdgeDock("right")}>
+              <div className="flex items-center justify-between w-full">
+                <span>Snap to Right Edge</span>
+                {edgeDock === "right" && <Check className="h-3 w-3 text-primary" weight="bold" />}
+              </div>
+            </SimpleDropdownItem>
+          </SimpleDropdown>
+          </span>
 
           {/* Formatting dock toggle: minimize or maximize the dock */}
           <HeaderTooltip
@@ -1359,6 +1481,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
           </HeaderTooltip>
 
           {/* Always-on-top toggle */}
+<span className="contents max-[399px]:hidden">
           <HeaderTooltip
             label={alwaysOnTopState ? "Stop Keeping on Top" : "Keep on Top"}
             shortcut={formatShortcut(SHORTCUTS.alwaysOnTop)}
@@ -1380,8 +1503,10 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
               )}
             </button>
           </HeaderTooltip>
+          </span>
 
           {/* Share as Image Button */}
+<span className="contents max-[639px]:hidden">
           <HeaderTooltip label="Share as Beautiful Image">
             <button
               onClick={() => setExportImageOpen(true)}
@@ -1391,8 +1516,10 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
               <Camera className="h-3.5 w-3.5" />
             </button>
           </HeaderTooltip>
+          </span>
 
           {/* Voice to Stash Dictation */}
+<span className="contents max-[439px]:hidden">
           <HeaderTooltip label="Voice Dictation (Speech-to-Text · Right-click for Settings)">
             <div className="no-drag-region">
               <VoiceDictationButton
@@ -1401,6 +1528,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
               />
             </div>
           </HeaderTooltip>
+          </span>
 
           <SimpleDropdown
             align="end"
@@ -1413,6 +1541,33 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
               </HeaderTooltip>
             )}
           >
+            <SimpleDropdownItem className="min-[360px]:hidden" onSelect={() => setAiModalOpen(true)}>
+              <Sparkles className={cn("mr-2 h-3.5 w-3.5", colorClass("text-amber-500", isColorful, "text-primary"))} />
+              Stash AI Copilot
+            </SimpleDropdownItem>
+            <SimpleDropdownItem className="min-[400px]:hidden" onSelect={handleTogglePin}>
+              {alwaysOnTopState ? (
+                <PinOff className="mr-2 h-3.5 w-3.5 text-primary" />
+              ) : (
+                <Pin className="mr-2 h-3.5 w-3.5 text-primary" />
+              )}
+              {alwaysOnTopState ? "Stop Keeping on Top" : "Keep on Top"}
+            </SimpleDropdownItem>
+            <SimpleDropdownItem className="min-[440px]:hidden" onSelect={() => void handleToggleShade()}>
+              {isShaded ? (
+                <ChevronDown className="mr-2 h-3.5 w-3.5 text-primary" />
+              ) : (
+                <ChevronUp className="mr-2 h-3.5 w-3.5 text-primary" />
+              )}
+              {isShaded ? "Unshade Note" : "Roll Up to Titlebar"}
+            </SimpleDropdownItem>
+            <SimpleDropdownItem
+              className="min-[520px]:hidden"
+              onSelect={() => handleSetEdgeDock(edgeDock === "none" ? "right" : "none")}
+            >
+              <SidebarSimple className="mr-2 h-3.5 w-3.5 text-primary" />
+              {edgeDock === "none" ? "Snap to Right Edge" : "Undock (Free Float)"}
+            </SimpleDropdownItem>
             <SimpleDropdownItem onSelect={() => setExportImageOpen(true)}>
               <Camera className={cn("mr-2 h-3.5 w-3.5", colorClass("text-cyan-500", isColorful, "text-primary"))} />
               Share as Beautiful Image
@@ -1526,6 +1681,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
           </SimpleDropdown>
 
           {/* Window Shade / Roll-Up Button */}
+<span className="contents max-[439px]:hidden">
           <HeaderTooltip
             label={
               isShaded
@@ -1549,6 +1705,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
               )}
             </button>
           </HeaderTooltip>
+          </span>
 
           {/* Minimize Button */}
           <HeaderTooltip label="Minimize Window">
@@ -1775,6 +1932,26 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
             <Palette className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("palette", isColorful))} />
             <span>Color Palette</span>
           </ContextMenuItem>
+          <ContextMenuItem onClick={() => handleAddWidget("coderunner")}>
+            <Code2 className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("coderunner", isColorful))} />
+            <span>Code Runner & Sandbox</span>
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => handleAddWidget("devtools")}>
+            <Code2 className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("devtools", isColorful))} />
+            <span>Developer Utilities</span>
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => handleAddWidget("spreadsheet")}>
+            <Kanban className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("spreadsheet", isColorful))} />
+            <span>Mini Spreadsheet</span>
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => handleAddWidget("expenses")}>
+            <CalcIcon className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("expenses", isColorful))} />
+            <span>Expense Log</span>
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => handleAddWidget("whiteboard")}>
+            <Palette className={cn("mr-2 h-3.5 w-3.5", getWidgetColorClass("whiteboard", isColorful))} />
+            <span>Freehand Sketch Canvas</span>
+          </ContextMenuItem>
         </ContextMenuSubContent>
       </ContextMenuSub>
 
@@ -2000,7 +2177,7 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
             </div>
 
             {/* Interactive Note Statistics HUD */}
-            <div className="fixed bottom-2.5 right-3 z-30 pointer-events-auto">
+            <div className={cn("fixed bottom-2.5 right-3 z-30 pointer-events-auto", !isDockMinimized && "max-[767px]:bottom-14")}>
               <NoteStatsHud plainText={note.plainText || ""} />
             </div>
           </div>
@@ -2225,6 +2402,14 @@ export const FloatingStashView: React.FC<FloatingStashViewProps> = ({
         notePaper={notePaper}
         noteFont={noteFont}
         noteFrame={noteFrame}
+      />
+      {/* Stash AI Copilot & Intelligence Modal */}
+      <NoteAIAssistantModal
+        open={aiModalOpen}
+        onOpenChange={setAiModalOpen}
+        noteTitle={note.title || "Untitled Stash"}
+        noteText={(aiModalOpen && editorRef.current?.getPlainText()) || note.plainText || ""}
+        onInsertToNote={(text) => handleInsertTextToNote(text)}
       />
     </div>
   </TooltipProvider>

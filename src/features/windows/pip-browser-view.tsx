@@ -478,7 +478,7 @@ export const PipBrowserView: React.FC<PipBrowserViewProps> = ({
       {/* Viewport Frame */}
       <div className="relative flex-1 w-full bg-card overflow-hidden">
         {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/30 backdrop-blur-xs z-10 pointer-events-none">
+          <div className="absolute inset-0 flex items-center justify-center bg-background/30 backdrop-blur-[2px] z-10 pointer-events-none">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-popover/90 border border-border shadow-md text-xs text-foreground">
               <RotateCw className="h-3 w-3 animate-spin text-primary" />
               <span>Loading webpage…</span>

@@ -16,7 +16,13 @@ export type WidgetType =
   | "bug"
   | "idea"
   | "api"
-  | "reading";
+  | "reading"
+  | "coderunner"
+  | "devtools"
+  | "spreadsheet"
+  | "expenses"
+  | "whiteboard"
+  | "links";
 
 export interface NoteWidgetData {
   id: string;

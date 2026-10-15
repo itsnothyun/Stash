@@ -17,6 +17,7 @@ import {
   Lightbulb,
   CodeBlock as Code2,
   BookOpen,
+  LinkSimple,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils/cn";
 import { WidgetType } from "./types";
@@ -40,6 +41,12 @@ export const DEFAULT_WIDTHS: Record<WidgetType, number | string> = {
   idea: "100%",
   api: "100%",
   reading: "100%",
+  coderunner: 380,
+  devtools: 380,
+  spreadsheet: 440,
+  expenses: 340,
+  whiteboard: 360,
+  links: "100%",
 };
 
 export const SIZE_PRESETS = [
@@ -68,6 +75,12 @@ export const DEFAULT_WIDGET_TITLES: Record<WidgetType, string> = {
   idea: "Idea Incubator",
   api: "API & Tech Blueprint",
   reading: "Book & Article Digest",
+  coderunner: "Code Runner & Sandbox",
+  devtools: "Developer Utilities",
+  spreadsheet: "Reactive Mini Spreadsheet",
+  expenses: "Expense & Budget Log",
+  whiteboard: "Freehand Sketch & Canvas",
+  links: "Link Collection",
 };
 
 export function getWidgetIcon(type: WidgetType, isColorful: boolean): React.ReactNode {
@@ -109,6 +122,18 @@ export function getWidgetIcon(type: WidgetType, isColorful: boolean): React.Reac
       return <Code2 className={c("text-blue-500")} />;
     case "reading":
       return <BookOpen className={c("text-indigo-500")} />;
+    case "coderunner":
+      return <Code2 className={c("text-emerald-500")} />;
+    case "devtools":
+      return <Code2 className={c("text-violet-500")} />;
+    case "spreadsheet":
+      return <Kanban className={c("text-teal-500")} />;
+    case "expenses":
+      return <ArrowUpDown className={c("text-amber-500")} />;
+    case "whiteboard":
+      return <Palette className={c("text-indigo-500")} />;
+    case "links":
+      return <LinkSimple className={c("text-sky-500")} />;
     default:
       return null;
   }

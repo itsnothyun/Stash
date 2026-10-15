@@ -65,6 +65,10 @@ import {
   BookOpen,
   ArrowsDownUp,
   TrendUp,
+  Terminal,
+  Table,
+  Receipt,
+  PaintBrush,
 } from "@phosphor-icons/react";
 import {
   getNoteOpacity,
@@ -261,6 +265,12 @@ export const NoteMenuItems: React.FC<
         idea: "Idea Incubator",
         api: "API & Tech Blueprint",
         reading: "Book & Article Digest",
+        coderunner: "Code Runner & Sandbox",
+        devtools: "Developer Utilities",
+        spreadsheet: "Mini Spreadsheet",
+        expenses: "Expense Log",
+        whiteboard: "Freehand Sketch Canvas",
+        links: "Link Collection",
       };
       const newWidget: NoteWidgetData = {
         id: `${type}-${Date.now()}`,
@@ -796,6 +806,26 @@ export const NoteMenuItems: React.FC<
           <Item onClick={() => handleAddWidget("palette")}>
             <Palette className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
             <span>Color Palette</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("coderunner")}>
+            <Terminal className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
+            <span>Code Runner & Sandbox</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("devtools")}>
+            <Code className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
+            <span>Developer Utilities</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("spreadsheet")}>
+            <Table className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
+            <span>Mini Spreadsheet</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("expenses")}>
+            <Receipt className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
+            <span>Expense & Budget Log</span>
+          </Item>
+          <Item onClick={() => handleAddWidget("whiteboard")}>
+            <PaintBrush className="mr-2 h-3.5 w-3.5 text-muted-foreground" weight="regular" />
+            <span>Freehand Sketch Canvas</span>
           </Item>
         </SubContent>
       </Sub>

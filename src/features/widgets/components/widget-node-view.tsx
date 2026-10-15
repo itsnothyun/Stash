@@ -37,6 +37,12 @@ import { BugWidget } from "./bug-widget";
 import { IdeaWidget } from "./idea-widget";
 import { ApiWidget } from "./api-widget";
 import { ReadingWidget } from "./reading-widget";
+import { CodeRunnerWidget } from "./code-runner-widget";
+import { DevToolsWidget } from "./dev-tools-widget";
+import { SpreadsheetWidget } from "./spreadsheet-widget";
+import { ExpensesWidget } from "./expenses-widget";
+import { WhiteboardWidget } from "./whiteboard-widget";
+import { LinksWidget } from "./links-widget";
 import { cn } from "@/lib/utils/cn";
 
 /**
@@ -307,6 +313,18 @@ export const WidgetNodeView: React.FC<NodeViewProps> = ({
             {attrs.widgetType === "idea" && <IdeaWidget onInsertToNote={onInsertToNote} />}
             {attrs.widgetType === "api" && <ApiWidget onInsertToNote={onInsertToNote} />}
             {attrs.widgetType === "reading" && <ReadingWidget onInsertToNote={onInsertToNote} />}
+            {attrs.widgetType === "coderunner" && <CodeRunnerWidget onInsertToNote={onInsertToNote} />}
+            {attrs.widgetType === "devtools" && <DevToolsWidget onInsertToNote={onInsertToNote} />}
+            {attrs.widgetType === "spreadsheet" && <SpreadsheetWidget onInsertToNote={onInsertToNote} />}
+            {attrs.widgetType === "expenses" && <ExpensesWidget onInsertToNote={onInsertToNote} />}
+            {attrs.widgetType === "whiteboard" && <WhiteboardWidget onInsertToNote={onInsertToNote} />}
+            {attrs.widgetType === "links" && (
+              <LinksWidget
+                config={attrs.config ?? undefined}
+                onConfigChange={(cfg) => updateAttributes({ config: cfg })}
+                onInsertToNote={onInsertToNote}
+              />
+            )}
           </div>
         )}
       </div>

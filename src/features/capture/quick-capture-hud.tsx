@@ -15,7 +15,6 @@ import {
   Pin,
   Star,
   CornerDownLeft,
-  X,
   Hash,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
@@ -158,56 +157,52 @@ export const QuickCaptureHud: React.FC<QuickCaptureHudProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg p-0 gap-0 overflow-hidden bg-background/95 backdrop-blur-xl border border-border shadow-2xl rounded-xl">
         {/* Spotlight Navigation Tabs */}
-        <div className="flex items-center justify-between px-3.5 pt-3 pb-2 border-b border-border/60 bg-muted/20">
-          <div className="flex items-center gap-1">
+        <div className="flex items-center justify-between pl-3.5 pr-11 pt-3 pb-2 border-b border-border/60 bg-muted/20">
+          <div className="flex min-w-0 items-center gap-1">
             <button
               type="button"
               onClick={() => setMode("float")}
               className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1 rounded-md text-2xs font-medium transition-colors cursor-pointer",
+                "flex shrink-0 items-center gap-1.5 whitespace-nowrap px-2.5 py-1 rounded-md text-2xs font-medium transition-colors cursor-pointer",
                 mode === "float"
                   ? "bg-primary text-primary-foreground shadow-2xs"
                   : "text-muted-foreground hover:text-foreground hover:bg-surface"
               )}
             >
               <Layers className="h-3 w-3" />
-              <span>Floating Stash</span>
+              <span className="min-[440px]:hidden">Float</span>
+              <span className="hidden min-[440px]:inline">Floating Stash</span>
             </button>
             <button
               type="button"
               onClick={() => setMode("daily")}
               className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1 rounded-md text-2xs font-medium transition-colors cursor-pointer",
+                "flex shrink-0 items-center gap-1.5 whitespace-nowrap px-2.5 py-1 rounded-md text-2xs font-medium transition-colors cursor-pointer",
                 mode === "daily"
                   ? "bg-primary text-primary-foreground shadow-2xs"
                   : "text-muted-foreground hover:text-foreground hover:bg-surface"
               )}
             >
               <Calendar className="h-3 w-3" />
-              <span>Append to Today</span>
+              <span className="min-[440px]:hidden">Today</span>
+              <span className="hidden min-[440px]:inline">Append to Today</span>
             </button>
             <button
               type="button"
               onClick={() => setMode("inbox")}
               className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1 rounded-md text-2xs font-medium transition-colors cursor-pointer",
+                "flex shrink-0 items-center gap-1.5 whitespace-nowrap px-2.5 py-1 rounded-md text-2xs font-medium transition-colors cursor-pointer",
                 mode === "inbox"
                   ? "bg-primary text-primary-foreground shadow-2xs"
                   : "text-muted-foreground hover:text-foreground hover:bg-surface"
               )}
             >
               <Archive className="h-3 w-3" />
-              <span>Silent Library</span>
+              <span className="min-[440px]:hidden">Library</span>
+              <span className="hidden min-[440px]:inline">Silent Library</span>
             </button>
           </div>
 
-          <button
-            type="button"
-            onClick={() => onOpenChange(false)}
-            className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-surface transition-colors cursor-pointer"
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
         </div>
 
         {/* Form Body */}
@@ -306,8 +301,8 @@ export const QuickCaptureHud: React.FC<QuickCaptureHudProps> = ({
         </div>
 
         {/* Footer controls & shortcuts */}
-        <div className="flex items-center justify-between px-4 py-2.5 bg-muted/30 border-t border-border/60">
-          <div className="flex items-center gap-2 text-2xs text-muted-foreground">
+        <div className="flex items-center justify-end gap-2 px-4 py-2.5 bg-muted/30 border-t border-border/60 sm:justify-between">
+          <div className="hidden items-center gap-2 text-2xs text-muted-foreground sm:flex">
             <span className="flex items-center gap-1">
               <kbd className="px-1.5 py-0.5 rounded bg-surface border border-border text-[9px] font-mono">
                 Ctrl
@@ -331,7 +326,7 @@ export const QuickCaptureHud: React.FC<QuickCaptureHudProps> = ({
             type="button"
             disabled={isSubmitting || (!content.trim() && !title.trim())}
             onClick={() => void handleCapture()}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-xs active:scale-95 disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+            className="flex shrink-0 items-center gap-1.5 whitespace-nowrap px-3 py-1.5 rounded-md text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-xs active:scale-95 disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
           >
             <Sparkles className="h-3 w-3" />
             <span>

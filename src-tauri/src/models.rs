@@ -180,3 +180,31 @@ pub struct ExportData {
     pub tags: Vec<Tag>,
     pub window_states: Vec<NoteWindowState>,
 }
+
+/// One saved link/tool in the References library.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ReferenceLink {
+    pub id: String,
+    pub title: String,
+    pub url: Option<String>,
+    #[serde(default)]
+    pub description: String,
+    pub category: String,
+    /// "ready" (we have the link), "ask" (creator DMs it), "video" (only shown in the video)
+    pub status: String,
+    pub keyword: Option<String>,
+    pub source_label: Option<String>,
+    pub source_url: Option<String>,
+    pub collection: Option<String>,
+    /// Remote image URL or a `data:` URI.
+    pub thumbnail: Option<String>,
+    #[serde(default)]
+    pub is_starred: bool,
+    #[serde(default)]
+    pub is_visited: bool,
+    #[serde(default)]
+    pub created_at: String,
+    #[serde(default)]
+    pub updated_at: String,
+}

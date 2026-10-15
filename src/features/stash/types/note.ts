@@ -66,6 +66,7 @@ export type SidebarSection =
   | "todos"
   | "pinned"
   | "favorites"
+  | "references"
   | "tags"
   | "performance"
   | "archive"

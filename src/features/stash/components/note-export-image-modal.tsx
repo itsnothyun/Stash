@@ -185,23 +185,23 @@ export const NoteExportImageModal: React.FC<NoteExportImageModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-3xl p-0 overflow-hidden gap-0 border border-border shadow-2xl rounded-2xl bg-background">
-        <DialogHeader className="p-4 pb-3 border-b border-border/60 bg-muted/20">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <DialogHeader className="p-4 pb-3 pr-12 border-b border-border/60 bg-muted/20">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <Camera className="h-4 w-4" />
               </div>
               <div>
                 <DialogTitle className="text-sm font-semibold tracking-tight text-foreground">
                   Share Note as Beautiful Image
                 </DialogTitle>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="hidden text-[11px] text-muted-foreground sm:block">
                   Export or copy high-resolution, social-ready graphics for Slack, Discord, and presentations
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 mr-6">
+            <div className="flex shrink-0 items-center gap-2">
               <button
                 type="button"
                 onClick={handleCopyImage}

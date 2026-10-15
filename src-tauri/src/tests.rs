@@ -3,10 +3,11 @@ mod tests {
     use rusqlite::Connection;
     use crate::db::DbState;
     use crate::models::{
-        CreateNoteInput, NoteColor, NoteWindowState, Settings, UpdateNoteInput,
+        CreateNoteInput, NoteColor, NoteWindowState, ReferenceLink, Settings, UpdateNoteInput,
     };
     use crate::repositories::{
-        NoteRepository, RevisionRepository, SettingsRepository, TagRepository, WindowRepository,
+        NoteRepository, ReferenceRepository, RevisionRepository, SettingsRepository, TagRepository,
+        WindowRepository,
     };
 
     fn setup_test_db() -> Connection {
@@ -406,6 +407,46 @@ mod tests {
                 |row| row.get(0),
             )
             .unwrap();
-        assert_eq!(version, 4);
+        assert_eq!(version, 5);
+    }
+
+    #[test]
+    fn test_reference_links_crud() {
+        let conn = setup_test_db();
+        let link = ReferenceLink {
+            id: String::new(),
+            title: "Repomix".into(),
+            url: Some("https://github.com/yamadashy/repomix".into()),
+            description: "Pack a repo for AI".into(),
+            category: "Dev tools".into(),
+            status: "ready".into(),
+            keyword: None,
+            source_label: Some("@bitbyybit".into()),
+            source_url: None,
+            collection: Some("Hyun's Reels".into()),
+            thumbnail: Some("data:image/jpeg;base64,AAAA".into()),
+            is_starred: false,
+            is_visited: false,
+            created_at: String::new(),
+            updated_at: String::new(),
+        };
+        let saved = ReferenceRepository::upsert(&conn, link).expect("insert");
+        assert!(!saved.id.is_empty());
+        assert!(!saved.created_at.is_empty());
+
+        // Upsert by id updates instead of duplicating
+        let mut edited = saved.clone();
+        edited.title = "Repomix CLI".into();
+        ReferenceRepository::upsert(&conn, edited).expect("update");
+        let all = ReferenceRepository::list(&conn).expect("list");
+        assert_eq!(all.len(), 1);
+        assert_eq!(all[0].title, "Repomix CLI");
+
+        ReferenceRepository::set_flags(&conn, &saved.id, Some(true), Some(true)).expect("flags");
+        let all = ReferenceRepository::list(&conn).expect("list");
+        assert!(all[0].is_starred && all[0].is_visited);
+
+        ReferenceRepository::delete(&conn, &saved.id).expect("delete");
+        assert!(ReferenceRepository::list(&conn).expect("list").is_empty());
     }
 }

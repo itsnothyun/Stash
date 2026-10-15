@@ -25,6 +25,7 @@ interface SearchBarProps {
   includeArchived: boolean;
   onToggleIncludeArchived: (val: boolean) => void;
   showFilterButton?: boolean;
+  className?: string;
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
@@ -39,6 +40,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   includeArchived,
   onToggleIncludeArchived,
   showFilterButton = true,
+  className,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const firstRender = useRef(true);
@@ -62,8 +64,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     (selectedTagId ? 1 : 0) + (selectedColor ? 1 : 0) + (includeArchived ? 1 : 0);
 
   return (
-    <div className="flex items-center gap-1.5">
-      <div className="relative flex items-center">
+    <div className={cn("flex items-center gap-1.5", className)}>
+      <div className="relative flex min-w-0 flex-1 items-center">
         {isTerminal ? (
           <span className="pointer-events-none absolute left-2 font-mono text-[11px] font-bold text-brand select-none flex items-center gap-1">
             <Terminal className="h-3 w-3 shrink-0 opacity-75" />
@@ -92,8 +94,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           className={cn(
             "h-8 rounded border border-border bg-surface pr-14 text-xs text-foreground placeholder:text-muted-foreground transition-[width,border-color,box-shadow] duration-200 ease-soft focus:border-ring/60 focus:bg-surface-elevated focus:outline-none focus:ring-2 focus:ring-ring/20",
             isTerminal
-              ? "pl-14 sm:pl-22 font-mono text-[11px] w-56 focus:w-68 lg:w-68 lg:focus:w-76"
-              : "w-52 pl-8 focus:w-64 lg:w-64 lg:focus:w-72"
+              ? "pl-14 sm:pl-[5.5rem] font-mono text-[11px] w-full sm:w-56 sm:focus:w-[17rem] lg:w-[17rem] lg:focus:w-[19rem]"
+              : "w-full pl-8 sm:w-44 sm:focus:w-56 lg:w-56 lg:focus:w-64 xl:w-64 xl:focus:w-72"
           )}
         />
 

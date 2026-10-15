@@ -148,7 +148,7 @@ export const ScratchpadWidget: React.FC<ScratchpadWidgetProps> = ({
         </div>
         <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
           <div
-            className="h-full rounded-full bg-linear-to-r from-amber-500 to-emerald-500 transition-all duration-300"
+            className="h-full rounded-full bg-gradient-to-r from-amber-500 to-emerald-500 transition-all duration-300"
             style={{ width: `${progressPct}%` }}
           />
         </div>

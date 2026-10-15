@@ -534,6 +534,26 @@ export const EditorContextMenu: React.FC<EditorContextMenuProps> = ({
                     <Palette className="mr-2 h-3.5 w-3.5 text-foreground" />
                     <span>Color Palette</span>
                   </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("coderunner")}>
+                    <Code2 className="mr-2 h-3.5 w-3.5 text-foreground" />
+                    <span>Code Runner & Sandbox</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("devtools")}>
+                    <Code2 className="mr-2 h-3.5 w-3.5 text-foreground" />
+                    <span>Developer Utilities</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("spreadsheet")}>
+                    <Kanban className="mr-2 h-3.5 w-3.5 text-foreground" />
+                    <span>Reactive Mini Spreadsheet</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("expenses")}>
+                    <CalcIcon className="mr-2 h-3.5 w-3.5 text-foreground" />
+                    <span>Expense & Budget Log</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => onAddWidget("whiteboard")}>
+                    <Palette className="mr-2 h-3.5 w-3.5 text-foreground" />
+                    <span>Freehand Sketch & Canvas</span>
+                  </ContextMenuItem>
                 </ContextMenuSubContent>
               </ContextMenuSub>
             )}

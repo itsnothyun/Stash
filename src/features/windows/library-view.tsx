@@ -68,8 +68,14 @@ import {
   ArrowCounterClockwise,
   Lightning,
   Cpu,
+  BookmarksSimple,
+  ShareNetwork,
 } from "@phosphor-icons/react";
+import { TaskMatrixHub } from "@/features/stash/components/task-matrix-hub";
+import { KnowledgeGraphModal } from "@/features/stash/components/knowledge-graph-modal";
+import { WorkspaceManagerModal } from "@/features/stash/components/workspace-manager-modal";
 import { PerformanceHub } from "@/features/performance/components/performance-hub";
+import { ReferenceLibrary } from "@/features/references/components/reference-library";
 import {
   openOrCreateTodayStash,
   findTodayNote,
@@ -86,6 +92,7 @@ import { playClickSound } from "@/lib/utils/sound-effects";
 import { FilterSortControl } from "./components/filter-sort-control";
 import { getSystemUsername, getQuirkyGreeting } from "@/lib/utils/greetings";
 import { cn } from "@/lib/utils/cn";
+import { useIsNarrow } from "@/lib/utils/use-media-query";
 
 interface LibraryViewProps {
   onUpdateSettings: (patch: Partial<Settings>) => void | Promise<void>;
@@ -107,6 +114,7 @@ const NAV_GROUPS: { heading: string; items: NavItem[] }[] = [
       { id: "todos", label: "To-dos", icon: CheckSquareOffset },
       { id: "pinned", label: "Pinned", icon: PushPin },
       { id: "favorites", label: "Favorites", icon: Star },
+      { id: "references", label: "References", icon: BookmarksSimple },
     ],
   },
   {
@@ -129,6 +137,7 @@ const SECTION_TITLES: Record<SidebarSection, string> = {
   todos: "To-dos",
   pinned: "Pinned",
   favorites: "Favorites",
+  references: "References",
   tags: "Tagged",
   performance: "PC Performance & Bottleneck Radar",
   archive: "Archive",
@@ -152,7 +161,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
     searchFocusToken,
     viewMode,
     setViewMode,
-    sidebarCollapsed,
+    sidebarCollapsed: storeSidebarCollapsed,
     toggleSidebar,
     selectedNoteId,
     setSelectedNoteId,
@@ -171,6 +180,21 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
     showGreetingHeader,
     iconSet,
   } = useUIStore();
+
+  // Below the md breakpoint the sidebar becomes a slide-in drawer.
+  const isNarrow = useIsNarrow();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const sidebarCollapsed = isNarrow ? false : storeSidebarCollapsed;
+  const handleToggleSidebar = useCallback(() => {
+    if (isNarrow) setDrawerOpen((open) => !open);
+    else toggleSidebar();
+  }, [isNarrow, toggleSidebar]);
+  useEffect(() => {
+    if (!isNarrow) setDrawerOpen(false);
+  }, [isNarrow]);
+  useEffect(() => {
+    setDrawerOpen(false);
+  }, [activeSection, selectedTagId]);
   const isColorful = iconSet === "colorful";
 
   const [notes, setNotes] = useState<Note[]>([]);
@@ -183,6 +207,9 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [quickCaptureOpen, setQuickCaptureOpen] = useState(false);
+  const [todoViewMode, setTodoViewMode] = useState<"matrix" | "cards">("matrix");
+  const [knowledgeGraphOpen, setKnowledgeGraphOpen] = useState(false);
+  const [workspacesModalOpen, setWorkspacesModalOpen] = useState(false);
   const [username, setUsername] = useState<string>("Friend");
 
   useEffect(() => {
@@ -658,12 +685,28 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
   return (
     <div className="flex h-screen w-screen select-none overflow-hidden bg-background text-foreground">
       {/* ---------------------------- Sidebar ---------------------------- */}
+      {isNarrow && drawerOpen && (
+        <div
+          aria-hidden
+          onClick={() => setDrawerOpen(false)}
+          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px] animate-in fade-in-0"
+        />
+      )}
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <aside
+            aria-hidden={isNarrow && !drawerOpen ? true : undefined}
             className={cn(
-              "flex shrink-0 flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-200 ease-soft",
-              sidebarCollapsed ? "w-[60px]" : "w-[232px]"
+              "flex shrink-0 flex-col border-r border-sidebar-border bg-sidebar",
+              isNarrow
+                ? cn(
+                    "fixed inset-y-0 left-0 z-50 w-[260px] max-w-[85vw] shadow-xl transition-transform duration-200 ease-soft",
+                    drawerOpen ? "translate-x-0" : "-translate-x-full invisible"
+                  )
+                : cn(
+                    "transition-[width] duration-200 ease-soft",
+                    sidebarCollapsed ? "w-[60px]" : "w-[232px]"
+                  )
             )}
           >
         <div
@@ -1001,7 +1044,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
         </ContextMenuSubContent>
       </ContextMenuSub>
 
-      <ContextMenuItem onClick={toggleSidebar}>
+      <ContextMenuItem onClick={handleToggleSidebar}>
         <SidebarSimple className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
         <span>{sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}</span>
       </ContextMenuItem>
@@ -1025,8 +1068,12 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
         >
           <div className="no-drag-region flex min-w-0 items-center gap-2">
             <button
-              onClick={toggleSidebar}
-              aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              onClick={handleToggleSidebar}
+              aria-label={
+                isNarrow
+                  ? drawerOpen ? "Close sidebar" : "Open sidebar"
+                  : sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
+              }
               className="flex h-7 w-7 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
             >
               <SidebarSimple className="h-3.5 w-3.5" />
@@ -1045,10 +1092,14 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
           <div className="relative flex-1 overflow-y-auto">
             <PerformanceHub />
           </div>
+        ) : activeSection === "references" ? (
+          <div className="relative flex min-h-0 flex-1 flex-col">
+            <ReferenceLibrary />
+          </div>
         ) : (
           <>
             {/* Page header */}
-            <div className="flex shrink-0 flex-wrap items-end justify-between gap-3 border-b border-border px-6 py-4">
+            <div className="flex shrink-0 flex-wrap items-end justify-between gap-x-3 gap-y-3 border-b border-border px-4 py-3 sm:px-6 sm:py-4">
           <div className="min-w-0">
             {activeSection === "all" && !isSearching && !selectedTagId && !selectedColorFilter && showGreetingHeader ? (
               <>
@@ -1073,6 +1124,28 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                   <h1 className="text-[1.375rem] font-semibold tracking-tight">
                     {isTerminal ? `> ${sectionTitle.toLowerCase()}` : sectionTitle}
                   </h1>
+                  {activeSection === "todos" && (
+                    <div className="flex items-center bg-muted/70 p-0.5 rounded-lg border border-border text-xs">
+                      <button
+                        onClick={() => setTodoViewMode("matrix")}
+                        className={cn(
+                          "px-2 py-0.5 rounded-md font-medium text-[11px] transition-all",
+                          todoViewMode === "matrix" ? "bg-background text-foreground shadow-2xs" : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        Tasks
+                      </button>
+                      <button
+                        onClick={() => setTodoViewMode("cards")}
+                        className={cn(
+                          "px-2 py-0.5 rounded-md font-medium text-[11px] transition-all",
+                          todoViewMode === "cards" ? "bg-background text-foreground shadow-2xs" : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        Cards
+                      </button>
+                    </div>
+                  )}
                   {isTerminal && (
                     <span className="font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 rounded border border-brand/40 bg-brand/10 text-brand font-semibold select-none flex items-center gap-1.5 shadow-xs">
                       <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand animate-pulse" />
@@ -1102,8 +1175,9 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex w-full flex-wrap items-center gap-1.5 sm:w-auto sm:flex-nowrap sm:gap-2">
             <SearchBar
+              className="w-full sm:w-auto"
               query={searchQuery}
               onQueryChange={setSearchQuery}
               focusToken={searchFocusToken}
@@ -1145,18 +1219,47 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             {/* Ambient Focus Soundscapes */}
             <AmbientSoundBar />
 
+            {/* Knowledge Graph Button */}
+            <button
+              type="button"
+              onClick={() => {
+                playClickSound();
+                setKnowledgeGraphOpen(true);
+              }}
+              title="Knowledge Graph (Constellation & Backlinks)"
+              className="flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap px-2.5 rounded border border-border bg-surface hover:bg-surface-hover text-xs font-medium text-foreground transition-colors shadow-2xs cursor-pointer active:scale-95"
+            >
+              <ShareNetwork className="h-3.5 w-3.5 text-sky-500" weight="bold" />
+              <span className="hidden xl:inline">Graph</span>
+            </button>
+
+            {/* Desktop Workspaces Layouts */}
+            <button
+              type="button"
+              onClick={() => {
+                playClickSound();
+                setWorkspacesModalOpen(true);
+              }}
+              title="Desktop Spatial Workspaces"
+              className="flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap px-2.5 rounded border border-border bg-surface hover:bg-surface-hover text-xs font-medium text-foreground transition-colors shadow-2xs cursor-pointer active:scale-95"
+            >
+              <SquaresFour className="h-3.5 w-3.5 text-indigo-500" weight="bold" />
+              <span className="hidden xl:inline">Layouts</span>
+            </button>
+
             {/* Quick Capture Spotlight Button */}
             <button
               type="button"
               onClick={() => setQuickCaptureOpen(true)}
               title="Quick Capture HUD (Ctrl+Shift+Space)"
-              className="flex h-8 items-center gap-1.5 px-2.5 rounded border border-border bg-surface hover:bg-surface-hover text-xs font-medium text-foreground transition-colors shadow-2xs cursor-pointer active:scale-95"
+              className="flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap px-2.5 rounded border border-border bg-surface hover:bg-surface-hover text-xs font-medium text-foreground transition-colors shadow-2xs cursor-pointer active:scale-95"
             >
               <Lightning className="h-3.5 w-3.5 text-amber-500" weight="fill" />
-              <span className="hidden sm:inline">Capture</span>
+              <span className="hidden xl:inline">Capture</span>
             </button>
 
             <NewStashMenu
+              className="ml-auto shrink-0 sm:ml-0"
               onCreate={() => void onCapture()}
               onOpenTemplateStudio={() => setTemplateModalOpen(true)}
             />
@@ -1166,8 +1269,14 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
         {/* Collection with custom canvas right-click context menu */}
         <ContextMenu>
           <ContextMenuTrigger asChild>
-            <div className="relative flex-1 overflow-y-auto px-6 py-5">
-              {filteredNotes.length === 0 && !isLoading ? (
+            <div className="relative flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">
+              {activeSection === "todos" && todoViewMode === "matrix" ? (
+                <TaskMatrixHub
+                  notes={notes}
+                  onNoteUpdated={() => void loadNotes()}
+                  onOpenStash={(id) => void openFloating(id)}
+                />
+              ) : filteredNotes.length === 0 && !isLoading ? (
                 notes.length === 0 ? (
                   <EmptyStash
                     section={activeSection}
@@ -1535,6 +1644,20 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
         open={quickCaptureOpen}
         onOpenChange={setQuickCaptureOpen}
         onNoteCreated={() => void loadNotes()}
+      />
+
+      <KnowledgeGraphModal
+        open={knowledgeGraphOpen}
+        onOpenChange={setKnowledgeGraphOpen}
+        notes={notes}
+        onOpenStash={(id) => void openFloating(id)}
+      />
+
+      <WorkspaceManagerModal
+        open={workspacesModalOpen}
+        onOpenChange={setWorkspacesModalOpen}
+        notes={notes}
+        onOpenStash={(id) => void openFloating(id)}
       />
 
       <ConfirmDialog

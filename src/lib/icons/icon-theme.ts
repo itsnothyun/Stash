@@ -95,6 +95,36 @@ export const WIDGET_COLORS: Record<string, WidgetColorDef> = {
     bg: "bg-pink-500/15",
     border: "border-pink-500/30",
   },
+  coderunner: {
+    text: "text-emerald-500",
+    bg: "bg-emerald-500/15",
+    border: "border-emerald-500/30",
+  },
+  devtools: {
+    text: "text-violet-500",
+    bg: "bg-violet-500/15",
+    border: "border-violet-500/30",
+  },
+  spreadsheet: {
+    text: "text-teal-500",
+    bg: "bg-teal-500/15",
+    border: "border-teal-500/30",
+  },
+  expenses: {
+    text: "text-amber-500",
+    bg: "bg-amber-500/15",
+    border: "border-amber-500/30",
+  },
+  whiteboard: {
+    text: "text-indigo-500",
+    bg: "bg-indigo-500/15",
+    border: "border-indigo-500/30",
+  },
+  links: {
+    text: "text-sky-500",
+    bg: "bg-sky-500/15",
+    border: "border-sky-500/30",
+  },
 };
 
 /**

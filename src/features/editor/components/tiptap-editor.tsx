@@ -15,10 +15,12 @@ import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
 import TextAlign from "@tiptap/extension-text-align";
 import { Table, TableRow, TableHeader, TableCell } from "@tiptap/extension-table";
+import Image from "@tiptap/extension-image";
 import { FontSize } from "../extensions/font-size";
 import { StashWidget } from "../extensions/stash-widget-node";
 import { docForEditor, docToPlainText, WIDGET_NODE_TYPE, WidgetWrapSide } from "../stash-content";
 import { evaluateInlineMath } from "../inline-math";
+import { markdownToBlocks } from "../markdown-to-doc";
 import { SlashMenu } from "./slash-menu";
 import { FloatingToolbar } from "./floating-toolbar";
 import { EditorContextMenu } from "./editor-context-menu";
@@ -190,6 +192,10 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
         },
       }),
       TableRow,
+      Image.configure({
+        allowBase64: true,
+        HTMLAttributes: { class: "rounded-lg border border-border max-w-full" },
+      }),
       TableHeader.configure({
         HTMLAttributes: {
           class:
@@ -302,7 +308,14 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
         editor?.commands.setContent(content);
       },
       insertContent: (content: string) => {
-        editor?.commands.insertContent(content);
+        if (!editor) return;
+        const blocks = markdownToBlocks(content);
+        if (blocks.length === 0) return;
+        // Insert after the top-level block holding the caret, so inserted
+        // content never splits a paragraph, list or table in half.
+        const { $from, to } = editor.state.selection;
+        const pos = $from.depth > 0 ? $from.after(1) : to;
+        editor.chain().insertContentAt(pos, blocks).scrollIntoView().run();
       },
       insertWidget: (attrs) => {
         editor?.commands.insertWidget(attrs);

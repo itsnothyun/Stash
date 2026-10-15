@@ -189,6 +189,19 @@ cargo test
 
 ---
 
+## Code Signing Policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
+- **Committers and reviewers:** [itsnothyun](https://github.com/itsnothyun)
+- **Approvers:** [itsnothyun](https://github.com/itsnothyun)
+
+Windows installers are built from this repository by GitHub Actions and signed only after an approver confirms the signing request.
+
+**Privacy policy:** This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. Optional AI features talk only to an Ollama endpoint the user configures (by default `localhost`).
+
+---
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).

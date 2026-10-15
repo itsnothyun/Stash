@@ -2,10 +2,12 @@ use tauri::{AppHandle, Emitter, Manager, State, WebviewUrl, WebviewWindowBuilder
 use crate::db::DbState;
 use crate::errors::{AppError, AppResult};
 use crate::models::{
-    CreateNoteInput, ExportData, Note, NoteWindowState, Revision, Settings, Tag, UpdateNoteInput,
+    CreateNoteInput, ExportData, Note, NoteWindowState, ReferenceLink, Revision, Settings, Tag,
+    UpdateNoteInput,
 };
 use crate::repositories::{
-    NoteRepository, RevisionRepository, SettingsRepository, TagRepository, WindowRepository,
+    NoteRepository, ReferenceRepository, RevisionRepository, SettingsRepository, TagRepository,
+    WindowRepository,
 };
 
 #[tauri::command]
@@ -701,6 +703,38 @@ pub fn open_path_in_explorer(path: String) -> AppResult<()> {
     Ok(())
 }
 
+/// Opens an http(s) URL in the default browser. Only web URLs are accepted so a
+/// note can't be used to launch arbitrary programs or local files.
+#[tauri::command]
+pub fn open_external_url(url: String) -> AppResult<()> {
+    let lower = url.to_ascii_lowercase();
+    if !(lower.starts_with("https://") || lower.starts_with("http://"))
+        || url.chars().any(|c| c.is_control() || c == '"')
+    {
+        return Err(AppError::Internal("Only http(s) links can be opened".into()));
+    }
+    #[cfg(target_os = "windows")]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        // rundll32's URL handler hands the string straight to the default
+        // browser without going through cmd.exe, so `&` etc. stay literal.
+        let _ = std::process::Command::new("rundll32")
+            .args(["url.dll,FileProtocolHandler", &url])
+            .creation_flags(CREATE_NO_WINDOW)
+            .spawn();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let _ = std::process::Command::new("open").arg(&url).spawn();
+    }
+    #[cfg(target_os = "linux")]
+    {
+        let _ = std::process::Command::new("xdg-open").arg(&url).spawn();
+    }
+    Ok(())
+}
+
 /// Opens the operating system's storage settings (Windows ms-settings:storagesense).
 #[tauri::command]
 pub fn open_storage_settings() -> AppResult<()> {
@@ -724,3 +758,46 @@ pub fn open_storage_settings() -> AppResult<()> {
 
 
 
+
+#[tauri::command]
+pub fn list_references(db: State<'_, DbState>) -> AppResult<Vec<ReferenceLink>> {
+    let conn = db.conn.lock().map_err(|e| AppError::Internal(e.to_string()))?;
+    ReferenceRepository::list(&conn)
+}
+
+#[tauri::command]
+pub fn save_reference(db: State<'_, DbState>, link: ReferenceLink) -> AppResult<ReferenceLink> {
+    let conn = db.conn.lock().map_err(|e| AppError::Internal(e.to_string()))?;
+    ReferenceRepository::upsert(&conn, link)
+}
+
+#[tauri::command]
+pub fn import_references(db: State<'_, DbState>, links: Vec<ReferenceLink>) -> AppResult<usize> {
+    let conn = db.conn.lock().map_err(|e| AppError::Internal(e.to_string()))?;
+    conn.execute("BEGIN TRANSACTION", [])?;
+    let mut count = 0;
+    for link in links {
+        if ReferenceRepository::upsert(&conn, link).is_ok() {
+            count += 1;
+        }
+    }
+    conn.execute("COMMIT", [])?;
+    Ok(count)
+}
+
+#[tauri::command]
+pub fn set_reference_flags(
+    db: State<'_, DbState>,
+    id: String,
+    starred: Option<bool>,
+    visited: Option<bool>,
+) -> AppResult<()> {
+    let conn = db.conn.lock().map_err(|e| AppError::Internal(e.to_string()))?;
+    ReferenceRepository::set_flags(&conn, &id, starred, visited)
+}
+
+#[tauri::command]
+pub fn delete_reference(db: State<'_, DbState>, id: String) -> AppResult<()> {
+    let conn = db.conn.lock().map_err(|e| AppError::Internal(e.to_string()))?;
+    ReferenceRepository::delete(&conn, &id)
+}

@@ -90,13 +90,13 @@ export const RevisionDiffViewer: React.FC<RevisionDiffViewerProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl sm:max-w-3xl h-[80vh] flex flex-col p-0 gap-0 overflow-hidden bg-background border border-border shadow-2xl">
         {/* Header */}
-        <DialogHeader className="p-4 border-b border-border/80 flex flex-row items-center justify-between shrink-0 bg-surface/50 backdrop-blur-md">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <DialogHeader className="p-4 pr-12 border-b border-border/80 flex flex-row items-center justify-between gap-3 shrink-0 bg-surface/50 backdrop-blur-md">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <History className="h-4 w-4" />
             </div>
             <div>
-              <DialogTitle className="text-sm font-semibold flex items-center gap-2">
+              <DialogTitle className="text-sm font-semibold flex flex-wrap items-center gap-x-2 gap-y-1">
                 <span>Time Machine</span>
                 {currentTitle && (
                   <span className="truncate max-w-[200px] font-normal text-muted-foreground text-xs">
@@ -107,7 +107,7 @@ export const RevisionDiffViewer: React.FC<RevisionDiffViewerProps> = ({
                   {revisions.length} {revisions.length === 1 ? "checkpoint" : "checkpoints"}
                 </span>
               </DialogTitle>
-              <p className="text-2xs text-muted-foreground mt-0.5">
+              <p className="hidden text-2xs text-muted-foreground mt-0.5 sm:block">
                 Scrub through checkpoints and compare changes against current content
               </p>
             </div>
@@ -117,10 +117,11 @@ export const RevisionDiffViewer: React.FC<RevisionDiffViewerProps> = ({
             <button
               type="button"
               onClick={() => void onCreateCheckpoint()}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-2xs active:scale-95 cursor-pointer"
+              title="New Checkpoint"
+              className="flex shrink-0 items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-2xs active:scale-95 cursor-pointer"
             >
               <Plus className="h-3.5 w-3.5" />
-              <span>New Checkpoint</span>
+              <span className="hidden sm:inline">New Checkpoint</span>
             </button>
           </div>
         </DialogHeader>

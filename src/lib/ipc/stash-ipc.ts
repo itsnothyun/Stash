@@ -9,6 +9,26 @@ import {
   Tag,
 } from "@/features/stash/types/note";
 import { NoteColor } from "@/features/stash/types/color";
+import { ReferenceLink } from "@/features/references/types";
+
+const MOCK_REFERENCES_KEY = "stash_mock_references_v1";
+
+function loadMockReferences(): ReferenceLink[] {
+  try {
+    const raw = localStorage.getItem(MOCK_REFERENCES_KEY);
+    return raw ? (JSON.parse(raw) as ReferenceLink[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveMockReferences(links: ReferenceLink[]) {
+  try {
+    localStorage.setItem(MOCK_REFERENCES_KEY, JSON.stringify(links));
+  } catch {
+    /* storage full or unavailable — browser preview only */
+  }
+}
 
 export interface CreateNoteInput {
   id?: string;
@@ -566,6 +586,58 @@ export const stashIpc = {
   async setNoteAlwaysOnTop(noteId: string, alwaysOnTop: boolean): Promise<void> {
     if (isTauri()) {
       await invoke("set_note_always_on_top", { noteId, alwaysOnTop });
+    }
+  },
+
+  async listReferences(): Promise<ReferenceLink[]> {
+    if (isTauri()) return await invoke<ReferenceLink[]>("list_references");
+    return loadMockReferences();
+  },
+
+  async saveReference(link: ReferenceLink): Promise<ReferenceLink> {
+    if (isTauri()) return await invoke<ReferenceLink>("save_reference", { link });
+    const now = new Date().toISOString();
+    const saved = { ...link, id: link.id || crypto.randomUUID(), createdAt: link.createdAt || now, updatedAt: now };
+    const list = loadMockReferences().filter((l) => l.id !== saved.id);
+    saveMockReferences([saved, ...list]);
+    return saved;
+  },
+
+  async importReferences(links: ReferenceLink[]): Promise<number> {
+    if (isTauri()) return await invoke<number>("import_references", { links });
+    const ids = new Set(links.map((l) => l.id));
+    saveMockReferences([...links, ...loadMockReferences().filter((l) => !ids.has(l.id))]);
+    return links.length;
+  },
+
+  async setReferenceFlags(id: string, flags: { starred?: boolean; visited?: boolean }): Promise<void> {
+    if (isTauri()) {
+      await invoke("set_reference_flags", { id, starred: flags.starred, visited: flags.visited });
+      return;
+    }
+    saveMockReferences(
+      loadMockReferences().map((l) =>
+        l.id === id
+          ? { ...l, isStarred: flags.starred ?? l.isStarred, isVisited: flags.visited ?? l.isVisited }
+          : l
+      )
+    );
+  },
+
+  async deleteReference(id: string): Promise<void> {
+    if (isTauri()) {
+      await invoke("delete_reference", { id });
+      return;
+    }
+    saveMockReferences(loadMockReferences().filter((l) => l.id !== id));
+  },
+
+  /** Opens an http(s) URL in the user's default browser. */
+  async openExternalUrl(url: string): Promise<void> {
+    if (isTauri()) {
+      await invoke("open_external_url", { url });
+    } else {
+      window.open(url, "_blank", "noopener,noreferrer");
     }
   },
 

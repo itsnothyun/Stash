@@ -87,7 +87,7 @@ export const TemplateModal: React.FC<TemplateModalProps> = ({
               <DialogTitle className="text-sm font-semibold text-foreground">
                 Template Studio
               </DialogTitle>
-              <p className="text-[11px] text-muted-foreground">
+              <p className="hidden text-[11px] text-muted-foreground sm:block">
                 Jumpstart your thought capture with curated layouts & frameworks.
               </p>
             </div>
@@ -95,7 +95,7 @@ export const TemplateModal: React.FC<TemplateModalProps> = ({
         </DialogHeader>
 
         {/* Category Filter Pills */}
-        <div className="flex items-center gap-1 px-4 py-2 border-b border-border/50 bg-surface/50 overflow-x-auto text-2xs">
+        <div className="flex shrink-0 items-center gap-1 px-4 py-2 border-b border-border/50 bg-surface/50 overflow-x-auto no-scrollbar text-2xs">
           {[
             { id: "all", label: "All Templates" },
             { id: "work", label: "Work & Team" },
@@ -108,7 +108,7 @@ export const TemplateModal: React.FC<TemplateModalProps> = ({
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
               className={cn(
-                "px-2.5 py-1 rounded-full border transition-all cursor-pointer font-medium",
+                "shrink-0 whitespace-nowrap px-2.5 py-1 rounded-full border transition-all cursor-pointer font-medium",
                 activeCategory === cat.id
                   ? "bg-brand text-brand-foreground border-brand font-semibold shadow-xs"
                   : "bg-surface border-border text-muted-foreground hover:bg-surface-hover hover:text-foreground"
@@ -120,9 +120,9 @@ export const TemplateModal: React.FC<TemplateModalProps> = ({
         </div>
 
         {/* Main 2-Column Split: Template List & Live Preview */}
-        <div className="grid grid-cols-1 md:grid-cols-5 flex-1 min-h-0 overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-5 flex-1 min-h-0 overflow-y-auto md:overflow-hidden">
           {/* Left Column: Template Cards */}
-          <div className="md:col-span-2 border-r border-border/70 p-3 overflow-y-auto space-y-2">
+          <div className="md:col-span-2 border-b md:border-b-0 md:border-r border-border/70 p-3 md:overflow-y-auto space-y-2">
             {filtered.map((item) => {
               const isSelected = selectedTemplate?.id === item.id;
               return (

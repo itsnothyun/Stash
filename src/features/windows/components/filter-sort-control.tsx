@@ -219,7 +219,7 @@ export const FilterSortControl: React.FC<FilterSortControlProps> = ({
           aria-label="Filter and Sort options"
           onClick={() => playSfx("click")}
           className={cn(
-            "group relative flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-all select-none cursor-pointer shadow-xs",
+            "group relative flex h-8 shrink-0 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-all select-none cursor-pointer shadow-xs",
             activeFiltersCount > 0
               ? "border-primary/50 bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20 hover:bg-primary/15"
               : "border-border/70 bg-surface text-muted-foreground hover:border-border hover:bg-surface-hover hover:text-foreground",
@@ -229,7 +229,7 @@ export const FilterSortControl: React.FC<FilterSortControlProps> = ({
           <SlidersHorizontal className="h-3.5 w-3.5 shrink-0 transition-transform group-hover:scale-105" />
 
           {/* Title */}
-          <span className="font-semibold text-xs tracking-tight">Filter & Sort</span>
+          <span className="hidden whitespace-nowrap font-semibold text-xs tracking-tight lg:inline">Filter & Sort</span>
 
           {/* Active Filter Count Badge */}
           {activeFiltersCount > 0 && (
@@ -245,7 +245,8 @@ export const FilterSortControl: React.FC<FilterSortControlProps> = ({
       <PopoverContent
         align="end"
         sideOffset={6}
-        className="w-84 sm:w-96 p-0 text-xs shadow-2xl rounded-2xl border border-border/70 bg-popover/95 backdrop-blur-xl overflow-hidden"
+        collisionPadding={12}
+        className="w-[min(24rem,calc(100vw-1.5rem))] max-h-[var(--radix-popover-content-available-height)] p-0 text-xs shadow-2xl rounded-2xl border border-border/70 bg-popover/95 backdrop-blur-xl overflow-y-auto overflow-x-hidden"
       >
         {/* Card Header */}
         <div className="flex items-center justify-between p-3.5 pb-2.5 border-b border-border/50 bg-muted/20">

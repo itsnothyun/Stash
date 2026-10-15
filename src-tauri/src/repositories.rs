@@ -3,7 +3,8 @@ use uuid::Uuid;
 use chrono::Utc;
 use crate::errors::{AppError, AppResult};
 use crate::models::{
-    CreateNoteInput, Note, NoteColor, NoteWindowState, Revision, Settings, Tag, UpdateNoteInput,
+    CreateNoteInput, Note, NoteColor, NoteWindowState, ReferenceLink, Revision, Settings, Tag,
+    UpdateNoteInput,
 };
 
 /// A new stash opens on an empty Tiptap document. Checklists are blocks inside
@@ -748,6 +749,93 @@ impl SettingsRepository {
             "INSERT OR REPLACE INTO settings (key, value) VALUES ('app_settings', ?1)",
             params![json],
         )?;
+        Ok(())
+    }
+}
+
+pub struct ReferenceRepository;
+
+impl ReferenceRepository {
+    const COLUMNS: &'static str = "id, title, url, description, category, status, keyword, source_label, source_url,
+         collection, thumbnail, is_starred, is_visited, created_at, updated_at";
+
+    fn from_row(row: &rusqlite::Row) -> rusqlite::Result<ReferenceLink> {
+        Ok(ReferenceLink {
+            id: row.get(0)?,
+            title: row.get(1)?,
+            url: row.get(2)?,
+            description: row.get(3)?,
+            category: row.get(4)?,
+            status: row.get(5)?,
+            keyword: row.get(6)?,
+            source_label: row.get(7)?,
+            source_url: row.get(8)?,
+            collection: row.get(9)?,
+            thumbnail: row.get(10)?,
+            is_starred: row.get::<_, i64>(11)? != 0,
+            is_visited: row.get::<_, i64>(12)? != 0,
+            created_at: row.get(13)?,
+            updated_at: row.get(14)?,
+        })
+    }
+
+    pub fn list(conn: &Connection) -> AppResult<Vec<ReferenceLink>> {
+        let sql = format!(
+            "SELECT {} FROM reference_links ORDER BY is_starred DESC, created_at DESC, title COLLATE NOCASE",
+            Self::COLUMNS
+        );
+        let mut stmt = conn.prepare(&sql)?;
+        let rows = stmt.query_map([], Self::from_row)?;
+        Ok(rows.collect::<Result<Vec<_>, _>>()?)
+    }
+
+    /// Insert or replace by id; timestamps are filled in when missing.
+    pub fn upsert(conn: &Connection, mut link: ReferenceLink) -> AppResult<ReferenceLink> {
+        let now = Utc::now().to_rfc3339();
+        if link.id.trim().is_empty() {
+            link.id = Uuid::new_v4().to_string();
+        }
+        if link.created_at.is_empty() {
+            link.created_at = now.clone();
+        }
+        link.updated_at = now;
+        conn.execute(
+            "INSERT INTO reference_links (id, title, url, description, category, status, keyword, source_label,
+                source_url, collection, thumbnail, is_starred, is_visited, created_at, updated_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15)
+             ON CONFLICT(id) DO UPDATE SET title = excluded.title, url = excluded.url,
+                description = excluded.description, category = excluded.category, status = excluded.status,
+                keyword = excluded.keyword, source_label = excluded.source_label, source_url = excluded.source_url,
+                collection = excluded.collection, thumbnail = excluded.thumbnail, is_starred = excluded.is_starred,
+                is_visited = excluded.is_visited, updated_at = excluded.updated_at",
+            params![
+                link.id, link.title, link.url, link.description, link.category, link.status, link.keyword,
+                link.source_label, link.source_url, link.collection, link.thumbnail,
+                link.is_starred as i64, link.is_visited as i64, link.created_at, link.updated_at
+            ],
+        )?;
+        Ok(link)
+    }
+
+    pub fn set_flags(conn: &Connection, id: &str, starred: Option<bool>, visited: Option<bool>) -> AppResult<()> {
+        let now = Utc::now().to_rfc3339();
+        if let Some(s) = starred {
+            conn.execute(
+                "UPDATE reference_links SET is_starred = ?1, updated_at = ?2 WHERE id = ?3",
+                params![s as i64, now, id],
+            )?;
+        }
+        if let Some(v) = visited {
+            conn.execute(
+                "UPDATE reference_links SET is_visited = ?1, updated_at = ?2 WHERE id = ?3",
+                params![v as i64, now, id],
+            )?;
+        }
+        Ok(())
+    }
+
+    pub fn delete(conn: &Connection, id: &str) -> AppResult<()> {
+        conn.execute("DELETE FROM reference_links WHERE id = ?1", params![id])?;
         Ok(())
     }
 }

@@ -213,6 +213,12 @@ pub fn run() {
             commands::kill_process,
             commands::open_path_in_explorer,
             commands::open_storage_settings,
+            commands::open_external_url,
+            commands::list_references,
+            commands::save_reference,
+            commands::import_references,
+            commands::set_reference_flags,
+            commands::delete_reference,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Stash application");
