@@ -1,8 +1,9 @@
 name: Release
 
-# Builds Windows and macOS installers in the cloud and attaches them to a
-# draft GitHub Release. Trigger by pushing a tag like `v0.1.0`, or manually
-# via the Actions tab (workflow_dispatch) for a test build.
+# Builds Stash, embeds it in the custom "Stash Setup" installer (installer/),
+# and attaches Stash-Setup-<version>.exe / .dmg to a draft GitHub Release.
+# Trigger by pushing a tag like `v0.1.0`, or manually via the Actions tab
+# (workflow_dispatch) for a test build.
 on:
   push:
     tags:
@@ -10,7 +11,34 @@ on:
   workflow_dispatch:
 
 jobs:
-  release:
+  # One job owns the draft so the platform jobs never race to create two.
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: read version
+        id: version
+        run: echo "version=$(node -p "require('./src-tauri/tauri.conf.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: create draft release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "Release v$VERSION already exists; uploading into it."
+          else
+            gh release create "v$VERSION" --draft --title "Stash v$VERSION" --target "$GITHUB_SHA" --notes \
+              "Download **Stash-Setup-$VERSION.exe** for Windows or **Stash-Setup-$VERSION.dmg** for macOS. The macOS setup is currently unsigned: right-click Stash Setup and choose Open the first time to bypass Gatekeeper."
+          fi
+
+  build:
+    needs: create-release
     permissions:
       contents: write
     strategy:
@@ -18,11 +46,13 @@ jobs:
       matrix:
         include:
           - platform: "macos-latest"
-            args: "--target universal-apple-darwin"
+            target: "universal-apple-darwin"
           - platform: "windows-latest"
-            args: ""
+            target: ""
 
     runs-on: ${{ matrix.platform }}
+    env:
+      VERSION: ${{ needs.create-release.outputs.version }}
     steps:
       - uses: actions/checkout@v4
 
@@ -45,13 +75,128 @@ jobs:
       - name: install frontend dependencies
         run: pnpm install --frozen-lockfile
 
-      - uses: tauri-apps/tauri-action@v0
+      - name: test installer
+        run: |
+          pnpm installer:test
+          cargo test --manifest-path installer/src-tauri/Cargo.toml
+
+      # ---------------------------------------------------------------- Windows
+
+      # Windows code signing via Azure Trusted Signing (Artifact Signing).
+      # Signing stash.exe and the setup with a Microsoft-issued certificate is
+      # what removes the SmartScreen "Run anyway" dialog. Skipped (unsigned
+      # build) until the AZURE_* secrets and TRUSTED_SIGNING_* variables are
+      # configured on the repo.
+      - name: configure Windows signing
+        id: winsign
+        if: matrix.platform == 'windows-latest'
+        shell: pwsh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tagName: v__VERSION__
-          releaseName: "Stash v__VERSION__"
-          releaseBody: "Windows and macOS installers for this release — see the assets below. macOS build is currently unsigned: right-click the app and choose Open the first time to bypass Gatekeeper."
-          releaseDraft: true
-          prerelease: false
-          args: ${{ matrix.args }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          TS_ENDPOINT: ${{ vars.TRUSTED_SIGNING_ENDPOINT }}
+          TS_ACCOUNT: ${{ vars.TRUSTED_SIGNING_ACCOUNT }}
+          TS_PROFILE: ${{ vars.TRUSTED_SIGNING_PROFILE }}
+        run: |
+          if (-not $env:AZURE_CLIENT_ID -or -not $env:TS_ENDPOINT -or -not $env:TS_ACCOUNT -or -not $env:TS_PROFILE) {
+            Write-Host "::warning::Windows signing not configured; building an unsigned setup (SmartScreen will warn)."
+            "enabled=false" >> $env:GITHUB_OUTPUT
+            exit 0
+          }
+          cargo install trusted-signing-cli --locked
+          "enabled=true" >> $env:GITHUB_OUTPUT
+
+      - name: build Stash (Windows)
+        if: matrix.platform == 'windows-latest'
+        run: pnpm tauri build --no-bundle
+
+      - name: sign stash.exe
+        if: matrix.platform == 'windows-latest' && steps.winsign.outputs.enabled == 'true'
+        shell: pwsh
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        run: trusted-signing-cli -e "${{ vars.TRUSTED_SIGNING_ENDPOINT }}" -a "${{ vars.TRUSTED_SIGNING_ACCOUNT }}" -c "${{ vars.TRUSTED_SIGNING_PROFILE }}" -d Stash src-tauri/target/release/stash.exe
+
+      - name: build Stash Setup (Windows)
+        if: matrix.platform == 'windows-latest'
+        shell: pwsh
+        run: |
+          Copy-Item src-tauri/target/release/stash.exe installer/src-tauri/payload/stash.exe
+          pnpm installer:tauri build --no-bundle
+          New-Item -ItemType Directory -Force out | Out-Null
+          Copy-Item installer/src-tauri/target/release/stash-setup.exe "out/Stash-Setup-$env:VERSION.exe"
+
+      - name: sign Stash Setup
+        if: matrix.platform == 'windows-latest' && steps.winsign.outputs.enabled == 'true'
+        shell: pwsh
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        run: trusted-signing-cli -e "${{ vars.TRUSTED_SIGNING_ENDPOINT }}" -a "${{ vars.TRUSTED_SIGNING_ACCOUNT }}" -c "${{ vars.TRUSTED_SIGNING_PROFILE }}" -d "Stash Setup" "out/Stash-Setup-$env:VERSION.exe"
+
+      # Fail the release if signing was configured but a binary came out
+      # unsigned, so a broken signing setup never ships a warning-prone build.
+      - name: verify Windows signature
+        if: matrix.platform == 'windows-latest' && steps.winsign.outputs.enabled == 'true'
+        shell: pwsh
+        run: |
+          $files = @(Get-Item src-tauri/target/release/stash.exe, "out/Stash-Setup-$env:VERSION.exe")
+          $bad = $files | Where-Object { (Get-AuthenticodeSignature $_.FullName).Status -ne 'Valid' }
+          $files | ForEach-Object { $sig = Get-AuthenticodeSignature $_.FullName; "{0}: {1} ({2})" -f $_.Name, $sig.Status, $sig.SignerCertificate.Subject }
+          if ($bad) { Write-Error "Unsigned binaries: $($bad.Name -join ', ')"; exit 1 }
+
+      - name: smoke test Stash Setup (Windows)
+        if: matrix.platform == 'windows-latest'
+        shell: pwsh
+        run: |
+          $setup = (Resolve-Path "out/Stash-Setup-$env:VERSION.exe").Path
+          $dir = Join-Path $env:RUNNER_TEMP "stash-it"
+          $key = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\com.stash.desktop"
+
+          $p = Start-Process $setup -ArgumentList "--silent", "--dir", "`"$dir`"", "--no-desktop-shortcut" -Wait -PassThru
+          if ($p.ExitCode -ne 0) { Get-Content "$env:TEMP\stash-setup.log"; Write-Error "install exited $($p.ExitCode)"; exit 1 }
+          if (-not (Test-Path "$dir\stash.exe")) { Write-Error "stash.exe missing"; exit 1 }
+          if (-not (Test-Path "$dir\uninstall.exe")) { Write-Error "uninstall.exe missing"; exit 1 }
+          if ((Get-ItemProperty $key).DisplayVersion -ne $env:VERSION) { Write-Error "Apps & Features entry missing"; exit 1 }
+
+          $p = Start-Process "$dir\uninstall.exe" -ArgumentList "--uninstall", "--silent" -Wait -PassThru
+          if ($p.ExitCode -ne 0) { Get-Content "$env:TEMP\stash-setup.log"; Write-Error "uninstall exited $($p.ExitCode)"; exit 1 }
+          Start-Sleep -Seconds 5  # the uninstaller deletes itself just after exiting
+          if (Test-Path $key) { Write-Error "Apps & Features entry left behind"; exit 1 }
+          if (Test-Path "$dir\stash.exe") { Write-Error "stash.exe left behind"; exit 1 }
+          if (Test-Path $dir) { Write-Error "install folder left behind"; exit 1 }
+
+      # ------------------------------------------------------------------ macOS
+
+      - name: build Stash (macOS)
+        if: matrix.platform == 'macos-latest'
+        run: pnpm tauri build --target ${{ matrix.target }} --bundles app
+
+      - name: build Stash Setup (macOS)
+        if: matrix.platform == 'macos-latest'
+        run: |
+          cp -R "src-tauri/target/${{ matrix.target }}/release/bundle/macos/Stash.app/." installer/src-tauri/payload/
+          pnpm installer:tauri build --target ${{ matrix.target }} --bundles app,dmg
+          mkdir -p out
+          cp installer/src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg "out/Stash-Setup-$VERSION.dmg"
+
+      - name: smoke test Stash Setup (macOS)
+        if: matrix.platform == 'macos-latest'
+        run: |
+          macos="installer/src-tauri/target/${{ matrix.target }}/release/bundle/macos/Stash Setup.app/Contents/MacOS"
+          setup="$macos/$(ls "$macos" | head -1)"
+          dir="$RUNNER_TEMP/apps"
+          "$setup" --silent --dir "$dir" || { cat "$TMPDIR/stash-setup.log"; exit 1; }
+          test -n "$(ls "$dir/Stash.app/Contents/MacOS")" || { echo "Stash.app missing"; exit 1; }
+          "$setup" --uninstall --silent || { cat "$TMPDIR/stash-setup.log"; exit 1; }
+          test ! -e "$dir/Stash.app" || { echo "Stash.app left behind"; exit 1; }
+
+      # ----------------------------------------------------------------- upload
+
+      - name: upload to release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "v$VERSION" out/* --clobber

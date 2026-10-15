@@ -9,7 +9,11 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "website:dev": "vite website",
-    "website:build": "vite build website"
+    "website:build": "vite build website",
+    "installer:dev": "vite --config installer/vite.config.ts",
+    "installer:build": "tsc -p installer && vite build --config installer/vite.config.ts",
+    "installer:test": "vitest run --config installer/vitest.config.ts",
+    "installer:tauri": "cd installer && tauri"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.7",

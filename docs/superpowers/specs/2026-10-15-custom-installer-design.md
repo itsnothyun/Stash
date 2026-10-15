@@ -39,15 +39,15 @@ New top-level package `installer/`, an independent Tauri app (identifier `com.st
 - **Windows:** per-user, default `%LOCALAPPDATA%\Programs\Stash`, with no admin prompt. This matches the current NSIS default, so updates replace the old install in place.
 - **macOS:** default `/Applications/Stash.app`.
 - **User data:** `%APPDATA%\com.stash.desktop` and `~/Library/Application Support/com.stash.desktop`. These sit outside the install folder and are never touched except by the explicit uninstall option "Also delete my notes" (unticked by default).
-- **Manifest:** `<install dir>/.stash-install.json` holds `{ version, installedAt, options }`. On Windows the same version is also written to the Apps & Features entry (`DisplayVersion`).
+- **Manifest:** `{ version, installedAt, target, options }`. Windows: `<install dir>/.stash-install.json`, with the version also in the Apps & Features entry (`DisplayVersion`). macOS: `~/Library/Application Support/com.stash.setup/install.json`, kept outside the bundle so writing it never invalidates a code signature.
 
 ## Install flow
 
-1. **Close running Stash:** a graceful close request with a 5 s timeout; if it times out, the UI asks the user to close it, with a Retry button.
+1. **Close running Stash:** a graceful close request (`taskkill` without `/F`, or AppleScript `quit`) with a 5 s timeout. If it times out, the error screen offers Try again and "Quit Stash for me" (force quit).
 2. **Migrate legacy:** for `MigrateLegacy`, run the old NSIS uninstaller with `/S` and wait. User data is unaffected.
 3. **Extract** the payload into a staging folder `<install dir>.staging` next to the target, emitting byte-level progress.
 4. **Swap:** rename the existing install to `<install dir>.old`, then rename staging to the install dir. If the second rename fails, rename `.old` back.
-5. **Integrate:** create the chosen shortcuts, launch-at-login entry and Apps & Features entry, and copy the setup binary to `<install dir>/uninstall.exe` (Windows) or into the app's Resources folder (macOS).
+5. **Integrate:** create the chosen shortcuts, launch-at-login entry and Apps & Features entry, and copy the setup binary to `<install dir>/uninstall.exe` (Windows only).
 6. **Write the manifest.**
 7. **Clean up:** delete `.old`.
 
@@ -64,7 +64,7 @@ New top-level package `installer/`, an independent Tauri app (identifier `com.st
 
 ### Uninstall
 
-Started from Apps & Features (`uninstall.exe --uninstall`), from the macOS Resources copy, or by running the setup when Stash is already installed and choosing Remove. It uses the same window with a "Remove Stash" screen and an "Also delete my notes" option (unticked). It closes Stash, removes the shortcuts, launch-at-login entry and Apps & Features entry, then the install folder. On Windows the uninstaller deletes itself after it exits, via a delayed `cmd /c` delete.
+Started from Apps & Features (`uninstall.exe --uninstall`), or by running the setup when Stash is already installed and choosing Remove. That second route is the only one on macOS, matching how Mac apps are normally removed. It uses the same window with a "Remove Stash" screen and an "Also delete my notes" option (unticked). It closes Stash, removes the shortcuts, launch-at-login entry and Apps & Features entry, then the install folder. On Windows the uninstaller deletes itself after it exits, via a delayed `cmd /c` delete.
 
 ### Silent mode
 

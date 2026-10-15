@@ -1,0 +1,51 @@
+{
+  "$schema": "../../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Stash Setup",
+  "version": "0.1.1",
+  "identifier": "com.stash.setup",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://127.0.0.1:1421",
+    "beforeDevCommand": "pnpm -w installer:dev",
+    "beforeBuildCommand": "pnpm -w installer:build"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Stash Setup",
+        "width": 640,
+        "height": 420,
+        "resizable": false,
+        "maximizable": false,
+        "decorations": false,
+        "shadow": true,
+        "center": true,
+        "focus": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg"],
+    "icon": [
+      "../../src-tauri/icons/32x32.png",
+      "../../src-tauri/icons/128x128.png",
+      "../../src-tauri/icons/128x128@2x.png",
+      "../../src-tauri/icons/icon.icns",
+      "../../src-tauri/icons/icon.ico"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "12.0",
+      "dmg": {
+        "background": "dmg/background.png",
+        "windowSize": { "width": 660, "height": 400 },
+        "appPosition": { "x": 330, "y": 200 },
+        "applicationFolderPosition": { "x": 330, "y": 900 }
+      }
+    }
+  }
+}
