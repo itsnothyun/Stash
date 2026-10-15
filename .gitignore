@@ -18,3 +18,5 @@ pnpm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+.vercel
+src-tauri/tauri.signing.conf.json
