@@ -155,7 +155,7 @@ export const DownloadMatrix: React.FC = () => {
             <div className="mt-5 pt-3 border-t border-white/[0.06] text-[10px] font-mono text-zinc-500 flex items-center justify-between">
               <span className="flex items-center gap-1.5">
                 <ShieldCheck className="h-3 w-3 text-emerald-400" />
-                <span>SHA256: 8ea5a...0c4f</span>
+                <span>SHA256: 752c3...c081</span>
               </span>
               <a
                 href={`${GITHUB_REPO}/releases`}
@@ -279,7 +279,7 @@ export const DownloadMatrix: React.FC = () => {
             <div className="mt-5 pt-3 border-t border-white/[0.06] text-[10px] font-mono text-zinc-500 flex items-center justify-between">
               <span className="flex items-center gap-1.5">
                 <ShieldCheck className="h-3 w-3 text-emerald-400" />
-                <span>SHA256: 3201e...5b4e</span>
+                <span>SHA256: 160e2...2149</span>
               </span>
               <a
                 href={`${GITHUB_REPO}/releases`}

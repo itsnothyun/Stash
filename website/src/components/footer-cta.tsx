@@ -99,7 +99,7 @@ export const FooterCta: React.FC<FooterCtaProps> = ({ onNavigate, onNavigateToDo
                     <span className="font-semibold text-sm text-white tracking-tight">Stash</span>
                   </div>
                   <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/10 text-zinc-400 border border-white/10">
-                    Desktop v0.1.1
+                    Desktop v0.1.2
                   </span>
                 </div>
 

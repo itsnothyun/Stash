@@ -25,7 +25,7 @@ export interface PlatformDownloadInfo {
 }
 
 export const GITHUB_REPO = "https://github.com/itsnothyun/Stash";
-export const LATEST_VERSION = "v0.1.1";
+export const LATEST_VERSION = "v0.1.2";
 
 export const DOWNLOAD_PACKAGES: Record<OperatingSystem, PlatformDownloadInfo> = {
   windows: {
@@ -33,20 +33,12 @@ export const DOWNLOAD_PACKAGES: Record<OperatingSystem, PlatformDownloadInfo> = 
     osName: "Windows",
     badge: "Windows 10 / 11",
     primaryInstaller: {
-      name: "Windows Setup Installer (.exe)",
-      filename: "Stash_0.1.1_x64-setup.exe",
+      name: "Stash Setup (.exe)",
+      filename: "Stash-Setup-0.1.2.exe",
       ext: ".exe",
       arch: "x64 / x86_64",
-      url: `${GITHUB_REPO}/releases/download/${LATEST_VERSION}/Stash_0.1.1_x64-setup.exe`,
-      size: "4.7 MB",
-    },
-    secondaryInstaller: {
-      name: "Windows Installer Package (.msi)",
-      filename: "Stash_0.1.1_x64_en-US.msi",
-      ext: ".msi",
-      arch: "x64",
-      url: `${GITHUB_REPO}/releases/download/${LATEST_VERSION}/Stash_0.1.1_x64_en-US.msi`,
-      size: "5.9 MB",
+      url: `${GITHUB_REPO}/releases/download/${LATEST_VERSION}/Stash-Setup-0.1.2.exe`,
+      size: "10.9 MB",
     },
     cliCommand: "winget install stash-app",
     cliLabel: "winget",
@@ -56,12 +48,12 @@ export const DOWNLOAD_PACKAGES: Record<OperatingSystem, PlatformDownloadInfo> = 
     osName: "macOS",
     badge: "macOS 12+ Universal",
     primaryInstaller: {
-      name: "Apple Silicon & Intel Disk Image (.dmg)",
-      filename: "Stash_0.1.1_universal.dmg",
+      name: "Stash Setup Disk Image (.dmg)",
+      filename: "Stash-Setup-0.1.2.dmg",
       ext: ".dmg",
       arch: "Universal (M1/M2/M3/M4 & Intel)",
-      url: `${GITHUB_REPO}/releases/download/${LATEST_VERSION}/Stash_0.1.1_universal.dmg`,
-      size: "13.9 MB",
+      url: `${GITHUB_REPO}/releases/download/${LATEST_VERSION}/Stash-Setup-0.1.2.dmg`,
+      size: "27.7 MB",
     },
     cliCommand: "brew install --cask stash",
     cliLabel: "Homebrew",
@@ -72,7 +64,7 @@ export const DOWNLOAD_PACKAGES: Record<OperatingSystem, PlatformDownloadInfo> = 
     badge: "Linux x64",
     primaryInstaller: {
       name: "Build from source (no Linux build yet)",
-      filename: "stash_0.1.1_amd64.AppImage",
+      filename: "stash_0.1.2_amd64.AppImage",
       ext: ".AppImage",
       arch: "x86_64",
       url: `${GITHUB_REPO}/releases`,
@@ -86,12 +78,12 @@ export const DOWNLOAD_PACKAGES: Record<OperatingSystem, PlatformDownloadInfo> = 
     osName: "Desktop",
     badge: "Windows & macOS",
     primaryInstaller: {
-      name: "Windows Setup Installer (.exe)",
-      filename: "Stash_0.1.1_x64-setup.exe",
+      name: "Stash Setup (.exe)",
+      filename: "Stash-Setup-0.1.2.exe",
       ext: ".exe",
       arch: "x64",
-      url: `${GITHUB_REPO}/releases/download/${LATEST_VERSION}/Stash_0.1.1_x64-setup.exe`,
-      size: "4.7 MB",
+      url: `${GITHUB_REPO}/releases/download/${LATEST_VERSION}/Stash-Setup-0.1.2.exe`,
+      size: "10.9 MB",
     },
     cliCommand: "winget install stash-app",
     cliLabel: "winget",
