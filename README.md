@@ -1,22 +1,43 @@
 <p align="center">
-  <img src="src/assets/logo.png" alt="Stash Desktop Logo" width="108" height="108" />
-</p>
-
-<h1 align="center">Stash</h1>
-
-<p align="center">
-  <strong>Capture it. Stash it. Personalize it. Find it instantly.</strong><br>
-  <em>A high-performance, local-first floating workspace utility for macOS and Windows.</em>
+  <img src="src/assets/logo.png" alt="Stash logo" width="96" height="96" />
 </p>
 
 <p align="center">
-  <a href="https://tauri.app/"><img src="https://img.shields.io/badge/Tauri-2.0-blue.svg?logo=tauri&logoColor=white" alt="Tauri 2" /></a>
-  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18-61dafb.svg?logo=react&logoColor=black" alt="React 18" /></a>
-  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.6-3178c6.svg?logo=typescript&logoColor=white" alt="TypeScript" /></a>
-  <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/Rust-1.77+-orange.svg?logo=rust&logoColor=white" alt="Rust" /></a>
-  <a href="https://sqlite.org/"><img src="https://img.shields.io/badge/SQLite-FTS5-003B57.svg?logo=sqlite&logoColor=white" alt="SQLite" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" /></a>
+  <img src=".github/readme/stash-banner.svg" alt="STASH — Capture it. Stash it. Find it instantly." width="100%" />
 </p>
+
+<p align="center">
+  <b>Stash</b> is a local-first floating notes app for macOS and Windows.<br>
+  Press <code>Ctrl/Cmd + Shift + N</code> anywhere and a note opens on top of whatever you're doing.<br>
+  Everything lives in a SQLite file on your machine, with instant full-text search and no cloud.
+</p>
+
+<p align="center">
+  <a href="https://github.com/itsnothyun/Stash/releases/latest"><b>Download</b></a> &nbsp;·&nbsp;
+  <a href="https://stash-gray.vercel.app"><b>Website</b></a> &nbsp;·&nbsp;
+  <a href="#key-features"><b>Features</b></a> &nbsp;·&nbsp;
+  <a href="#getting-started"><b>Build from source</b></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/itsnothyun/Stash/releases/latest"><img src="https://img.shields.io/github/v/release/itsnothyun/Stash?style=flat-square&label=release&labelColor=090909&color=262626" alt="Latest release" /></a>
+  <img src="https://img.shields.io/badge/Tauri-2-090909?style=flat-square&logo=tauri&logoColor=f2f2ed&labelColor=090909&color=262626" alt="{label} {msg}" />
+  <img src="https://img.shields.io/badge/Rust-1.77+-090909?style=flat-square&logo=rust&logoColor=f2f2ed&labelColor=090909&color=262626" alt="{label} {msg}" />
+  <img src="https://img.shields.io/badge/React-18-090909?style=flat-square&logo=react&logoColor=f2f2ed&labelColor=090909&color=262626" alt="{label} {msg}" />
+  <img src="https://img.shields.io/badge/SQLite-FTS5-090909?style=flat-square&logo=sqlite&logoColor=f2f2ed&labelColor=090909&color=262626" alt="{label} {msg}" />
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-090909?style=flat-square&labelColor=090909&color=262626" alt="{label} {msg}" /></a>
+</p>
+
+---
+
+## Download
+
+| Platform | File | Notes |
+| :--- | :--- | :--- |
+| **Windows 10 / 11** | [`Stash-Setup-0.1.3.exe`](https://github.com/itsnothyun/Stash/releases/latest) | Run the installer; SmartScreen may ask once |
+| **macOS** | [`Stash-Setup-0.1.3.dmg`](https://github.com/itsnothyun/Stash/releases/latest) | Drag `Stash.app` to Applications |
+
+Older builds are on the [Releases](https://github.com/itsnothyun/Stash/releases) page.
 
 ---
 
